@@ -1,0 +1,32 @@
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled output
+/tmp
+/out-tsc
+/dist
+/build
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# IDE / Editor specific
+# Ignore the .vscode directory, but allow team-shared settings
+/.vscode/*
+!/.vscode/settings.json
+!/.vscode/extensions.json
+!/.vscode/launch.json
+
+# Secrets / Environment variables
+# Never commit secrets, tokens, or API keys!
+voAppToke
+.env
+.env.*.local
+
+# OS generated files
+.DS_Store
+Thumbs.db

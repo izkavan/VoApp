@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoApp - The Voice Over Application</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>VoApp - The Voice Over Application</h1>
+            <div class="header-buttons">
+                <button id="new-character-button">New Character</button>
+                <button id="new-project-button">New Project</button>
+                <button id="import-project-button">Import Project</button>
+            </div>
+        </header>
+        <main>
+            <div id="filter-section">
+                <div id="active-tags-container"></div>
+                <input id="filter-tags" placeholder="Filter by tags...">
+                <div id="tag-suggestions"></div>
+                <div id="exclusive-toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="exclusive-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Exclusive Search</span>
+                </div>
+            </div>
+            <div id="character-list">
+                <!-- Character cards will be dynamically inserted here -->
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="hidden">
+        <div id="modal-content">
+            <span id="modal-close">&times;</span>
+            <div id="modal-view-content"></div>
+        </div>
+    </div>
+
+    <div id="project-modal" class="hidden">
+        <div id="modal-content">
+            <span id="project-modal-close">&times;</span>
+            <h2>Edit Project</h2>
+            <input id="project-name" placeholder="Project Name">
+            <textarea id="project-description" placeholder="Project Description"></textarea>
+            <input id="project-licensing" placeholder="Licensing">
+            <label for="project-start-date">Start Date:</label>
+            <input type="date" id="project-start-date">
+            <label for="project-end-date">End Date:</label>
+            <input type="date" id="project-end-date">
+            <button id="save-project-button">Save Project</button>
+            <button id="export-project-button">Export Project</button>
+            <button id="delete-project-button">Delete Project</button>
+        </div>
+    </div>
+
+    <div id="theme-toggle" class="theme-toggle">
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "jszip": "https://esm.run/jszip"
+        }
+    }
+    </script>
+    <script src="index.js" type="module"></script>
+</body>
+</html>

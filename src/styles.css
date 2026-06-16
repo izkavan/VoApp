@@ -1,0 +1,376 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #b8b8b8;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#app {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #dddddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+header {
+    background-color: #744abd;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.header-buttons button {
+    background-color: #fff;
+    color: #744abd;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: right;
+}
+
+main {
+    padding: 20px;
+}
+
+#filter-section {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#character-list {
+    display: block;
+}
+
+.project-section {
+    margin-bottom: 20px;
+    border: 2px dashed transparent;
+    padding: 10px;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+.project-section.drag-over {
+    border-color: #4a69bd;
+}
+
+.project-header {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #4a69bd;
+}
+
+.character-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.character-card {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    cursor: pointer;
+    transition: box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
+    text-align: center;
+}
+
+.character-card.dragging {
+    opacity: 0.5;
+}
+
+.character-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.character-card-artwork {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+button {
+    background-color: #4a69bd;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button#delete-project-button {
+    background-color: #dc3545;
+    margin-left: auto;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#modal, #project-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+#modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#modal-close, #project-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    transition: border-color 0.3s;
+}
+
+.modal-artwork-container, .modal-artwork-edit-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.modal-artwork, .modal-artwork-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.artwork-input-section {
+    width: 150px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.custom-file-input {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.file-name {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #555;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#tag-container, .tag-view, #active-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.tag-item {
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.tag-close {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#tag-suggestions {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    width: 100%;
+    z-index: 99;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+#exclusive-toggle-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-right: 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4a69bd;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* --- Dark Mode --- */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+}
+body.dark-mode #app {
+    background: #2c2c2c;
+}
+body.dark-mode .character-card {
+    background: #3a3a3a;
+    border-color: #555;
+}
+body.dark-mode textarea, body.dark-mode input {
+    background-color: #252525;
+    color: #f0f0f0;
+    border-color: #555;
+}
+body.dark-mode #modal-content {
+    background: #2c2c2c;
+}
+body.dark-mode .modal-footer {
+    border-top-color: #444;
+}
+body.dark-mode .tag-item {
+    background-color: #555;
+}
+body.dark-mode #tag-suggestions {
+    background-color: #3a3a3a;
+    border-color: #555;
+}
+body.dark-mode .suggestion-item:hover {
+    background-color: #4a4a4a;
+}
+body.dark-mode .custom-file-input {
+    background-color: #3a3a3a;
+    border-color: #555;
+}
+
+/* --- Theme Toggle --- */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+body.dark-mode .theme-toggle {
+    background-color: #2c2c2c;
+}
+.theme-toggle svg {
+    color: #333;
+}
+body.dark-mode .theme-toggle svg {
+    color: #f0f0f0;
+}
