@@ -22,6 +22,7 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 This is just the beginning! Here are some of the features planned for the future to make Vo-App even more useful:
 
 *   **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
+* **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character. When you export the lines, you can choose how the file paths are structured, so it can be character_name/line1, or character_name/LineOverview, or whatever else is needed. May need to look into industry workflows.
 
 
 Thanks for checking out Vo-App. I hope it helps you bring your characters to life!
