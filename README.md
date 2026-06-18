@@ -18,13 +18,17 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 *   **Duplicate & Delete**: Quickly duplicate or delete characters from the character detail view.
 *   **Persistent Storage**: All your characters, projects, and voice samples are saved right in your browser's local storage, so they'll be there the next time you open the app.
 *   **Character Packager**: Package a set of your characters into a single zip file to share with friends or move between computers.
-* 
+* **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character.
+
+
 ## What's Coming Next?
 
 This is just the beginning! Here are some of the features planned for the future to make Vo-App even more useful:
 
+* **System Preferences**: Select how you want your files downloaded/stored. Webm, wav, mp3, flac, etc.
+
 *   **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
-* **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character. When you export the lines, you can choose how the file paths are structured, so it can be character_name/line1, or character_name/LineOverview, or whatever else is needed. May need to look into industry workflows.
+* **Line Reader Updates**:  When you export the lines, you can choose how the file paths are structured, so it can be character_name/line1, or character_name/LineOverview, or whatever else is needed. May need to look into industry workflows.
 * **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. 
 * **Vocal Warmup/Practice**: Record and play back various vocal warmups, flag them as your favorites, or tag them with specific voices that you prefer to work with or that need more practice. 
 * **Vocal Actor Specific Features/mode**: 

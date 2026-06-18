@@ -212,7 +212,6 @@ async function saveCharacterHandler(characterId: number | null) {
     const name = (document.getElementById('edit-name') as HTMLInputElement).value;
     const description = (document.getElementById('edit-description') as HTMLTextAreaElement).value;
     const voice_description = (document.getElementById('edit-voice') as HTMLTextAreaElement).value;
-    const sampleFile = (document.getElementById('edit-sample') as HTMLInputElement).files?.[0];
     const artworkFile = (document.getElementById('edit-artwork') as HTMLInputElement).files?.[0];
     const projectId = parseInt((document.getElementById('character-project') as HTMLSelectElement).value);
     const tagElements = document.querySelectorAll('#tag-container .tag-item');
@@ -233,5 +232,5 @@ async function saveCharacterHandler(characterId: number | null) {
         voice_sample: existingCharacter?.voice_sample,
     };
 
-    await saveCharacterCallback(characterToSave, artworkFile, sampleFile, recordedSample);
+    await saveCharacterCallback(characterToSave, artworkFile, undefined, recordedSample);
 }

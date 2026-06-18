@@ -5,6 +5,9 @@ import { initializeCharacterModal, openModal, closeModal } from './character-mod
 import { initializeProjectModal, openProjectModal, closeProjectModal, saveProject } from './project-modal.js';
 import { initializeFilterSearch, filterCharacters } from './filter-search.js';
 import { initializeTheme } from './theme.js';
+import { initializeNavigation } from './navigation.js';
+import { initializeVoiceActorView } from './voice-actor-view.js';
+import { initializeLineReader } from './line-reader.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -239,4 +242,7 @@ initializeFilterSearch(
 );
 
 initializeTheme();
+initializeNavigation();
+initializeVoiceActorView();
+initializeLineReader(characters, projects, openModal);
 renderApp();

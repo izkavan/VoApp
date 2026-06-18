@@ -7,32 +7,82 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>VoApp - The Voice Over Application</h1>
-            <div class="header-buttons">
-                <button id="new-character-button">New Character</button>
-                <button id="new-project-button">New Project</button>
-                <button id="import-project-button">Import Project</button>
+    <div class="app-container">
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#" id="nav-character-library" class="active">Character Library</a></li>
+                <li><a href="#" id="nav-voice-actors">Voice Actor View</a></li>
+            </ul>
+        </nav>
+
+        <div id="character-library-view" class="view">
+            <div id="app">
+                <header>
+                    <h1>Vocal Characters</h1>
+                    <div class="header-buttons">
+                        <button id="new-character-button">New Character</button>
+                        <button id="new-project-button">New Project</button>
+                        <button id="import-project-button">Import Project</button>
+                    </div>
+                </header>
+                <main>
+                    <div id="filter-section">
+                        <div id="active-tags-container"></div>
+                        <input id="filter-tags" placeholder="Filter by tags...">
+                        <div id="tag-suggestions"></div>
+                        <div id="exclusive-toggle-container">
+                            <label class="switch">
+                                <input type="checkbox" id="exclusive-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Exclusive Search</span>
+                        </div>
+                    </div>
+                    <div id="character-list">
+                        <!-- Character cards will be dynamically inserted here -->
+                    </div>
+                </main>
             </div>
-        </header>
-        <main>
-            <div id="filter-section">
-                <div id="active-tags-container"></div>
-                <input id="filter-tags" placeholder="Filter by tags...">
-                <div id="tag-suggestions"></div>
-                <div id="exclusive-toggle-container">
-                    <label class="switch">
-                        <input type="checkbox" id="exclusive-toggle">
-                        <span class="slider"></span>
-                    </label>
-                    <span>Exclusive Search</span>
+        </div>
+
+        <div id="voice-actor-view" class="view hidden">
+            <div class="tab-container">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="scripts">Scripts</button>
+                    <button class="tab-link" data-tab="auditions">Auditions</button>
+                    <button class="tab-link" data-tab="misc">Misc</button>
+                </div>
+                <div id="scripts" class="tab-content active">
+                    <h2>Line Reader</h2>
+                    <label for="script-file-input" class="custom-file-input">Upload Script</label>
+                    <input type="file" id="script-file-input" accept=".txt,.zip">
+                    <input type="text" id="script-name-input" placeholder="Script Name..." />
+                    <select id="script-project-select"></select>
+                    <div id="line-container"></div>
+                    <div class="line-reader-controls">
+                        <button id="read-button">Read</button>
+                        <button id="omit-button">Omit</button>
+                        <button id="remit-button">Remit</button>
+                        <button id="reset-button">Reset</button>
+                    </div>
+                    <div class="read-view-wrapper">
+                        <div id="read-container"></div>
+                        <div id="read-details"></div>
+                    </div>
+                    <div class="script-save-container">
+                        <button id="save-button">Save Script</button>
+                    </div>
+                </div>
+                <div id="auditions" class="tab-content">
+                    <h2>Auditions</h2>
+                    <p>Feature coming soon.</p>
+                </div>
+                <div id="misc" class="tab-content">
+                    <h2>Misc</h2>
+                    <p>Undecided work goes here.</p>
                 </div>
             </div>
-            <div id="character-list">
-                <!-- Character cards will be dynamically inserted here -->
-            </div>
-        </main>
+        </div>
     </div>
 
     <div id="modal" class="hidden">
@@ -53,9 +103,11 @@
             <input type="date" id="project-start-date">
             <label for="project-end-date">End Date:</label>
             <input type="date" id="project-end-date">
-            <button id="save-project-button">Save Project</button>
-            <button id="export-project-button">Export Project</button>
-            <button id="delete-project-button">Delete Project</button>
+            <div class="modal-footer">
+                <button id="delete-project-button">Delete Project</button>
+                <button id="export-project-button">Export Project</button>
+                <button id="save-project-button">Save Project</button>
+            </div>
         </div>
     </div>
 
