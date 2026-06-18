@@ -281,5 +281,10 @@ export function initializeLineReader(characters, projects, openCharacterModal) {
     remitButton?.addEventListener('click', () => { if (selectedLine) {
         selectedLine.classList.remove('read', 'omitted');
     } });
-    resetButton?.addEventListener('click', resetUI);
+    resetButton?.addEventListener('click', () => {
+        const confirmed = confirm("Are you sure you want to reset? All line statuses, notes, and recorded audio takes for this script will be lost.");
+        if (confirmed) {
+            resetUI();
+        }
+    });
 }

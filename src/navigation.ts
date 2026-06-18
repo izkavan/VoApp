@@ -1,24 +1,34 @@
-const navCharacterLibrary = document.getElementById('nav-character-library');
-const navVoiceActors = document.getElementById('nav-voice-actors');
-const characterLibraryView = document.getElementById('character-library-view');
-const voiceActorView = document.getElementById('voice-actor-view');
-
 export function initializeNavigation() {
-    navCharacterLibrary?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showView('character-library');
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const views = document.querySelectorAll('.view');
+
+    const navCharacterLibrary = document.getElementById('nav-character-library');
+    const navVoiceActors = document.getElementById('nav-voice-actors');
+    const navUtilities = document.getElementById('nav-utilities');
+
+    const characterLibraryView = document.getElementById('character-library-view');
+    const voiceActorView = document.getElementById('voice-actor-view');
+    const utilityView = document.getElementById('utility-view');
+
+    const showView = (viewToShow: HTMLElement) => {
+        views.forEach(view => (view as HTMLElement).classList.add('hidden'));
+        viewToShow.classList.remove('hidden');
+    };
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            const id = link.id;
+            if (id === 'nav-character-library' && characterLibraryView) {
+                showView(characterLibraryView);
+            } else if (id === 'nav-voice-actors' && voiceActorView) {
+                showView(voiceActorView);
+            } else if (id === 'nav-utilities' && utilityView) {
+                showView(utilityView);
+            }
+        });
     });
-
-    navVoiceActors?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showView('voice-actors');
-    });
-}
-
-function showView(viewName: 'character-library' | 'voice-actors') {
-    characterLibraryView?.classList.toggle('hidden', viewName !== 'character-library');
-    voiceActorView?.classList.toggle('hidden', viewName !== 'voice-actors');
-
-    navCharacterLibrary?.classList.toggle('active', viewName === 'character-library');
-    navVoiceActors?.classList.toggle('active', viewName !== 'character-library');
 }

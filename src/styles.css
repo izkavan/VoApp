@@ -365,6 +365,7 @@ body.dark-mode .tab-link { color: #aaa; }
 body.dark-mode .tab-link.active { background-color: #3a3a3a; color: #fff; }
 body.dark-mode .tab-content { background-color: #3a3a3a; }
 body.dark-mode #line-container, body.dark-mode #read-container, body.dark-mode #read-details { background-color: #252525; color: #f0f0f0; border-color: #555; }
+body.dark-mode .warm-up-container { background-color: #252525; border-color: #555; }
 
 /* --- Theme Toggle --- */
 .theme-toggle {
@@ -498,3 +499,23 @@ body.dark-mode .theme-toggle svg { color: #f0f0f0; }
     border: 1px solid #ddd;
 }
 .notes-area { width: 100%; min-height: 80px; margin-top: 10px; }
+
+/* Utility View Styles */
+.warm-up-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.warm-up-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+#warm-up-audio-player {
+    flex-grow: 1;
+}
+#warm-up-audio-player audio {
+    width: 100%;
+}

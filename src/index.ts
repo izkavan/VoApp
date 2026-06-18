@@ -8,6 +8,7 @@ import { initializeTheme } from './theme.js';
 import { initializeNavigation } from './navigation.js';
 import { initializeVoiceActorView } from './voice-actor-view.js';
 import { initializeLineReader } from './line-reader.js';
+import { initializeUtilityView } from './utility-view.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -245,4 +246,5 @@ initializeTheme();
 initializeNavigation();
 initializeVoiceActorView();
 initializeLineReader(characters, projects, openModal);
+initializeUtilityView();
 renderApp();
