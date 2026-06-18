@@ -1,6 +1,8 @@
 # Vo-App: Your Personal Vocal Character Library
 
-Welcome to Vo-App! This is a simple, lightweight tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
+Welcome to Vo-App! This is a "simple", lightweight tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
+
+As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others find common ground on.
 
 ## What can you do right now?
 
@@ -38,8 +40,24 @@ This is just the beginning! Here are some of the features planned for the future
 3. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
 4. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
 
+* **Advanced Craft & Professional Tools:**
+1. **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
+2. **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
+3. **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc.
+4.**Effort & Grunt Library:** A special category for recording and tagging non-dialogue vocalizations (grunts, yells, laughs, etc.) to build a reusable library for action-heavy roles. I don't know if this needs to be per character, or if a different tagging system should be put in place. 
+
+* **Immersion & Storytelling Tools:**
+1. **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
+
+* **Community & Platform Features:** I don't know how this would work without being hosted centrally, so this is a very very low priority. 
+1. **Community Sharing:** An opt-in platform to share and download "Vocal Recipes" or character templates to get a head start on new projects. 
+2. **Community Assistance**: Be able to post a voice to get feedback and review on the work-- Tag it with assistance tags or requests on specific features (Breath control, recovery, etc)
+3. **Gamified Practice Tracking:** A personal dashboard to track your practice habits and earn badges for milestones, encouraging consistent vocal work. Could have a leaderboard?
+4. **Recruiter Browser**: Oh man, it would be sick if an extension of the sharing and assistance allowed headhunters a centralized location to be able to browse through people's samples or profiles and send messages. We'd need a way to vet who is a recruiter, that isn't prohibitive. 
+
 Thanks for checking out Vo-App. I hope it helps you bring your characters to life!
 
+If you feel like this project is fun enough to kick a few bucks to, check me out on https://ko-fi.com/izkavan!
 
 
 Dependencies:
