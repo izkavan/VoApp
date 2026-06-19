@@ -20,6 +20,8 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 *   **Character Packager**: Package a set of your characters into a single zip file to share with friends or move between computers.
 * **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character.
 * **Vocal Warm-Ups**: Enjoy a vocal warmup area, which lets you record a sample and play it back of a block of text that should get your voice nice and ready for work.
+* **Audition tracker**: A section to log audition submissions. An entry could include the project name, casting director, due date, script sides, and a status (e.g., Submitted, Callback, Booked, Rejected). Users could link characters from their library to auditions they used them for, or even a whole export zip to keep track of what files were sent.
+* * **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project!
 
 
 ## What's Coming Next?
@@ -35,14 +37,13 @@ This is just the beginning! Here are some of the features planned for the future
 6. Full Backup - If you need to move to another machine, or want to perform routine backup.
 
 *   **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
-* **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project! Would pair really well with the sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
+* **Voice Memos** Would pair really well with the sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
 * **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. 
 * **Vocal Warmup/Practice updates**: Record and play back different vocal warmups, flag them as your favorites, or tag them with specific voices that you prefer to work with or that need more practice. Probably a dropdown of the "common" ones, or a list selector that lets you store your ratings.
 
 * Waveform viewer with all audio (optional expand to see)
 
 * **Vocal Actor Specific Features/mode**: 
-* A new section to log audition submissions. An entry could include the project name, casting director, due date, script sides, and a status (e.g., Submitted, Callback, Booked, Rejected). Users could link characters from their library to auditions they used them for, or even a whole export zip to keep track of what files were sent.
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
 * Script/Line Management; This comes in two subpoints, so it's a list in a list (Pointy Hat would be proud)
 1. Take Management - When a user records multiple takes for a single line, allow them to rate each take (e.g., with stars), add notes ("a bit faster," "more energy"), and quickly A/B test two takes against each other.

@@ -2,21 +2,35 @@ import { Character, Project } from './types.js';
 import JSZip from 'jszip';
 
 // In-memory representation
+interface TakeDetail {
+    audioData: string;
+    rating: number;
+    notes: string;
+    title?: string;
+}
+
 interface LineDetail {
     text: string;
     lineName: string;
     characterId?: number;
     notes: string;
-    takes: string[]; // Array of Base64 data URLs for the audio
+    takes: TakeDetail[]; // Array of TakeDetail
 }
 
 // JSON representation
+interface SavedTakeDetail {
+    path: string;
+    rating: number;
+    notes: string;
+    title?: string;
+}
+
 interface SavedLineDetail {
     text: string;
     lineName: string;
     characterId?: number;
     notes: string;
-    takePaths: string[]; // Array of paths within the zip
+    takes: SavedTakeDetail[];
 }
 
 interface SavedScript {
@@ -32,6 +46,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
     const projectSelect = document.getElementById('script-project-select') as HTMLSelectElement;
+    const filterSelect = document.getElementById('line-filter-select') as HTMLSelectElement;
     const lineContainer = document.getElementById('line-container');
     const readContainer = document.getElementById('read-container');
     const readDetailsContainer = document.getElementById('read-details');
@@ -50,6 +65,93 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
     // Populate Project Dropdown
     projectSelect.innerHTML = `<option value="">--Select Project--</option>${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
+    
+    const getAvailableCharacters = () => {
+        const selectedProjectId = projectSelect?.value ? Number(projectSelect.value) : undefined;
+        if (selectedProjectId !== undefined && !isNaN(selectedProjectId)) {
+            return characters.filter(c => c.projectId === selectedProjectId);
+        }
+        return characters;
+    };
+
+    const updateCharacterDropdowns = () => {
+        const availableCharacters = getAvailableCharacters();
+        if (filterSelect) {
+            const currentFilter = filterSelect.value;
+            filterSelect.innerHTML = `<option value="all">No Filter</option><option value="unassigned">Unassigned</option>${availableCharacters.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}`;
+            if (Array.from(filterSelect.options).some(o => o.value === currentFilter)) {
+                filterSelect.value = currentFilter;
+            } else {
+                filterSelect.value = 'all';
+            }
+        }
+    };
+
+    updateCharacterDropdowns();
+
+    projectSelect?.addEventListener('change', () => {
+        updateCharacterDropdowns();
+        const availableCharacters = getAvailableCharacters();
+        const availableIds = new Set(availableCharacters.map(c => c.id));
+        
+        lineDetails.forEach(detail => {
+            if (detail.characterId !== undefined && !availableIds.has(detail.characterId)) {
+                detail.characterId = undefined;
+            }
+        });
+
+        if (selectedReadLine && selectedReadLine.textContent) {
+            renderDetails(selectedReadLine.textContent);
+        }
+        updateLineContainerUI();
+    });
+
+    const updateLineContainerUI = () => {
+        const filterValue = filterSelect?.value || 'all';
+        [lineContainer, readContainer].forEach(container => {
+            if (!container) return;
+            Array.from(container.children).forEach(child => {
+                const lineDiv = child as HTMLElement;
+                const lineText = lineDiv.getAttribute('data-line-text') || lineDiv.textContent || '';
+                if (!lineDiv.hasAttribute('data-line-text')) {
+                    lineDiv.setAttribute('data-line-text', lineText);
+                }
+
+                const detail = lineDetails.get(lineText);
+                const charId = detail?.characterId;
+                
+                let visible = true;
+                if (filterValue !== 'all') {
+                    if (filterValue === 'unassigned') {
+                        visible = (charId === undefined || isNaN(charId));
+                    } else {
+                        visible = (charId === Number(filterValue));
+                    }
+                }
+                lineDiv.style.display = visible ? 'flex' : 'none';
+
+                if (lineDiv.classList.contains('read') && charId !== undefined && !isNaN(charId)) {
+                    const char = characters.find(c => c.id === charId);
+                    if (char && char.artwork) {
+                        let img = lineDiv.querySelector('.line-character-icon') as HTMLImageElement;
+                        if (!img) {
+                            lineDiv.innerHTML = `<span class="line-entry-text">${lineText}</span><img class="line-character-icon" src="${char.artwork}">`;
+                        } else {
+                            img.src = char.artwork;
+                        }
+                    } else {
+                        lineDiv.innerHTML = `<span class="line-entry-text">${lineText}</span>`;
+                    }
+                } else {
+                    if (lineDiv.querySelector('.line-character-icon') || lineDiv.querySelector('.line-entry-text')) {
+                        lineDiv.textContent = lineText;
+                    }
+                }
+            });
+        });
+    };
+
+    filterSelect?.addEventListener('change', updateLineContainerUI);
 
     const renderDetails = (lineText: string) => {
         if (!readDetailsContainer) return;
@@ -67,12 +169,28 @@ export function initializeLineReader(characters: Character[], projects: Project[
             <div class="character-selector">
                 <select id="line-character-select">
                     <option value="">--Select Character--</option>
-                    ${characters.map(c => `<option value="${c.id}" ${c.id === details.characterId ? 'selected' : ''}>${c.name}</option>`).join('')}
+                    ${getAvailableCharacters().map(c => `<option value="${c.id}" ${c.id === details.characterId ? 'selected' : ''}>${c.name}</option>`).join('')}
                 </select>
                 ${artworkImage}
             </div>
             <button id="record-take-button" class="record-button">●</button>
-            <ul id="takes-list" class="takes-list">${details.takes.map((take, index) => `<li class="take-item" data-index="${index}"><audio controls src="${take}"></audio><span class="delete-take">🗑️</span></li>`).join('')}</ul>
+            <ul id="takes-list" class="takes-list">
+                ${details.takes.map((take, index) => `
+                <li class="take-item" data-index="${index}">
+                    <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
+                    <div class="take-audio-controls">
+                        <audio controls src="${take.audioData}"></audio>
+                        <span class="delete-take">🗑️</span>
+                    </div>
+                    <div class="take-metadata">
+                        <div class="star-rating">
+                            ${[1, 2, 3, 4, 5].map(star => `<span class="star ${star <= take.rating ? 'active' : ''}" data-value="${star}">★</span>`).join('')}
+                        </div>
+                        <input type="text" class="take-note-input" placeholder="Take notes..." value="${take.notes.replace(/"/g, '&quot;')}" />
+                    </div>
+                </li>
+                `).join('')}
+            </ul>
             <textarea id="line-notes" class="notes-area" placeholder="Notes...">${details.notes}</textarea>
         `;
 
@@ -81,13 +199,28 @@ export function initializeLineReader(characters: Character[], projects: Project[
         document.getElementById('line-character-select')?.addEventListener('change', (e) => {
             details.characterId = Number((e.target as HTMLSelectElement).value);
             renderDetails(lineText);
+            updateLineContainerUI();
         });
         document.getElementById('line-character-art')?.addEventListener('click', () => { if (associatedCharacter) openCharacterModal(associatedCharacter); });
         document.getElementById('line-notes')?.addEventListener('input', (e) => { details.notes = (e.target as HTMLTextAreaElement).value; });
         document.querySelectorAll('.delete-take').forEach(btn => btn.addEventListener('click', (e) => {
-            const index = Number((e.currentTarget as HTMLElement).parentElement?.dataset.index);
+            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             details.takes.splice(index, 1);
             renderDetails(lineText);
+        }));
+        document.querySelectorAll('.take-note-input').forEach(input => input.addEventListener('input', (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+            details.takes[index].notes = (e.target as HTMLInputElement).value;
+        }));
+        document.querySelectorAll('.star').forEach(star => star.addEventListener('click', (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+            const rating = Number((e.currentTarget as HTMLElement).getAttribute('data-value'));
+            details.takes[index].rating = rating;
+            renderDetails(lineText);
+        }));
+        document.querySelectorAll('.take-title-input').forEach(input => input.addEventListener('input', (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+            details.takes[index].title = (e.target as HTMLInputElement).value;
         }));
     };
 
@@ -136,7 +269,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 if (lineText) {
                     const details = lineDetails.get(lineText);
                     if (details) {
-                        details.takes.unshift(base64Audio);
+                        details.takes.unshift({ audioData: base64Audio, rating: 0, notes: '', title: '' });
                         renderDetails(lineText);
                     }
                 }
@@ -173,6 +306,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     lineContainer.appendChild(lineDiv);
                 }
             });
+            updateLineContainerUI();
         };
         reader.readAsText(file);
     };
@@ -213,16 +347,23 @@ export function initializeLineReader(characters: Character[], projects: Project[
             });
 
             for (const savedDetail of scriptData.lineDetails) {
-                const takesAsBase64: string[] = [];
-                for (const path of savedDetail.takePaths) {
-                    const takeFile = zip.file(path);
+                const loadedTakes: TakeDetail[] = [];
+                for (const savedTake of (savedDetail.takes || [])) {
+                    const takeFile = zip.file(savedTake.path);
                     if (takeFile) {
                         const blob = await takeFile.async('blob');
-                        takesAsBase64.push(await blobToBase64(blob));
+                        loadedTakes.push({
+                            audioData: await blobToBase64(blob),
+                            rating: savedTake.rating,
+                            notes: savedTake.notes,
+                            title: savedTake.title || ''
+                        });
                     }
                 }
-                lineDetails.set(savedDetail.text, { ...savedDetail, takes: takesAsBase64 });
+                lineDetails.set(savedDetail.text, { ...savedDetail, takes: loadedTakes });
             }
+            if (projectSelect) projectSelect.dispatchEvent(new Event('change'));
+            updateLineContainerUI();
         } catch (error) {
             console.error("Error loading script from zip:", error);
             alert("Failed to load script. The file may be corrupted or in the wrong format.");
@@ -259,6 +400,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     }
                 }
             }
+            updateLineContainerUI();
         }
     });
 
@@ -283,17 +425,17 @@ export function initializeLineReader(characters: Character[], projects: Project[
             const lineFolder = audioFolder.folder(detail.lineName);
             if (!lineFolder) continue;
 
-            const takePaths: string[] = [];
+            const jsonTakes: SavedTakeDetail[] = [];
             for (let i = 0; i < detail.takes.length; i++) {
-                const takeBase64 = detail.takes[i];
+                const take = detail.takes[i];
                 const path = `audio/${detail.lineName}/${i + 1}.webm`;
-                takePaths.push(path);
+                jsonTakes.push({ path, rating: take.rating, notes: take.notes, title: take.title });
 
-                const response = await fetch(takeBase64);
+                const response = await fetch(take.audioData);
                 const blob = await response.blob();
                 lineFolder.file(`${i + 1}.webm`, blob);
             }
-            jsonLineDetails.push({ text: detail.text, lineName: detail.lineName, characterId: detail.characterId, notes: detail.notes, takePaths: takePaths });
+            jsonLineDetails.push({ text: detail.text, lineName: detail.lineName, characterId: detail.characterId, notes: detail.notes, takes: jsonTakes });
         }
 
         const linesToSave = Array.from(lineContainer?.querySelectorAll('.line-entry') || []).map(line => {
@@ -319,13 +461,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
         URL.revokeObjectURL(url);
     });
 
-    omitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read'); selectedLine.classList.add('omitted'); } });
-    remitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read', 'omitted'); } });
+    omitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read'); selectedLine.classList.add('omitted'); updateLineContainerUI(); } });
+    remitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read', 'omitted'); updateLineContainerUI(); } });
 
     resetButton?.addEventListener('click', () => {
         const confirmed = confirm("Are you sure you want to reset? All line statuses, notes, and recorded audio takes for this script will be lost.");
         if (confirmed) {
             resetUI();
+            updateLineContainerUI();
         }
     });
 }
