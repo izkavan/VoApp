@@ -93,11 +93,53 @@
         </div>
 
         <div id="utility-view" class="view hidden">
-            <h2>Vocal Warm Ups</h2>
-            <div id="warm-up-text" class="warm-up-container"></div>
-            <div class="warm-up-controls">
-                <button id="warm-up-record-button" class="record-button">●</button>
-                <div id="warm-up-audio-player"></div>
+            <div class="tab-container">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="warm-ups">Vocal Warm Ups</button>
+                    <button class="tab-link" data-tab="voice-memos">Voice Memos</button>
+                </div>
+                <div id="warm-ups" class="tab-content active">
+                    <h2>Vocal Warm Ups</h2>
+                    <div id="warm-up-text" class="warm-up-container"></div>
+                    <div class="warm-up-controls">
+                        <button id="warm-up-record-button" class="record-button">●</button>
+                        <div id="warm-up-audio-player"></div>
+                    </div>
+                </div>
+                <div id="voice-memos" class="tab-content">
+                    <div class="voice-memo-header">
+                        <h2>Voice Memos</h2>
+                        <button id="new-voice-memo-button">New Voice Memo</button>
+                    </div>
+                    <div class="voice-memo-controls">
+                        <div class="voice-memo-filters">
+                            <input type="text" id="voice-memo-search-tags" placeholder="Search by tag...">
+                        </div>
+                        <div class="voice-memo-actions">
+                            <div class="left-actions">
+                                <button id="export-voice-memos-button">Export Selected to ZIP</button>
+                                <button id="delete-voice-memos-button">Delete Selected</button>
+                            </div>
+                            <div class="right-actions">
+                                <div id="important-first-toggle-container">
+                                    <label class="switch">
+                                        <input type="checkbox" id="voice-memo-sort-important-first">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span>Important First</span>
+                                </div>
+                                <select id="voice-memo-sort-select">
+                                    <option value="date">Sort by Date</option>
+                                    <option value="name">Sort by Name</option>
+                                    <option value="size">Sort by Size</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="voice-memo-list" class="voice-memo-list">
+                        <!-- Voice memos will be dynamically inserted here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -132,6 +174,40 @@
         <div id="modal-content">
             <span id="audition-modal-close">&times;</span>
             <div id="audition-modal-content"></div>
+        </div>
+    </div>
+
+    <div id="voice-memo-modal" class="hidden">
+        <div id="modal-content">
+            <span id="voice-memo-modal-close">&times;</span>
+            <h2>New Voice Memo</h2>
+            
+            <div class="voice-memo-record-section">
+                <button id="voice-memo-record-button" class="record-button">●</button>
+                <span id="voice-memo-record-status">Ready to record</span>
+                <div id="voice-memo-audio-preview"></div>
+            </div>
+
+            <input id="voice-memo-title" placeholder="Memo Title">
+            
+            <div class="tag-input-container">
+                <div id="voice-memo-active-tags-container"></div>
+                <input id="voice-memo-tags" placeholder="Add tags...">
+                <div id="voice-memo-tag-suggestions" class="tag-suggestions"></div>
+            </div>
+
+            <select id="voice-memo-project-select">
+                <option value="">Unassigned</option>
+            </select>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="voice-memo-importance">
+                <label for="voice-memo-importance">High Importance</label>
+            </div>
+
+            <div class="modal-footer">
+                <button id="save-voice-memo-button" disabled>Save Memo</button>
+            </div>
         </div>
     </div>
 

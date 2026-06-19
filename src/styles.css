@@ -254,7 +254,11 @@ input[type="file"] {
     display: none;
 }
 
-#tag-container, .tag-view, #active-tags-container {
+input[type="checkbox"] {
+    width: auto;
+}
+
+#tag-container, .tag-view, #active-tags-container, #voice-memo-active-tags-container {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
@@ -356,6 +360,7 @@ body.dark-mode textarea, body.dark-mode input, body.dark-mode select { backgroun
 body.dark-mode #modal-content, body.dark-mode #audition-modal #modal-content { background: #2c2c2c; }
 body.dark-mode .modal-footer { border-top-color: #444; }
 body.dark-mode .tag-item { background-color: #555; }
+body.dark-mode .voice-memo-item .tag-item, body.dark-mode #voice-memo-modal .tag-item { background-color: #444; }
 body.dark-mode #tag-suggestions { background-color: #3a3a3a; border-color: #555; }
 body.dark-mode .suggestion-item:hover { background-color: #4a4a4a; }
 body.dark-mode .custom-file-input { background-color: #3a3a3a; border-color: #555; }
@@ -587,4 +592,155 @@ body.dark-mode .theme-toggle svg { color: #f0f0f0; }
 }
 body.dark-mode .collapsible-header {
     background-color: #252525;
+}
+
+/* Additions for Voice Memos */
+.voice-memo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.voice-memo-controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.voice-memo-filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+#voice-memo-search-tags {
+    flex-grow: 1;
+}
+
+.voice-memo-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.left-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.right-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#important-first-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#voice-memo-sort-select {
+    width: auto;
+    min-width: 120px;
+}
+
+.voice-memo-item .tag-item, #voice-memo-modal .tag-item {
+    background-color: #c8c8c8;
+}
+
+.voice-memo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 2px solid #ccc;
+    min-height: 20vh;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+body.dark-mode .voice-memo-list {
+    border-color: #555;
+}
+
+.voice-memo-item {
+    background-color: var(--secondary-color);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.voice-memo-item:hover {
+    box-shadow: 0 0px 12px rgba(0,0,0,0.2);
+}
+
+.voice-memo-item.high-importance {
+    border-left: 5px solid purple;
+}
+
+.memo-checkbox {
+    transform: scale(1.5);
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.memo-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.memo-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.memo-header {
+    display: block;
+}
+
+.memo-date {
+    font-size: 0.8em;
+    color: #666;
+}
+
+body.dark-mode .memo-date {
+    color: #aaa;
+}
+
+.memo-meta {
+    font-size: 0.9em;
+    color: #555;
+}
+
+body.dark-mode .memo-meta {
+    color: #bbb;
+}
+
+.voice-memo-record-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    justify-content: flex-start;
 }

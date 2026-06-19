@@ -81,4 +81,6 @@ Typescript
 npm install --save-dev @types/jszip
 npm install --save-dev @types/node
 
-install/run via tsc
+install/run via npm
+
+npm run build && npx serve src

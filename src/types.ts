@@ -43,3 +43,13 @@ export interface Audition {
     linkedCharacterIds: number[];
     files: AuditionFile[];
 }
+
+export interface VoiceMemo {
+    id: number;
+    blob: Blob;
+    title: string;
+    tags: string[];
+    projectId?: number | null;
+    isHighImportance: boolean;
+    date: number; // timestamp
+}
