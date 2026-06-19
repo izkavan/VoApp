@@ -13,6 +13,7 @@ import { initializeAuditionView } from './audition-view.js';
 import { initializeTeleprompter } from './teleprompt.js';
 import { initializeDungeonMasterView, refreshDungeonMasterView } from './dungeon-master-view.js';
 import { initializeSettingsView } from './settings-view.js';
+import { initializeDictionaryModal, openDictionaryModal } from './dictionary-modal.js';
 import { SystemSettings } from './types.js';
 import JSZip from 'jszip';
 
@@ -47,6 +48,10 @@ const projectDescriptionInput = document.getElementById('project-description') a
 const projectLicensingInput = document.getElementById('project-licensing') as HTMLInputElement;
 const projectStartDateInput = document.getElementById('project-start-date') as HTMLInputElement;
 const projectEndDateInput = document.getElementById('project-end-date') as HTMLInputElement;
+
+// --- Dictionary Modal ---
+const dictionaryModalElement = document.getElementById('dictionary-modal') as HTMLElement;
+const dictionaryModalContentElement = document.getElementById('dictionary-modal-content') as HTMLElement;
 
 export function renderApp() {
     filterCharacters();
@@ -208,7 +213,7 @@ projects = loadedProjects;
 auditions = loadedAuditions;
 currentSettings = loadedSettings;
 
-initializeCharacterRenderer(openModal, openProjectModal);
+initializeCharacterRenderer(openModal, openProjectModal, openDictionaryModal);
 
 initializeCharacterModal(
     modalElement as HTMLElement,
@@ -219,6 +224,8 @@ initializeCharacterModal(
     duplicateCharacter,
     deleteCharacter
 );
+
+initializeDictionaryModal(dictionaryModalElement, dictionaryModalContentElement);
 
 initializeProjectModal(
     projectModalElement as HTMLElement,

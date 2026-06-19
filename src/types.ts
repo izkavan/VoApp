@@ -7,6 +7,15 @@ export interface Project {
     endDate?: string;
 }
 
+export interface DictionaryEntry {
+    id: string;
+    projectId: number;
+    word: string;
+    phonetic: string;
+    meaning: string;
+    audioData?: string;
+}
+
 export interface Character {
     id: number;
     name: string;

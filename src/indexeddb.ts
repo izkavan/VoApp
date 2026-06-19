@@ -1,8 +1,9 @@
-import { VoiceMemo } from './types.js';
+import { VoiceMemo, DictionaryEntry } from './types.js';
 
 const DB_NAME = 'VoAppDatabase';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented for dictionary store
 const VOICE_MEMOS_STORE = 'voice_memos';
+const DICTIONARY_STORE = 'dictionary';
 
 export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -21,6 +22,10 @@ export function initDB(): Promise<IDBDatabase> {
             const db = (event.target as IDBOpenDBRequest).result;
             if (!db.objectStoreNames.contains(VOICE_MEMOS_STORE)) {
                 db.createObjectStore(VOICE_MEMOS_STORE, { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(DICTIONARY_STORE)) {
+                const store = db.createObjectStore(DICTIONARY_STORE, { keyPath: 'id' });
+                store.createIndex('projectId', 'projectId', { unique: false });
             }
         };
     });
@@ -99,15 +104,59 @@ export async function deleteVoiceMemos(ids: number[]): Promise<void> {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([VOICE_MEMOS_STORE], 'readwrite');
         const store = transaction.objectStore(VOICE_MEMOS_STORE);
-        
+        ids.forEach(id => store.delete(id));
+
         transaction.oncomplete = () => {
             resolve();
         };
 
         transaction.onerror = (event) => {
-            reject((event.target as IDBRequest).error);
+            reject((event.target as IDBTransaction).error);
+        };
+    });
+}
+
+// --- Dictionary Operations ---
+
+export async function saveDictionaryEntries(entries: DictionaryEntry[]): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([DICTIONARY_STORE], 'readwrite');
+        const store = transaction.objectStore(DICTIONARY_STORE);
+        
+        entries.forEach(entry => store.put(entry));
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
+    });
+}
+
+export async function deleteDictionaryEntry(id: string): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([DICTIONARY_STORE], 'readwrite');
+        const store = transaction.objectStore(DICTIONARY_STORE);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function getDictionaryEntries(projectId: number): Promise<DictionaryEntry[]> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([DICTIONARY_STORE], 'readonly');
+        const store = transaction.objectStore(DICTIONARY_STORE);
+        const index = store.index('projectId');
+        const request = index.getAll(projectId);
+
+        request.onsuccess = (event) => {
+            resolve((event.target as IDBRequest<DictionaryEntry[]>).result);
         };
 
-        ids.forEach(id => store.delete(id));
+        request.onerror = (event) => {
+            reject((event.target as IDBRequest).error);
+        };
     });
 }

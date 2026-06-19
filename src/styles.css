@@ -229,7 +229,7 @@ textarea, input, select {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-#modal, #project-modal, #audition-modal {
+#modal, #project-modal, #audition-modal, #voice-memo-modal, #dictionary-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -239,7 +239,7 @@ textarea, input, select {
     z-index: 100;
 }
 
-#modal-content, #audition-modal #modal-content {
+#modal-content, #audition-modal #modal-content, #dictionary-modal #modal-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -252,6 +252,29 @@ textarea, input, select {
     max-height: 90vh;
     overflow-y: auto;
     transition: background-color 0.3s, color 0.3s;
+}
+
+.dictionary-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 3fr 100px 40px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.dictionary-header {
+    font-weight: bold;
+    border-bottom: 2px solid var(--gray-300);
+    padding-bottom: 5px;
+}
+.dictionary-row {
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gray-200);
+}
+.dictionary-add-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 #modal-close, #project-modal-close, #audition-modal-close {
@@ -415,8 +438,10 @@ body.dark-mode { background-color: var(--gray-1000); color: var(--gray-100); }
 body.dark-mode #app, body.dark-mode #settings-container { background: var(--gray-950); }
 body.dark-mode .character-card { background: var(--gray-900); border-color: var(--gray-800); }
 body.dark-mode textarea, body.dark-mode input, body.dark-mode select { background-color: var(--gray-975); color: var(--gray-100); border-color: var(--gray-800); }
-body.dark-mode #modal-content, body.dark-mode #audition-modal #modal-content { background: var(--gray-950); }
+body.dark-mode #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #dictionary-modal #modal-content { background: var(--gray-950); }
 body.dark-mode .modal-footer { border-top-color: var(--gray-850); }
+body.dark-mode .dictionary-header { border-bottom-color: var(--gray-850); }
+body.dark-mode .dictionary-row { border-bottom-color: var(--gray-875); }
 body.dark-mode .tag-item { background-color: var(--gray-800); }
 body.dark-mode .voice-memo-item .tag-item, body.dark-mode #voice-memo-modal .tag-item { background-color: var(--gray-850); }
 body.dark-mode #tag-suggestions { background-color: var(--gray-900); border-color: var(--gray-800); }

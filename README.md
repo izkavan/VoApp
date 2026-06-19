@@ -1,14 +1,16 @@
 # Vo-App: Your Personal Vocal Character Library
 
-Welcome to Vo-App! This is a "simple", lightweight tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
+Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
 
 As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on.
 
 ## What can you do right now?
 
-Vo-App is designed to be your go-to place for organizing your character voices. Here’s what you can do with the app in its current form:
+Vo-App is designed to be your go-to place for a number of voice-work related items. Here’s what you can do with the app in its current form:
 
-*   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates. A Project can contain characters-- both ones that you portray, or ones that other people work with for your reference!
+*   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates. 
+  * A Project can contain characters-- both ones that you portray, or ones that other people work with for your reference!
+  * A project can also have a dictionary-- sometimes fantasy words are weird, and you need a way to reference them!
 
 *   **Character Creation**: Easily create new characters with a name, description, and voice details.
 1. **Vocal Recipe:** A structured way to define a voice beyond a simple description. Use sliders or tags for Pitch (Low/High), Pace (Slow/Fast), Placement (Chest/Nasal), and Timbre (Gravelly/Smooth) to create a quick, reproducible blueprint for any voice.
@@ -42,7 +44,12 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 3. A spot to define microhpone, headset, mixer, preamp, etc. so that editors can be aware of what the devices are and what profiles might be needed
 4. Full Backup - If you need to move to another machine, or want to perform routine backup.
 
-
+## I'm a voice actor. What is this and how do I use it?
+//TODO, I'm working on it. There's a lot of moving pieces here.
+## I'm a dungeon master. What is this and how do I use it?
+//TODO, I'm working on it. There's a lot of moving pieces here.
+## I'm a director or producer, is this useful for me?
+//TODO, I'm working on it. There's a lot of moving pieces here.
 
 ## What's Coming Next?
 
@@ -60,6 +67,7 @@ Here are some of the features that I thought up for the app that could be coming
 ### Changes to the Character and Project Management
 * **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. Not trying to replace Pinterest.
 * **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc.
+* **Pronunciation Update**: If a script is uploaded for the line-reader or the teleprompter, we should detect words that match words in the dictionary for that project. If we find one, highlight it. When the user mouses over the word, it shows the phonetic, and the audio file plays. 
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
 
 ### Changes for Voice Actors

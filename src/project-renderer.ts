@@ -3,7 +3,8 @@ import { Project } from './types.js';
 export function createProjectSection(
     project: Project,
     onDrop: (characterId: number, projectId?: number) => void,
-    openProjectModal: (project: Project) => void
+    openProjectModal: (project: Project) => void,
+    openDictionaryModal: (project: Project) => void
 ): HTMLElement {
     const projectSection = document.createElement('div');
     projectSection.className = 'project-section';
@@ -11,9 +12,24 @@ export function createProjectSection(
 
     const projectHeader = document.createElement('div');
     projectHeader.className = 'project-header';
-    projectHeader.textContent = project.name;
+    projectHeader.style.display = 'flex';
+    projectHeader.style.justifyContent = 'space-between';
+    projectHeader.style.alignItems = 'center';
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = project.name;
+    projectHeader.appendChild(titleSpan);
+
     if (project.id !== 0) {
-        projectHeader.addEventListener('dblclick', () => openProjectModal(project));
+        titleSpan.addEventListener('dblclick', () => openProjectModal(project));
+        
+        const dictionaryBtn = document.createElement('button');
+        dictionaryBtn.textContent = 'Dictionary';
+        dictionaryBtn.className = 'dictionary-btn';
+        dictionaryBtn.style.padding = '5px 10px';
+        dictionaryBtn.style.fontSize = '0.9rem';
+        dictionaryBtn.addEventListener('click', () => openDictionaryModal(project));
+        projectHeader.appendChild(dictionaryBtn);
     }
     projectSection.appendChild(projectHeader);
 

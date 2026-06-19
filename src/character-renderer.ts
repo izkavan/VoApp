@@ -1,15 +1,18 @@
 import { Character, Project } from './types.js';
 import { createProjectSection } from './project-renderer.js';
 
-let openModalCallback: (character: Character) => void;
+let openCharacterModalCallback: (character?: Character) => void;
 let openProjectModalCallback: (project: Project) => void;
+let openDictionaryModalCallback: (project: Project) => void;
 
 export function initializeCharacterRenderer(
-    openModalCb: (character: Character) => void,
-    openProjectModalCb: (project: Project) => void
+    openModalFn: (character?: Character) => void,
+    openProjectModalFn: (project: Project) => void,
+    openDictionaryModalFn: (project: Project) => void
 ) {
-    openModalCallback = openModalCb;
-    openProjectModalCallback = openProjectModalCb;
+    openCharacterModalCallback = openModalFn;
+    openProjectModalCallback = openProjectModalFn;
+    openDictionaryModalCallback = openDictionaryModalFn;
 }
 
 export function renderCharacterList(
@@ -21,7 +24,7 @@ export function renderCharacterList(
     characterListElement.innerHTML = '';
 
     projects.forEach(project => {
-        const projectSection = createProjectSection(project, onCharacterDrop, openProjectModalCallback);
+        const projectSection = createProjectSection(project, onCharacterDrop, openProjectModalCallback, openDictionaryModalCallback);
         characterListElement.appendChild(projectSection);
 
         const projectCharacters = characterData.filter(c => c.projectId === project.id);
@@ -33,7 +36,7 @@ export function renderCharacterList(
     });
 
     const unassignedProject = { id: 0, name: 'Unassigned Characters', description: '', licensing: '' };
-    const unassignedSection = createProjectSection(unassignedProject, onCharacterDrop, openProjectModalCallback);
+    const unassignedSection = createProjectSection(unassignedProject, onCharacterDrop, openProjectModalCallback, openDictionaryModalCallback);
     characterListElement.appendChild(unassignedSection);
     const unassignedCharacters = characterData.filter(c => !c.projectId);
     const unassignedCardsGrid = unassignedSection.querySelector('.character-cards-grid');
@@ -64,6 +67,6 @@ export function createCharacterCard(character: Character): HTMLElement {
         artwork = `<img src="${character.artwork}" class="character-card-artwork">`;
     }
     card.innerHTML = `${artwork}<h3>${character.name}</h3>`;
-    card.addEventListener('click', () => openModalCallback(character));
+    card.addEventListener('click', () => openCharacterModalCallback(character));
     return card;
 }
