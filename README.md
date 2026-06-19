@@ -6,43 +6,39 @@ As the project progresses, I am likely going to drop that Simple tag, as well as
 
 ## What can you do right now?
 
-Vo-App is designed to be your go-to place for a number of voice-work related items. Here’s what you can do with the app in its current form:
+Vo-App is designed to be your go-to place for voice-work related items. Here is a breakdown of the app by its main views and features:
 
-*   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates. 
-  * A Project can contain characters-- both ones that you portray, or ones that other people work with for your reference!
-  * A project can also have a  **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc. If a script is uploaded for the line-reader or the teleprompter, we should detect words that match words in the dictionary for that project. If we find one, highlight it. When the user mouses over the word, it shows the phonetic, and the audio file plays.
+### Project Management
+* **Create & Edit Projects**: Manage your work with details like name, description, licensing, and dates. Projects can contain characters (both ones you portray and references from others).
+* **Pronunciation Dictionary**: Build a project-level glossary to record the "canon" pronunciation for complex or fictional names. Add phonetics and record audio to ensure consistency across the project.
+* **Import/Export**: Package a project and its characters into a zip file to share with friends or move between computers.
 
-*   **Character Creation**: Easily create new characters with a name, description, and voice details.
-1. **Vocal Recipe:** A structured way to define a voice beyond a simple description. Use sliders or tags for Pitch (Low/High), Pace (Slow/Fast), Placement (Chest/Nasal), and Timbre (Gravelly/Smooth) to create a quick, reproducible blueprint for any voice.
-2. **Character Artwork**: Upload an image for each character to give them a face to go with the voice.
-3. **Voice Samples**: Upload an existing audio file or record a 10-second clip on the fly using your microphone.
-4. **Tagging System**: Add space-separated tags to your characters for easy categorization.
-5. **Descriptions**: Describing the character and the voice lets you have easy access to stylistic decisions when you want to reproduce the voice!
+### Character Library
+* **Vocal Recipe & Creation**: Define a voice beyond a simple description. Create reproducible blueprints using sliders for Pitch, Pace, Placement, and Timbre.
+* **Artwork & Voice Samples**: Upload images and voice samples (or record a clip on the fly) to bring your characters to life.
+* **Advanced Organization**: Use space-separated tags, advanced filtering (inclusive/OR, exclusive/AND), and drag-and-drop to categorize and assign characters to projects.
+* **Persistent Storage**: All characters, projects, and samples are saved automatically in your browser's local storage.
 
-*   **Advanced Search**: Filter your characters by one or more tags with both inclusive (OR) and exclusive (AND) search options.
-*   **Drag-and-Drop Organization**: Easily assign characters to projects by dragging and dropping them into the correct project section.
-*   **Duplicate & Delete**: Quickly duplicate or delete characters from the character detail view.
-*   **Persistent Storage**: All your characters, projects, and voice samples are saved right in your browser's local storage, so they'll be there the next time you open the app.
-*   **Character Packager**: Package a set of your characters into a single zip file to share with friends or move between computers.
+### Line Reader
+* **Script Upload & Take Management**: Upload a text script, split it into lines, and record multiple takes per line.
+* **Dictionary Highlighting**: When a project is selected, words in your script that match the project's dictionary are automatically highlighted in purple. Hover over them to see the phonetic pronunciation, and hover or click to instantly play the dictionary audio.
+* **Take Review**: Rate takes (with stars), add notes, and quickly A/B test recordings against each other.
 
-* **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character.
-1. Take Management - When a user records multiple takes for a single line, allow them to rate each take (e.g., with stars), add notes ("a bit faster," "more energy"), and quickly A/B test two takes against each other.
-2. Teleprompter mode - A full-screen, distraction-free view of a script that scrolls automatically at a user-defined pace. The user could control speed, font size, and color for maximum readability while recording. Spacebar to pause/resume, user scrolling auto stops.
+### Teleprompter
+* **Distraction-Free Recording**: A full-screen view of a script that scrolls automatically. Control the speed and font size for maximum readability while recording takes.
+* **Project Integration**: Select a project directly within the teleprompter to enable the same powerful dictionary highlighting, phonetic tooltips, and audio playback features found in the Line Reader.
 
-* **Vocal Warm-Ups**: Enjoy a vocal warmup area, which lets you record a sample and play it back of a block of text that should get your voice nice and ready for work.
+### Audition Tracker
+* **Log Submissions**: Keep track of audition details including project name, casting director, due date, script sides, and status (e.g., Submitted, Callback, Booked, Rejected). 
+* **Character Linking**: Link characters from your library to the auditions you used them for.
 
-* **Audition tracker**: A section to log audition submissions. An entry could include the project name, casting director, due date, script sides, and a status (e.g., Submitted, Callback, Booked, Rejected). Users could link characters from their library to auditions they used them for, or even a whole export zip to keep track of what files were sent.
+### Dungeon Master (Live Session) View
+* **Game Day Dashboard**: A simplified view tailored for running a game. Select a project to instantly access its assigned characters, voice samples, and notes without searching the full library.
+* **Improvised NPC Generator**: Instantly generate a new character with a random name, trait, and "Vocal Recipe" for on-the-fly encounters.
 
-* * **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project!
-
-1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
-2. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
-
-* **System Preferences**:
-1. **Filetypes**: Select how you want your files downloaded/stored. Webm, wav, mp3, flac, etc.
-2. **Line Reader Updates**:  When you export the lines, you can choose how the file paths are structured, so it can be character_name/line1, or character_name/LineOverview, or whatever else is needed. May need to look into industry workflows.
-3. A spot to define microhpone, headset, mixer, preamp, etc. so that editors can be aware of what the devices are and what profiles might be needed
-4. Full Backup - If you need to move to another machine, or want to perform routine backup.
+### Voice Memos & Utilities
+* **Voice Memos**: Record and save ad-hoc voice memos to capture spontaneous ideas, tagging them to specific projects or marking them as high importance.
+* **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
 
 ## I'm a voice actor. What is this and how do I use it?
 //TODO, I'm working on it. There's a lot of moving pieces here.
