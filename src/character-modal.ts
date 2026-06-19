@@ -41,8 +41,10 @@ export function openModal(character?: Character, isEditMode = false) {
             const artworkFilename = character.artworkFilename || '';
             modalContentElement.innerHTML = `
                 <h2>Edit Character</h2>
-                <select id="character-project"><option value="">No Project</option>${projectOptions}</select>
-                <input id="edit-name" value="${character.name}" />
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select id="character-project" style="flex: 1;"><option value="">No Project</option>${projectOptions}</select>
+                    <input id="edit-name" value="${character.name}" style="flex: 2;" placeholder="Character Name" />
+                </div>
                 <div class="modal-artwork-edit-container">
                     <div class="artwork-input-section">
                         <p><strong>Character Artwork:</strong></p>
@@ -58,7 +60,7 @@ export function openModal(character?: Character, isEditMode = false) {
                 <p><strong>Voice Description:</strong></p>
                 <textarea id="edit-voice">${character.voice_description}</textarea>
                 <div class="voice-sliders-container" style="margin: 15px 0;">
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div>
                             <label for="edit-pitch" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Low Pitch</span><span>High Pitch</span></label>
                             <input type="range" id="edit-pitch" min="1" max="100" value="${character.pitch ?? 50}" style="width: 100%;">
@@ -112,7 +114,7 @@ export function openModal(character?: Character, isEditMode = false) {
                 </div>
                 <p><strong>Voice:</strong> ${character.voice_description}</p>
                 <div class="voice-sliders-container" style="margin: 15px 0;">
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div>
                             <label style="display: flex; justify-content: space-between; font-size: 0.9em; color: #aaa;"><span>Low Pitch</span><span>High Pitch</span></label>
                             <input type="range" min="1" max="100" value="${character.pitch ?? 50}" style="width: 100%;" disabled>
@@ -144,8 +146,10 @@ export function openModal(character?: Character, isEditMode = false) {
         // New Character
         modalContentElement.innerHTML = `
             <h2>New Character</h2>
-            <select id="character-project"><option value="">No Project</option>${projectOptions}</select>
-            <input id="edit-name" placeholder="Character Name" />
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select id="character-project" style="flex: 1;"><option value="">No Project</option>${projectOptions}</select>
+                <input id="edit-name" style="flex: 2;" placeholder="Character Name" />
+            </div>
             <div class="modal-artwork-edit-container">
                 <div class="artwork-input-section">
                     <p><strong>Character Artwork:</strong></p>
@@ -159,7 +163,7 @@ export function openModal(character?: Character, isEditMode = false) {
             <p><strong>Voice Description:</strong></p>
             <textarea id="edit-voice" placeholder="Voice Description"></textarea>
             <div class="voice-sliders-container" style="margin: 15px 0;">
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
                         <label for="edit-pitch" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Low Pitch</span><span>High Pitch</span></label>
                         <input type="range" id="edit-pitch" min="1" max="100" value="50" style="width: 100%;">
@@ -193,6 +197,11 @@ export function openModal(character?: Character, isEditMode = false) {
         document.getElementById('record-button')?.addEventListener('click', recordAudio);
     }
     modalElement.classList.remove('hidden');
+    
+    // Background click to close
+    modalElement.onclick = (e) => {
+        if (e.target === modalElement) closeModal();
+    };
 }
 
 export function closeModal() {

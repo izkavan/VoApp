@@ -36,44 +36,48 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
 2. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
 
-
-## What's Coming Next?
-
-This is just the beginning! Here are some of the features planned for the future to make Vo-App even more useful:
-
 * **System Preferences**:
 1. **Filetypes**: Select how you want your files downloaded/stored. Webm, wav, mp3, flac, etc.
 2. **Line Reader Updates**:  When you export the lines, you can choose how the file paths are structured, so it can be character_name/line1, or character_name/LineOverview, or whatever else is needed. May need to look into industry workflows.
 3. A spot to define microhpone, headset, mixer, preamp, etc. so that editors can be aware of what the devices are and what profiles might be needed
-4. Docker Deployable
-5. "active memory management", see all the things this app has locally stored, and curate/trim things that you don't want.
-6. Full Backup - If you need to move to another machine, or want to perform routine backup.
+4. Full Backup - If you need to move to another machine, or want to perform routine backup.
 
-* Organize this readme so that groups of functionality are explained, rather than my ramblings of a madman and copy/pasted when I finish a specific section.
 
-*   **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
-* **Voice Memos** Would pair really well with the sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
-* **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. 
-* **Vocal Warmup/Practice updates**: Record and play back different vocal warmups, flag them as your favorites, or tag them with specific voices that you prefer to work with or that need more practice. Probably a dropdown of the "common" ones, or a list selector that lets you store your ratings.
 
-* Waveform viewer with all audio (optional expand to see)
+## What's Coming Next?
 
-* **Vocal Actor Specific Features/mode**: 
+Here are some of the features that I thought up for the app that could be coming in the future-- Feel free to leave comments or message me about getting something moved up in priority, or if there are ideas that you'd like to see, I can add them to the backlog and attribute you!
+
+### Changes to the core System
+* Get a Docker Image put together that can pull this repo and get it running. 
+* Organize this readme so that groups of functionality are explained, rather than my ramblings of a madman and copy/pasted when I finish a specific section. Would be nice to have a section for "I am a dungeon master, how do I use this?", "I am a voice actor, how do I use this?", "I am a director/producer, how do I use this?"
+* **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
+* **Voice Memos** Would pair really well with that sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
+* Tie ins to common note taking apps (Obsidian, Notion, World Anvil?)
+* Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
+* A configuration system in the settings to turn off specific views if they aren't of use to the person running the application.
+
+### Changes to the Character and Project Management
+* **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. Not trying to replace Pinterest.
+* **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc.
+* **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
+
+### Changes for Voice Actors
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
+* An extension for the Audition that lets a user compose a set of takes or reads for the characters being linked, with the clean slate read either interjected or whatnot. Would need to interview some Voice Actors to see how they typically work and what they would want out of that.
 * Script/Line Management; Would be great to possibly split existing audio takes?
 
+### Changes for Dungeon Masters
+* **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 
 
-* **Live Performance & Worldbuilding Tools (for DMs & Podcasters):**
-1. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
+### Utilities to add
+* Have a viewer for active memory management. Should allow a single view of all the data the application stores in local memory, with options to delete that data if the user wants.
+* **Vocal Warmup/Practice updates**: Record and play back multiple different vocal warmups, flag them as your favorites, or tag them with specific voices that you prefer to work with or that need more practice. Probably a dropdown of the "common" ones, or a list selector that lets you store your ratings like elsewhere in the system
+* **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
+* **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
+**Effort & Grunt Library:** A special category for recording and tagging non-dialogue vocalizations (grunts, yells, laughs, etc.) to build a reusable library for action-heavy roles. I don't know if this needs to be per character, or if a different tagging system should be put in place. Tag back to vocal recipes, and let there be a search system so you can cross reference "how did I do that before?"
 
-* **Advanced Craft & Professional Tools:**
-1. **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
-2. **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
-3. **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc.
-4.**Effort & Grunt Library:** A special category for recording and tagging non-dialogue vocalizations (grunts, yells, laughs, etc.) to build a reusable library for action-heavy roles. I don't know if this needs to be per character, or if a different tagging system should be put in place. Tag back to vocal recipes, and let there be a search system so you can cross reference "how did I do that before?"
-
-* **Immersion & Storytelling Tools:**
-1. **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
+### Community Platform
 
 * **Community & Platform Features:** I don't know how this would work without being hosted centrally, so this is a very very low priority. 
 1. **Community Sharing:** An opt-in platform to share and download "Vocal Recipes" or character templates to get a head start on new projects. 
@@ -82,11 +86,13 @@ This is just the beginning! Here are some of the features planned for the future
 4. **Recruiter Browser**: Oh man, it would be sick if an extension of the sharing and assistance allowed headhunters a centralized location to be able to browse through people's samples or profiles and send messages. We'd need a way to vet who is a recruiter, that isn't prohibitive. 
 
 
+# THANKS!
 Thanks for checking out Vo-App. I hope it helps you bring your characters to life!
 
 If you feel like this project is fun enough to kick a few bucks to, check me out on https://ko-fi.com/izkavan!
 
 
+# Technical callouts
 Dependencies:
 Typescript
 npm install --save-dev @types/jszip
@@ -94,4 +100,4 @@ npm install --save-dev @types/node
 
 install/run via npm
 
-npm run build && npx serve src
+`npm run build && npx serve src`
