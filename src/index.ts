@@ -10,6 +10,7 @@ import { initializeVoiceActorView } from './voice-actor-view.js';
 import { initializeLineReader } from './line-reader.js';
 import { initializeUtilityView } from './utility-view.js';
 import { initializeAuditionView } from './audition-view.js';
+import { initializeTeleprompter } from './teleprompt.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -258,4 +259,5 @@ initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;
     saveToLocalStorage(characters, projects, auditions);
 });
+initializeTeleprompter();
 renderApp();

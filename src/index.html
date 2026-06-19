@@ -49,7 +49,8 @@
         <div id="voice-actor-view" class="view hidden">
             <div class="tab-container">
                 <div class="tab-nav">
-                    <button class="tab-link active" data-tab="scripts">Scripts</button>
+                    <button class="tab-link active" data-tab="scripts">Lines</button>
+                    <button class="tab-link" data-tab="teleprompt">Teleprompt</button>
                     <button class="tab-link" data-tab="auditions">Auditions</button>
                     <button class="tab-link" data-tab="misc">Misc</button>
                 </div>
@@ -77,6 +78,37 @@
                     <div class="script-save-container">
                         <button id="save-button">Save Script</button>
                     </div>
+                </div>
+                <div id="teleprompt" class="tab-content">
+                    <h2>Teleprompter</h2>
+                    <label for="teleprompt-file-input" class="custom-file-input">Upload Text File</label>
+                    <input type="file" id="teleprompt-file-input" accept=".txt">
+                    <div id="teleprompt-display" style="height: 40vh; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-top: 10px; font-size: 24px;"></div>
+                    
+                    <div class="teleprompt-controls" style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                        <div>
+                            <label>Speed:</label>
+                            <input type="range" id="teleprompt-speed" min="1" max="3" value="2" step="1">
+                        </div>
+                        <div>
+                            <label>Font Size:</label>
+                            <button id="teleprompt-font-minus">-</button>
+                            <span id="teleprompt-font-label">24px</span>
+                            <button id="teleprompt-font-plus">+</button>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; font-weight: bold; margin-right: 10px;">Read</span>
+                            <label class="switch" style="margin: 0;">
+                                <input type="checkbox" id="teleprompt-read-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <button id="teleprompt-record-button" class="record-button" style="margin-bottom: 0;">●</button>
+                    </div>
+
+                    <ul id="teleprompt-takes-list" class="takes-list" style="margin-top: 20px;"></ul>
+                    
+                    <button id="teleprompt-save-session" style="position: fixed; bottom: 20px; right: 20px; z-index: 100;">Save Session</button>
                 </div>
                 <div id="auditions" class="tab-content">
                     <div class="audition-header">

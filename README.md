@@ -19,6 +19,8 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 *   **Persistent Storage**: All your characters, projects, and voice samples are saved right in your browser's local storage, so they'll be there the next time you open the app.
 *   **Character Packager**: Package a set of your characters into a single zip file to share with friends or move between computers.
 * **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character.
+1. Take Management - When a user records multiple takes for a single line, allow them to rate each take (e.g., with stars), add notes ("a bit faster," "more energy"), and quickly A/B test two takes against each other.
+2. Teleprompter mode - A full-screen, distraction-free view of a script that scrolls automatically at a user-defined pace. The user could control speed, font size, and color for maximum readability while recording. Spacebar to pause/resume, user scrolling auto stops.
 * **Vocal Warm-Ups**: Enjoy a vocal warmup area, which lets you record a sample and play it back of a block of text that should get your voice nice and ready for work.
 * **Audition tracker**: A section to log audition submissions. An entry could include the project name, casting director, due date, script sides, and a status (e.g., Submitted, Callback, Booked, Rejected). Users could link characters from their library to auditions they used them for, or even a whole export zip to keep track of what files were sent.
 * * **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project!
@@ -45,10 +47,7 @@ This is just the beginning! Here are some of the features planned for the future
 
 * **Vocal Actor Specific Features/mode**: 
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
-* Script/Line Management; This comes in two subpoints, so it's a list in a list (Pointy Hat would be proud)
-1. Take Management - When a user records multiple takes for a single line, allow them to rate each take (e.g., with stars), add notes ("a bit faster," "more energy"), and quickly A/B test two takes against each other.
-2. Teleprompter mode - A full-screen, distraction-free view of a script that scrolls automatically at a user-defined pace. The user could control speed, font size, and color for maximum readability while recording. Spacebar to pause/resume, arrow key to skip a line. 
-2b. A way to split the read audio, maybe? so that multiple takes are easier?
+* Script/Line Management; Would be great to possibly split existing audio takes?
 
 * **Live Performance & Worldbuilding Tools (for DMs & Podcasters):**
 1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
