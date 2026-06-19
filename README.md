@@ -8,21 +8,29 @@ As the project progresses, I am likely going to drop that Simple tag, as well as
 
 Vo-App is designed to be your go-to place for organizing your character voices. Here’s what you can do with the app in its current form:
 
-*   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates.
+*   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates. A Project can contain characters-- both ones that you portray, or ones that other people work with for your reference!
+
 *   **Character Creation**: Easily create new characters with a name, description, and voice details.
-*   **Character Artwork**: Upload an image for each character to give them a face to go with the voice.
-*   **Voice Samples**: Upload an existing audio file or record a 10-second clip on the fly using your microphone.
-*   **Tagging System**: Add space-separated tags to your characters for easy categorization.
+1. **Vocal Recipe:** A structured way to define a voice beyond a simple description. Use sliders or tags for Pitch (Low/High), Pace (Slow/Fast), Placement (Chest/Nasal), and Timbre (Gravelly/Smooth) to create a quick, reproducible blueprint for any voice.
+2. **Character Artwork**: Upload an image for each character to give them a face to go with the voice.
+3. **Voice Samples**: Upload an existing audio file or record a 10-second clip on the fly using your microphone.
+4. **Tagging System**: Add space-separated tags to your characters for easy categorization.
+5. **Descriptions**: Describing the character and the voice lets you have easy access to stylistic decisions when you want to reproduce the voice!
+
 *   **Advanced Search**: Filter your characters by one or more tags with both inclusive (OR) and exclusive (AND) search options.
 *   **Drag-and-Drop Organization**: Easily assign characters to projects by dragging and dropping them into the correct project section.
 *   **Duplicate & Delete**: Quickly duplicate or delete characters from the character detail view.
 *   **Persistent Storage**: All your characters, projects, and voice samples are saved right in your browser's local storage, so they'll be there the next time you open the app.
 *   **Character Packager**: Package a set of your characters into a single zip file to share with friends or move between computers.
+
 * **Line Reader**: Upload a script, select a portion of text, split it, and make a recording (or multiple takes) of those lines. Can be assigned a character.
 1. Take Management - When a user records multiple takes for a single line, allow them to rate each take (e.g., with stars), add notes ("a bit faster," "more energy"), and quickly A/B test two takes against each other.
 2. Teleprompter mode - A full-screen, distraction-free view of a script that scrolls automatically at a user-defined pace. The user could control speed, font size, and color for maximum readability while recording. Spacebar to pause/resume, user scrolling auto stops.
+
 * **Vocal Warm-Ups**: Enjoy a vocal warmup area, which lets you record a sample and play it back of a block of text that should get your voice nice and ready for work.
+
 * **Audition tracker**: A section to log audition submissions. An entry could include the project name, casting director, due date, script sides, and a status (e.g., Submitted, Callback, Booked, Rejected). Users could link characters from their library to auditions they used them for, or even a whole export zip to keep track of what files were sent.
+
 * * **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project!
 
 
@@ -49,11 +57,11 @@ This is just the beginning! Here are some of the features planned for the future
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
 * Script/Line Management; Would be great to possibly split existing audio takes?
 
+
 * **Live Performance & Worldbuilding Tools (for DMs & Podcasters):**
 1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
-2. **Vocal Recipe:** A structured way to define a voice beyond a simple description. Use sliders or tags for Pitch (Low/High), Pace (Slow/Fast), Placement (Chest/Nasal), and Timbre (Gravelly/Smooth) to create a quick, reproducible blueprint for any voice.
-3. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
-4. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
+2. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
+3. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
 
 * **Advanced Craft & Professional Tools:**
 1. **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.

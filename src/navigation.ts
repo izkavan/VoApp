@@ -4,10 +4,12 @@ export function initializeNavigation() {
 
     const navCharacterLibrary = document.getElementById('nav-character-library');
     const navVoiceActors = document.getElementById('nav-voice-actors');
+    const navDungeonMaster = document.getElementById('nav-dungeon-master');
     const navUtilities = document.getElementById('nav-utilities');
 
     const characterLibraryView = document.getElementById('character-library-view');
     const voiceActorView = document.getElementById('voice-actor-view');
+    const dungeonMasterView = document.getElementById('dungeon-master-view');
     const utilityView = document.getElementById('utility-view');
 
     const showView = (viewToShow: HTMLElement) => {
@@ -26,6 +28,8 @@ export function initializeNavigation() {
                 showView(characterLibraryView);
             } else if (id === 'nav-voice-actors' && voiceActorView) {
                 showView(voiceActorView);
+            } else if (id === 'nav-dungeon-master' && dungeonMasterView) {
+                showView(dungeonMasterView);
             } else if (id === 'nav-utilities' && utilityView) {
                 showView(utilityView);
             }

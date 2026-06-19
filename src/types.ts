@@ -17,6 +17,10 @@ export interface Character {
     artwork?: string;
     artworkFilename?: string;
     voice_sample?: string;
+    pitch?: number;
+    pace?: number;
+    placement?: number;
+    timbre?: number;
 }
 
 export interface AuditionFile {

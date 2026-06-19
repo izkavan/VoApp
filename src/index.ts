@@ -11,6 +11,7 @@ import { initializeLineReader } from './line-reader.js';
 import { initializeUtilityView } from './utility-view.js';
 import { initializeAuditionView } from './audition-view.js';
 import { initializeTeleprompter } from './teleprompt.js';
+import { initializeDungeonMasterView } from './dungeon-master-view.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -254,6 +255,7 @@ initializeTheme();
 initializeNavigation();
 initializeVoiceActorView();
 initializeLineReader(characters, projects, openModal);
+initializeDungeonMasterView(characters, projects, openModal);
 initializeUtilityView();
 initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;

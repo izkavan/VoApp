@@ -57,6 +57,26 @@ export function openModal(character?: Character, isEditMode = false) {
                 </div>
                 <p><strong>Voice Description:</strong></p>
                 <textarea id="edit-voice">${character.voice_description}</textarea>
+                <div class="voice-sliders-container" style="margin: 15px 0;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <label for="edit-pitch" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Low Pitch</span><span>High Pitch</span></label>
+                            <input type="range" id="edit-pitch" min="1" max="100" value="${character.pitch ?? 50}" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label for="edit-pace" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Slow Pace</span><span>Fast Pace</span></label>
+                            <input type="range" id="edit-pace" min="1" max="100" value="${character.pace ?? 50}" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label for="edit-placement" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Chest Placement</span><span>Nasal Placement</span></label>
+                            <input type="range" id="edit-placement" min="1" max="100" value="${character.placement ?? 50}" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label for="edit-timbre" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Gravelly Timbre</span><span>Smooth Timbre</span></label>
+                            <input type="range" id="edit-timbre" min="1" max="100" value="${character.timbre ?? 50}" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
                 <p><strong>Voice Sample:</strong></p>
                 <div id="recording-status"></div>
                 <button id="record-button">Record (10s)</button>
@@ -91,6 +111,26 @@ export function openModal(character?: Character, isEditMode = false) {
                     <p><strong>Description:</strong> ${character.description}</p>
                 </div>
                 <p><strong>Voice:</strong> ${character.voice_description}</p>
+                <div class="voice-sliders-container" style="margin: 15px 0;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <label style="display: flex; justify-content: space-between; font-size: 0.9em; color: #aaa;"><span>Low Pitch</span><span>High Pitch</span></label>
+                            <input type="range" min="1" max="100" value="${character.pitch ?? 50}" style="width: 100%;" disabled>
+                        </div>
+                        <div>
+                            <label style="display: flex; justify-content: space-between; font-size: 0.9em; color: #aaa;"><span>Slow Pace</span><span>Fast Pace</span></label>
+                            <input type="range" min="1" max="100" value="${character.pace ?? 50}" style="width: 100%;" disabled>
+                        </div>
+                        <div>
+                            <label style="display: flex; justify-content: space-between; font-size: 0.9em; color: #aaa;"><span>Chest Placement</span><span>Nasal Placement</span></label>
+                            <input type="range" min="1" max="100" value="${character.placement ?? 50}" style="width: 100%;" disabled>
+                        </div>
+                        <div>
+                            <label style="display: flex; justify-content: space-between; font-size: 0.9em; color: #aaa;"><span>Gravelly Timbre</span><span>Smooth Timbre</span></label>
+                            <input type="range" min="1" max="100" value="${character.timbre ?? 50}" style="width: 100%;" disabled>
+                        </div>
+                    </div>
+                </div>
                 ${tagsDisplay}
                 ${audioPlayer}
                 <div class="modal-footer"></div>
@@ -118,6 +158,26 @@ export function openModal(character?: Character, isEditMode = false) {
             </div>
             <p><strong>Voice Description:</strong></p>
             <textarea id="edit-voice" placeholder="Voice Description"></textarea>
+            <div class="voice-sliders-container" style="margin: 15px 0;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <label for="edit-pitch" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Low Pitch</span><span>High Pitch</span></label>
+                        <input type="range" id="edit-pitch" min="1" max="100" value="50" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="edit-pace" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Slow Pace</span><span>Fast Pace</span></label>
+                        <input type="range" id="edit-pace" min="1" max="100" value="50" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="edit-placement" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Chest Placement</span><span>Nasal Placement</span></label>
+                        <input type="range" id="edit-placement" min="1" max="100" value="50" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="edit-timbre" style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>Gravelly Timbre</span><span>Smooth Timbre</span></label>
+                        <input type="range" id="edit-timbre" min="1" max="100" value="50" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
             <p><strong>Voice Sample:</strong></p>
             <div id="recording-status"></div>
             <button id="record-button">Record (10s)</button>
@@ -217,6 +277,11 @@ async function saveCharacterHandler(characterId: number | null) {
     const tagElements = document.querySelectorAll('#tag-container .tag-item');
     const tags = Array.from(tagElements).map(el => el.textContent?.replace(/×$/, '').trim() || '').filter(Boolean);
 
+    const pitch = parseInt((document.getElementById('edit-pitch') as HTMLInputElement)?.value || '50', 10);
+    const pace = parseInt((document.getElementById('edit-pace') as HTMLInputElement)?.value || '50', 10);
+    const placement = parseInt((document.getElementById('edit-placement') as HTMLInputElement)?.value || '50', 10);
+    const timbre = parseInt((document.getElementById('edit-timbre') as HTMLInputElement)?.value || '50', 10);
+
     const idToSave = characterId ?? Date.now();
     const existingCharacter = characters.find(c => c.id === idToSave);
 
@@ -230,6 +295,10 @@ async function saveCharacterHandler(characterId: number | null) {
         artwork: existingCharacter?.artwork,
         artworkFilename: existingCharacter?.artworkFilename,
         voice_sample: existingCharacter?.voice_sample,
+        pitch: pitch,
+        pace: pace,
+        placement: placement,
+        timbre: timbre,
     };
 
     await saveCharacterCallback(characterToSave, artworkFile, undefined, recordedSample);

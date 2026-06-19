@@ -12,6 +12,7 @@
             <ul>
                 <li><a href="#" id="nav-character-library" class="active">Character Library</a></li>
                 <li><a href="#" id="nav-voice-actors">Voice Actor View</a></li>
+                <li><a href="#" id="nav-dungeon-master">Dungeon Master View</a></li>
                 <li><a href="#" id="nav-utilities">Utility View</a></li>
             </ul>
         </nav>
@@ -124,6 +125,45 @@
                 <div id="misc" class="tab-content">
                     <h2>Misc</h2>
                     <p>Undecided work goes here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="dungeon-master-view" class="view hidden">
+            <div class="tab-container">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="dm-session">Session</button>
+                    <button class="tab-link" data-tab="dm-generator">Generator</button>
+                </div>
+                <div id="dm-session" class="tab-content active">
+                    <h2>Session</h2>
+                    <div class="dm-session-controls" style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                        <button id="dm-session-reset">Reset</button>
+                        <select id="dm-session-project">
+                            <option value="none">None</option>
+                        </select>
+                        <select id="dm-session-character"></select>
+                        <button id="dm-session-add-character" style="font-size: 1.2rem; padding: 5px 10px; font-weight: bold;">+</button>
+                    </div>
+                    <div style="position: relative;">
+                        <div id="dm-session-characters" style="display: flex; gap: 15px; flex-wrap: wrap; min-height: 40vh; padding: 10px; border: 2px dashed var(--border-color, #ccc); border-radius: 8px;">
+                        </div>
+                        <div id="dm-session-trash" class="hidden" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; border-radius: 50%; background: #d9534f; color: white; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s;">
+                            &times;
+                        </div>
+                    </div>
+                </div>
+                <div id="dm-generator" class="tab-content">
+                    <h2>Generator</h2>
+                    <div class="dm-generator-controls" style="display: flex; flex-direction: column; gap: 15px; align-items: flex-start; margin-top: 20px;">
+                        <div>
+                            <label for="dm-generator-project" style="font-weight: bold; margin-right: 10px;">Target Project:</label>
+                            <select id="dm-generator-project">
+                                <option value="none">Unassigned</option>
+                            </select>
+                        </div>
+                        <button id="dm-generator-button" style="padding: 10px 20px; font-size: 1.2rem; font-weight: bold; background: var(--primary-color, #4a90e2); color: white; border-radius: 5px; border: none; cursor: pointer;">Generate Random Character</button>
+                    </div>
                 </div>
             </div>
         </div>
