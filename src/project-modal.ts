@@ -1,5 +1,4 @@
 import { Project, Character } from './types.js';
-import { saveToLocalStorage } from './storage.js';
 
 declare var JSZip: any;
 
@@ -9,6 +8,7 @@ let characters: Character[] = [];
 let currentProjectId: number | null = null;
 let renderAppCallback: () => void;
 let deleteProjectCallback: (id: number) => void;
+let saveCallback: (projects: Project[]) => void;
 
 // --- DOM Elements ---
 let projectModalElement: HTMLElement;
@@ -32,7 +32,8 @@ export function initializeProjectModal(
     initialProjects: Project[],
     initialCharacters: Character[],
     renderAppCb: () => void,
-    deleteCb: (id: number) => void
+    deleteCb: (id: number) => void,
+    onSave: (projects: Project[]) => void
 ) {
     projectModalElement = modalEl;
     projectNameInput = nameInput;
@@ -46,6 +47,7 @@ export function initializeProjectModal(
     characters = initialCharacters;
     renderAppCallback = renderAppCb;
     deleteProjectCallback = deleteCb;
+    saveCallback = onSave;
 
     exportProjectButton.addEventListener('click', exportProject);
     deleteProjectButton.addEventListener('click', () => {
@@ -106,7 +108,7 @@ export function saveProject() {
         projects.push(newProject);
     }
 
-    saveToLocalStorage(characters, projects);
+    saveCallback(projects);
     renderAppCallback();
     closeProjectModal();
 }

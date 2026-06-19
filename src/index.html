@@ -75,8 +75,15 @@
                     </div>
                 </div>
                 <div id="auditions" class="tab-content">
-                    <h2>Auditions</h2>
-                    <p>Feature coming soon.</p>
+                    <div class="audition-header">
+                        <h2>Auditions</h2>
+                        <button id="new-audition-button">New Audition</button>
+                    </div>
+                    <div id="active-audition-list"></div>
+                    <div class="collapsible-section">
+                        <h3 class="collapsible-header">Inactive Auditions</h3>
+                        <div id="inactive-audition-list" class="collapsible-content"></div>
+                    </div>
                 </div>
                 <div id="misc" class="tab-content">
                     <h2>Misc</h2>
@@ -118,6 +125,13 @@
                 <button id="export-project-button">Export Project</button>
                 <button id="save-project-button">Save Project</button>
             </div>
+        </div>
+    </div>
+
+    <div id="audition-modal" class="hidden">
+        <div id="modal-content">
+            <span id="audition-modal-close">&times;</span>
+            <div id="audition-modal-content"></div>
         </div>
     </div>
 

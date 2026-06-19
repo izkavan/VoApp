@@ -12,9 +12,34 @@ export interface Character {
     name: string;
     description: string;
     voice_description: string;
-    voice_sample?: string; // Store as base64 Data URL
-    tags?: string[];
-    artwork?: string; // Store as base64 Data URL
-    artworkFilename?: string;
+    tags: string[];
     projectId?: number;
+    artwork?: string;
+    artworkFilename?: string;
+    voice_sample?: string;
+}
+
+export interface AuditionFile {
+    name: string;
+    data: string; // Base64 data URL
+}
+
+export interface CastingDirector {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+}
+
+export type AuditionStatus = 'Submitted' | 'Callback' | 'Booked' | 'Rejected' | 'Ghosted';
+
+export interface Audition {
+    id: number;
+    projectName: string;
+    castingDirector: CastingDirector;
+    dueDate: string; // ISO date string
+    notes: string;
+    status: AuditionStatus;
+    linkedCharacterIds: number[];
+    files: AuditionFile[];
 }

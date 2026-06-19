@@ -1,34 +1,32 @@
-import { Character, Project } from './types.js';
+import { Character, Project, Audition } from './types.js';
 
-export function saveToLocalStorage(characters: Character[], projects: Project[]) {
-    localStorage.setItem('vocalCharacters', JSON.stringify(characters));
-    localStorage.setItem('vocalProjects', JSON.stringify(projects));
+const STORAGE_KEY_CHARACTERS = 'vo_app_characters';
+const STORAGE_KEY_PROJECTS = 'vo_app_projects';
+const STORAGE_KEY_AUDITIONS = 'vo_app_auditions';
+
+export function saveToLocalStorage(characters: Character[], projects: Project[], auditions: Audition[]): void {
+    try {
+        localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(characters));
+        localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+        localStorage.setItem(STORAGE_KEY_AUDITIONS, JSON.stringify(auditions));
+    } catch (e) {
+        console.error("Failed to save to local storage", e);
+    }
 }
 
-export function loadFromLocalStorage(): { characters: Character[], projects: Project[] } {
-    const storedCharacters = localStorage.getItem('vocalCharacters');
-    const storedProjects = localStorage.getItem('vocalProjects');
+export function loadFromLocalStorage(): { characters: Character[], projects: Project[], auditions: Audition[] } {
+    try {
+        const charactersJSON = localStorage.getItem(STORAGE_KEY_CHARACTERS);
+        const projectsJSON = localStorage.getItem(STORAGE_KEY_PROJECTS);
+        const auditionsJSON = localStorage.getItem(STORAGE_KEY_AUDITIONS);
 
-    let characters: Character[] = [];
-    let projects: Project[] = [];
+        const characters = charactersJSON ? JSON.parse(charactersJSON) : [];
+        const projects = projectsJSON ? JSON.parse(projectsJSON) : [];
+        const auditions = auditionsJSON ? JSON.parse(auditionsJSON) : [];
 
-    if (storedCharacters) {
-        characters = JSON.parse(storedCharacters);
-    } else {
-        characters = [
-            { id: 1, name: 'Old Man Hemlock', description: 'A wise, ancient tree spirit.', voice_description: 'Slow, deep, and creaky.', tags: ['fantasy', 'old', 'male'], projectId: 1 },
-            { id: 2, name: 'Sparky', description: 'A mischievous fire sprite.', voice_description: 'High-pitched and crackling.', tags: ['elemental', 'mischievous'] },
-            { id: 3, name: 'Seraphina', description: 'A serene celestial being.', voice_description: 'Melodic and resonant.', tags: ['celestial', 'calm', 'female'], projectId: 1 }
-        ];
+        return { characters, projects, auditions };
+    } catch (e) {
+        console.error("Failed to load from local storage", e);
+        return { characters: [], projects: [], auditions: [] };
     }
-
-    if (storedProjects) {
-        projects = JSON.parse(storedProjects);
-    } else {
-        projects = [
-            { id: 1, name: 'Project Phoenix', description: 'A fantasy epic.', licensing: 'Creative Commons', startDate: '2023-01-01' }
-        ];
-    }
-
-    return { characters, projects };
 }

@@ -1,4 +1,4 @@
-import { Project, Character } from './types.js';
+import { Project, Character, Audition } from './types.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './storage.js';
 import { initializeCharacterRenderer } from './character-renderer.js';
 import { initializeCharacterModal, openModal, closeModal } from './character-modal.js';
@@ -9,10 +9,12 @@ import { initializeNavigation } from './navigation.js';
 import { initializeVoiceActorView } from './voice-actor-view.js';
 import { initializeLineReader } from './line-reader.js';
 import { initializeUtilityView } from './utility-view.js';
+import { initializeAuditionView } from './audition-view.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
 let projects: Project[] = [];
+let auditions: Audition[] = [];
 
 // --- Main Page Elements ---
 const characterListElement = document.getElementById('character-list');
@@ -49,7 +51,7 @@ function onCharacterDrop(characterId: number, projectId?: number) {
     const charIndex = characters.findIndex(c => c.id === characterId);
     if (charIndex > -1) {
         characters[charIndex].projectId = projectId;
-        saveToLocalStorage(characters, projects);
+        saveToLocalStorage(characters, projects, auditions);
         renderApp();
     }
 }
@@ -82,7 +84,7 @@ async function saveCharacter(character: Character, artworkFile?: File, sampleFil
         characters.push(character);
     }
 
-    saveToLocalStorage(characters, projects);
+    saveToLocalStorage(characters, projects, auditions);
     renderApp();
     closeModal();
 }
@@ -94,7 +96,7 @@ function duplicateCharacter(characterToDuplicate: Character) {
         name: `${characterToDuplicate.name} (Copy)`
     };
     characters.push(newCharacter);
-    saveToLocalStorage(characters, projects);
+    saveToLocalStorage(characters, projects, auditions);
     renderApp();
     closeModal();
 }
@@ -105,7 +107,7 @@ function deleteCharacter(id: number) {
         if (indexToDelete > -1) {
             characters.splice(indexToDelete, 1);
         }
-        saveToLocalStorage(characters, projects);
+        saveToLocalStorage(characters, projects, auditions);
         renderApp();
         closeModal();
     }
@@ -122,7 +124,7 @@ function deleteProject(id: number) {
                 c.projectId = undefined;
             }
         });
-        saveToLocalStorage(characters, projects);
+        saveToLocalStorage(characters, projects, auditions);
         renderApp();
         closeProjectModal();
     }
@@ -169,7 +171,7 @@ async function importProject(zipFile: File) {
             }
         }
 
-        saveToLocalStorage(characters, projects);
+        saveToLocalStorage(characters, projects, auditions);
         renderApp();
         alert(`Project "${newProject.name}" and its characters imported successfully!`);
 
@@ -199,9 +201,10 @@ importProjectButton?.addEventListener('click', () => {
 });
 
 
-const { characters: loadedCharacters, projects: loadedProjects } = loadFromLocalStorage();
+const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions } = loadFromLocalStorage();
 characters = loadedCharacters;
 projects = loadedProjects;
+auditions = loadedAuditions;
 
 initializeCharacterRenderer(openModal, openProjectModal);
 
@@ -210,7 +213,7 @@ initializeCharacterModal(
     modalContentElement as HTMLElement,
     characters,
     projects,
-    saveCharacter,
+    (char, art, samp, rec) => saveCharacter(char, art, samp, rec),
     duplicateCharacter,
     deleteCharacter
 );
@@ -227,7 +230,11 @@ initializeProjectModal(
     projects,
     characters,
     renderApp,
-    deleteProject
+    (id) => deleteProject(id),
+    (updatedProjects) => {
+        projects = updatedProjects;
+        saveToLocalStorage(characters, projects, auditions);
+    }
 );
 
 initializeFilterSearch(
@@ -247,4 +254,8 @@ initializeNavigation();
 initializeVoiceActorView();
 initializeLineReader(characters, projects, openModal);
 initializeUtilityView();
+initializeAuditionView(auditions, characters, (updatedAuditions) => {
+    auditions = updatedAuditions;
+    saveToLocalStorage(characters, projects, auditions);
+});
 renderApp();
