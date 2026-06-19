@@ -11,7 +11,7 @@ import { initializeLineReader } from './line-reader.js';
 import { initializeUtilityView } from './utility-view.js';
 import { initializeAuditionView } from './audition-view.js';
 import { initializeTeleprompter } from './teleprompt.js';
-import { initializeDungeonMasterView } from './dungeon-master-view.js';
+import { initializeDungeonMasterView, refreshDungeonMasterView } from './dungeon-master-view.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -47,6 +47,7 @@ const projectEndDateInput = document.getElementById('project-end-date') as HTMLI
 
 export function renderApp() {
     filterCharacters();
+    refreshDungeonMasterView();
 }
 
 function onCharacterDrop(characterId: number, projectId?: number) {

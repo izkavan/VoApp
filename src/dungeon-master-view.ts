@@ -4,6 +4,11 @@ import { generateRandomCharacter } from './generator-data.js';
 
 let characters: Character[] = [];
 let projects: Project[] = [];
+let updateCharacterSelectCallback: () => void = () => {};
+
+export function refreshDungeonMasterView() {
+    updateCharacterSelectCallback();
+}
 
 export function initializeDungeonMasterView(
     initialCharacters: Character[], 
@@ -44,6 +49,7 @@ export function initializeDungeonMasterView(
             characterSelect.appendChild(option);
         });
     };
+    updateCharacterSelectCallback = updateCharacterSelect;
 
     projectSelect.addEventListener('change', updateCharacterSelect);
     updateCharacterSelect();

@@ -33,6 +33,9 @@ Vo-App is designed to be your go-to place for organizing your character voices. 
 
 * * **Voice Memos** Sometimes there's too many ideas, save a voice memo to a project!
 
+1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
+2. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
+
 
 ## What's Coming Next?
 
@@ -45,6 +48,8 @@ This is just the beginning! Here are some of the features planned for the future
 4. Docker Deployable
 5. "active memory management", see all the things this app has locally stored, and curate/trim things that you don't want.
 6. Full Backup - If you need to move to another machine, or want to perform routine backup.
+
+* Organize this readme so that groups of functionality are explained, rather than my ramblings of a madman and copy/pasted when I finish a specific section.
 
 *   **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
 * **Voice Memos** Would pair really well with the sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
@@ -59,9 +64,7 @@ This is just the beginning! Here are some of the features planned for the future
 
 
 * **Live Performance & Worldbuilding Tools (for DMs & Podcasters):**
-1. **Live Session Dashboard:** A simplified, high-contrast "game day" view. Drag the characters you need for a session into a panel for instant access to their voice samples and notes, without searching the full library.
-2. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
-3. **Improvised NPC Generator:** A tool to instantly generate a new character with a random name, a simple trait, and a "Vocal Recipe" for on-the-fly character creation when players go off the beaten path.
+1. **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs.
 
 * **Advanced Craft & Professional Tools:**
 1. **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
