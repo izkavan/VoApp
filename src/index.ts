@@ -14,6 +14,7 @@ import { initializeTeleprompter } from './teleprompt.js';
 import { initializeDungeonMasterView, refreshDungeonMasterView } from './dungeon-master-view.js';
 import { initializeSettingsView } from './settings-view.js';
 import { initializeDictionaryModal, openDictionaryModal } from './dictionary-modal.js';
+import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
 import { SystemSettings } from './types.js';
 import JSZip from 'jszip';
 
@@ -269,7 +270,8 @@ initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;
     saveToLocalStorage(characters, projects, auditions, currentSettings);
 });
-initializeTeleprompter();
+initializeDictionaryHighlighter();
+initializeTeleprompter(projects);
 initializeSettingsView(
     currentSettings,
     characters,

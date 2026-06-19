@@ -10,7 +10,7 @@ Vo-App is designed to be your go-to place for a number of voice-work related ite
 
 *   **Project Management**: Create and edit projects with details like name, description, licensing, and start/end dates. 
   * A Project can contain characters-- both ones that you portray, or ones that other people work with for your reference!
-  * A project can also have a dictionary-- sometimes fantasy words are weird, and you need a way to reference them!
+  * A project can also have a  **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc. If a script is uploaded for the line-reader or the teleprompter, we should detect words that match words in the dictionary for that project. If we find one, highlight it. When the user mouses over the word, it shows the phonetic, and the audio file plays.
 
 *   **Character Creation**: Easily create new characters with a name, description, and voice details.
 1. **Vocal Recipe:** A structured way to define a voice beyond a simple description. Use sliders or tags for Pitch (Low/High), Pace (Slow/Fast), Placement (Chest/Nasal), and Timbre (Gravelly/Smooth) to create a quick, reproducible blueprint for any voice.
@@ -66,8 +66,6 @@ Here are some of the features that I thought up for the app that could be coming
 
 ### Changes to the Character and Project Management
 * **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. Not trying to replace Pinterest.
-* **Project Pronunciation Guide:** A project-level glossary where you can record and save the "canon" pronunciation for complex or fictional names to ensure consistency. Should have a way to do IPA annotation alongside written word, alongside a recording of the word/name/etc.
-* **Pronunciation Update**: If a script is uploaded for the line-reader or the teleprompter, we should detect words that match words in the dictionary for that project. If we find one, highlight it. When the user mouses over the word, it shows the phonetic, and the audio file plays. 
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
 
 ### Changes for Voice Actors

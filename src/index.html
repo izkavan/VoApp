@@ -85,8 +85,13 @@
                 </div>
                 <div id="teleprompt" class="tab-content">
                     <h2>Teleprompter</h2>
-                    <label for="teleprompt-file-input" class="custom-file-input">Upload Text File</label>
-                    <input type="file" id="teleprompt-file-input" accept=".txt">
+                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                        <label for="teleprompt-file-input" class="custom-file-input">Upload Text File</label>
+                        <input type="file" id="teleprompt-file-input" accept=".txt">
+                        <select id="teleprompt-project-select" style="padding: 8px; border-radius: 4px; max-width: 20vw; width: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <option value="">--Select Project--</option>
+                        </select>
+                    </div>
                     <div id="teleprompt-display" style="height: 40vh; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-top: 10px; font-size: 24px;"></div>
                     
                     <div class="teleprompt-controls" style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">

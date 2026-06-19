@@ -1,7 +1,8 @@
-import { Character, Project, SystemSettings } from './types.js';
+import { Character, Project, SystemSettings, DictionaryEntry } from './types.js';
 import { convertWebMToWav } from './audio-utils.js';
-import { saveAudioBlob, getAudioBlob, deleteAudioBlob, initDB } from './indexeddb.js';
+import { saveAudioBlob, getAudioBlob, deleteAudioBlob, initDB, getDictionaryEntries } from './indexeddb.js';
 import JSZip from 'jszip';
+import { highlightDictionaryWords } from './dictionary-highlighter.js';
 
 // In-memory representation
 interface TakeDetail {
@@ -48,6 +49,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
     const projectSelect = document.getElementById('script-project-select') as HTMLSelectElement;
+    
+    let currentDictionary: DictionaryEntry[] = [];
 
     // --- Session Persistence ---
     const SESSION_KEY = 'vo_app_active_line_reader_session';
@@ -102,6 +105,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
             });
 
             if (projectSelect) projectSelect.dispatchEvent(new Event('change'));
+            
+            const pId = parseInt(projectSelect.value);
+            if (!isNaN(pId)) {
+                currentDictionary = await getDictionaryEntries(pId);
+            } else {
+                currentDictionary = [];
+            }
+            
             updateLineContainerUI();
         } catch (e) {
             console.error("Failed to load active session", e);
@@ -151,7 +162,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
     updateCharacterDropdowns();
 
-    projectSelect?.addEventListener('change', () => {
+    projectSelect?.addEventListener('change', async () => {
         updateCharacterDropdowns();
         const availableCharacters = getAvailableCharacters();
         const availableIds = new Set(availableCharacters.map(c => c.id));
@@ -161,6 +172,13 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 detail.characterId = undefined;
             }
         });
+
+        const projectId = parseInt(projectSelect.value);
+        if (!isNaN(projectId)) {
+            currentDictionary = await getDictionaryEntries(projectId);
+        } else {
+            currentDictionary = [];
+        }
 
         if (selectedReadLine && selectedReadLine.textContent) {
             renderDetails(selectedReadLine.textContent);
@@ -195,19 +213,12 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 if (lineDiv.classList.contains('read') && charId !== undefined && !isNaN(charId)) {
                     const char = characters.find(c => c.id === charId);
                     if (char && char.artwork) {
-                        let img = lineDiv.querySelector('.line-character-icon') as HTMLImageElement;
-                        if (!img) {
-                            lineDiv.innerHTML = `<span class="line-entry-text">${lineText}</span><img class="line-character-icon" src="${char.artwork}">`;
-                        } else {
-                            img.src = char.artwork;
-                        }
+                        lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
                     } else {
-                        lineDiv.innerHTML = `<span class="line-entry-text">${lineText}</span>`;
+                        lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                     }
                 } else {
-                    if (lineDiv.querySelector('.line-character-icon') || lineDiv.querySelector('.line-entry-text')) {
-                        lineDiv.textContent = lineText;
-                    }
+                    lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                 }
             });
         });

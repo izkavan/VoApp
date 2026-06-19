@@ -1,4 +1,7 @@
 import JSZip from 'jszip';
+import { Project, DictionaryEntry } from './types.js';
+import { getDictionaryEntries } from './indexeddb.js';
+import { highlightDictionaryWords } from './dictionary-highlighter.js';
 
 interface TakeDetail {
     audioData: string;
@@ -7,8 +10,9 @@ interface TakeDetail {
     title?: string;
 }
 
-export function initializeTeleprompter() {
+export function initializeTeleprompter(projects: Project[]) {
     const fileInput = document.getElementById('teleprompt-file-input') as HTMLInputElement;
+    const projectSelect = document.getElementById('teleprompt-project-select') as HTMLSelectElement;
     const displayDiv = document.getElementById('teleprompt-display') as HTMLDivElement;
     const speedInput = document.getElementById('teleprompt-speed') as HTMLInputElement;
     const fontMinus = document.getElementById('teleprompt-font-minus') as HTMLButtonElement;
@@ -32,6 +36,32 @@ export function initializeTeleprompter() {
     let audioChunks: Blob[] = [];
     let takes: TakeDetail[] = [];
     let uploadedFilename = 'session';
+    let currentRawText = '';
+    let currentDictionary: DictionaryEntry[] = [];
+
+    // Initialize Project Dropdown
+    if (projectSelect) {
+        projectSelect.innerHTML = `<option value="">--Select Project--</option>${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
+        
+        projectSelect.addEventListener('change', async () => {
+            const projectId = parseInt(projectSelect.value);
+            if (!isNaN(projectId)) {
+                currentDictionary = await getDictionaryEntries(projectId);
+            } else {
+                currentDictionary = [];
+            }
+            renderText();
+        });
+    }
+
+    const renderText = () => {
+        if (!currentRawText) {
+            displayDiv.innerHTML = '';
+            return;
+        }
+        const highlighted = highlightDictionaryWords(currentRawText, currentDictionary);
+        displayDiv.innerHTML = highlighted.split(/\r?\n/).map(line => line || '<br>').join('<br>');
+    };
 
     // Font Size Logic
     const updateFontSize = () => {
@@ -49,8 +79,8 @@ export function initializeTeleprompter() {
         uploadedFilename = file.name.replace(/\.[^/.]+$/, "").replace(/\s+/g, '_');
         const reader = new FileReader();
         reader.onload = (event) => {
-            const text = event.target?.result as string;
-            displayDiv.innerHTML = text.split(/\r?\n/).map(line => line || '<br>').join('<br>');
+            currentRawText = event.target?.result as string;
+            renderText();
         };
         reader.readAsText(file);
     });
