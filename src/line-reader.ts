@@ -1,10 +1,11 @@
 import { Character, Project, SystemSettings } from './types.js';
 import { convertWebMToWav } from './audio-utils.js';
+import { saveAudioBlob, getAudioBlob, deleteAudioBlob, initDB } from './indexeddb.js';
 import JSZip from 'jszip';
 
 // In-memory representation
 interface TakeDetail {
-    audioData: string;
+    audioId: string;
     rating: number;
     notes: string;
     title?: string;
@@ -47,6 +48,66 @@ export function initializeLineReader(characters: Character[], projects: Project[
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
     const projectSelect = document.getElementById('script-project-select') as HTMLSelectElement;
+
+    // --- Session Persistence ---
+    const SESSION_KEY = 'vo_app_active_line_reader_session';
+    
+    const saveActiveSession = () => {
+        const linesToSave = Array.from(document.getElementById('line-container')?.querySelectorAll('.line-entry') || []).map(line => {
+            const status: 'read' | 'omitted' | 'normal' = line.classList.contains('read') ? 'read' : line.classList.contains('omitted') ? 'omitted' : 'normal';
+            return { text: line.textContent || '', status: status };
+        });
+        const sessionData = {
+            projectId: parseInt(projectSelect.value) || undefined,
+            scriptName: scriptNameInput.value || '',
+            lines: linesToSave,
+            lineDetails: Array.from(lineDetails.values())
+        };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+    };
+
+    const loadActiveSession = async () => {
+        const dataStr = localStorage.getItem(SESSION_KEY);
+        if (!dataStr) return;
+        try {
+            const sessionData = JSON.parse(dataStr);
+            if (sessionData.scriptName) scriptNameInput.value = sessionData.scriptName;
+            if (sessionData.projectId && projectSelect) projectSelect.value = String(sessionData.projectId);
+            
+            const lineContainer = document.getElementById('line-container');
+            const readContainer = document.getElementById('read-container');
+            if (lineContainer) lineContainer.innerHTML = '';
+            if (readContainer) readContainer.innerHTML = '';
+
+            (sessionData.lines || []).forEach((lineInfo: any) => {
+                const lineDiv = document.createElement('div');
+                lineDiv.textContent = lineInfo.text;
+                lineDiv.className = 'line-entry';
+                if (lineInfo.status !== 'normal') lineDiv.classList.add(lineInfo.status);
+                lineDiv.addEventListener('click', () => selectLine(lineDiv, false));
+                lineContainer?.appendChild(lineDiv);
+
+                if (lineInfo.status === 'read') {
+                    const readLineDiv = document.createElement('div');
+                    readLineDiv.textContent = lineInfo.text;
+                    readLineDiv.className = 'line-entry';
+                    readLineDiv.addEventListener('click', () => selectLine(readLineDiv, true));
+                    readContainer?.appendChild(readLineDiv);
+                }
+            });
+
+            lineDetails.clear();
+            (sessionData.lineDetails || []).forEach((detail: LineDetail) => {
+                lineDetails.set(detail.text, detail);
+            });
+
+            if (projectSelect) projectSelect.dispatchEvent(new Event('change'));
+            updateLineContainerUI();
+        } catch (e) {
+            console.error("Failed to load active session", e);
+        }
+    };
+
     const filterSelect = document.getElementById('line-filter-select') as HTMLSelectElement;
     const lineContainer = document.getElementById('line-container');
     const readContainer = document.getElementById('read-container');
@@ -154,7 +215,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
     filterSelect?.addEventListener('change', updateLineContainerUI);
 
-    const renderDetails = (lineText: string) => {
+    const renderDetails = async (lineText: string) => {
         if (!readDetailsContainer) return;
         const details = lineDetails.get(lineText);
         if (!details) return;
@@ -163,6 +224,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
         const artworkImage = associatedCharacter?.artwork
             ? `<img id="line-character-art" class="character-art-preview" src="${associatedCharacter.artwork}" />`
             : `<div id="line-character-art" class="character-art-preview"></div>`;
+
+        const audioUrls = new Map<string, string>();
+        for (const take of details.takes) {
+            if (take.audioId) {
+                const blob = await getAudioBlob(take.audioId);
+                if (blob) audioUrls.set(take.audioId, URL.createObjectURL(blob));
+            }
+        }
 
         readDetailsContainer.innerHTML = `
             <label for="line-name-input">Line Name:</label>
@@ -180,7 +249,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 <li class="take-item" data-index="${index}">
                     <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
                     <div class="take-audio-controls">
-                        <audio controls controlsList="nodownload" src="${take.audioData}"></audio>
+                        <audio controls controlsList="nodownload" src="${audioUrls.get(take.audioId) || ''}"></audio>
                         <span class="download-take" title="Download Take">⬇️</span>
                         <span class="delete-take">🗑️</span>
                     </div>
@@ -205,9 +274,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
         });
         document.getElementById('line-character-art')?.addEventListener('click', () => { if (associatedCharacter) openCharacterModal(associatedCharacter); });
         document.getElementById('line-notes')?.addEventListener('input', (e) => { details.notes = (e.target as HTMLTextAreaElement).value; });
-        document.querySelectorAll('.delete-take').forEach(btn => btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.delete-take').forEach(btn => btn.addEventListener('click', async (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+            const take = details.takes[index];
+            if (take.audioId) {
+                await deleteAudioBlob(take.audioId).catch(e => console.warn(e));
+            }
             details.takes.splice(index, 1);
+            saveActiveSession();
             renderDetails(lineText);
         }));
         document.querySelectorAll('.download-take').forEach(btn => btn.addEventListener('click', async (e) => {
@@ -215,12 +289,21 @@ export function initializeLineReader(characters: Character[], projects: Project[
             const take = details.takes[index];
             const a = document.createElement('a');
             const safeTitle = (take.title || `take_${index + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            
+            const blob = await getAudioBlob(take.audioId);
+            if (!blob) return;
+
             if (settings.exportFormat === 'wav') {
-                const wavBlob = await convertWebMToWav(take.audioData);
+                const base64Audio = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.readAsDataURL(blob);
+                });
+                const wavBlob = await convertWebMToWav(base64Audio);
                 a.href = URL.createObjectURL(wavBlob);
                 a.download = `${safeTitle}.wav`;
             } else {
-                a.href = take.audioData;
+                a.href = URL.createObjectURL(blob);
                 a.download = `${safeTitle}.webm`;
             }
             a.click();
@@ -281,12 +364,13 @@ export function initializeLineReader(characters: Character[], projects: Project[
             mediaRecorder.addEventListener("dataavailable", event => audioChunks.push(event.data));
             mediaRecorder.addEventListener("stop", async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                const base64Audio = await blobToBase64(audioBlob);
+                const audioId = await saveAudioBlob(audioBlob);
                 const lineText = selectedReadLine?.textContent;
                 if (lineText) {
                     const details = lineDetails.get(lineText);
                     if (details) {
-                        details.takes.unshift({ audioData: base64Audio, rating: 0, notes: '', title: '' });
+                        details.takes.unshift({ audioId, rating: 0, notes: '', title: '' });
+                        saveActiveSession();
                         renderDetails(lineText);
                     }
                 }
@@ -298,17 +382,27 @@ export function initializeLineReader(characters: Character[], projects: Project[
         }
     };
 
-    const resetUI = () => {
+    const resetUI = async () => {
+        // Clear old blobs from IndexedDB
+        for (const detail of lineDetails.values()) {
+            for (const take of detail.takes) {
+                if (take.audioId) {
+                    await deleteAudioBlob(take.audioId).catch(e => console.warn(e));
+                }
+            }
+        }
+
         [lineContainer, readContainer, readDetailsContainer].forEach(c => c && (c.innerHTML = ''));
         if (scriptNameInput) scriptNameInput.value = '';
         if (projectSelect) projectSelect.value = '';
         selectedLine = null;
         selectedReadLine = null;
         lineDetails.clear();
+        localStorage.removeItem(SESSION_KEY);
     };
 
-    const loadScriptFromTxt = (file: File) => {
-        resetUI();
+    const loadScriptFromTxt = async (file: File) => {
+        await resetUI();
         if (scriptNameInput) scriptNameInput.value = file.name.replace(/\.[^/.]+$/, "");
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -324,12 +418,13 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 }
             });
             updateLineContainerUI();
+            saveActiveSession();
         };
         reader.readAsText(file);
     };
 
     const loadScriptFromZip = async (file: File) => {
-        resetUI();
+        await resetUI();
         if (scriptNameInput) scriptNameInput.value = file.name.replace(/\.zip$/, "");
 
         try {
@@ -369,8 +464,9 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     const takeFile = zip.file(savedTake.path);
                     if (takeFile) {
                         const blob = await takeFile.async('blob');
+                        const audioId = await saveAudioBlob(blob);
                         loadedTakes.push({
-                            audioData: await blobToBase64(blob),
+                            audioId,
                             rating: savedTake.rating,
                             notes: savedTake.notes,
                             title: savedTake.title || ''
@@ -381,6 +477,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
             }
             if (projectSelect) projectSelect.dispatchEvent(new Event('change'));
             updateLineContainerUI();
+            saveActiveSession();
         } catch (error) {
             console.error("Error loading script from zip:", error);
             alert("Failed to load script. The file may be corrupted or in the wrong format.");
@@ -474,13 +571,19 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
                 jsonTakes.push({ path, rating: take.rating, notes: take.notes, title: take.title });
 
-                if (format === 'wav') {
-                    const wavBlob = await convertWebMToWav(take.audioData);
-                    targetFolder.file(fileName, wavBlob);
-                } else {
-                    const response = await fetch(take.audioData);
-                    const blob = await response.blob();
-                    targetFolder.file(fileName, blob);
+                const blob = await getAudioBlob(take.audioId);
+                if (blob) {
+                    if (format === 'wav') {
+                        const base64Audio = await new Promise<string>((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result as string);
+                            reader.readAsDataURL(blob);
+                        });
+                        const wavBlob = await convertWebMToWav(base64Audio);
+                        targetFolder.file(fileName, wavBlob);
+                    } else {
+                        targetFolder.file(fileName, blob);
+                    }
                 }
             }
             jsonLineDetails.push({ text: detail.text, lineName: detail.lineName, characterId: detail.characterId, notes: detail.notes, takes: jsonTakes });
@@ -520,8 +623,9 @@ export function initializeLineReader(characters: Character[], projects: Project[
     resetButton?.addEventListener('click', () => {
         const confirmed = confirm("Are you sure you want to reset? All line statuses, notes, and recorded audio takes for this script will be lost.");
         if (confirmed) {
-            resetUI();
-            updateLineContainerUI();
+            resetUI().then(() => updateLineContainerUI());
         }
     });
+
+    loadActiveSession();
 }

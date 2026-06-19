@@ -1,9 +1,10 @@
 import { VoiceMemo, DictionaryEntry } from './types.js';
 
 const DB_NAME = 'VoAppDatabase';
-const DB_VERSION = 2; // Incremented for dictionary store
+const DB_VERSION = 3; // Incremented for audio blobs store
 const VOICE_MEMOS_STORE = 'voice_memos';
 const DICTIONARY_STORE = 'dictionary';
+const AUDIO_BLOBS_STORE = 'audio_blobs';
 
 export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -26,6 +27,9 @@ export function initDB(): Promise<IDBDatabase> {
             if (!db.objectStoreNames.contains(DICTIONARY_STORE)) {
                 const store = db.createObjectStore(DICTIONARY_STORE, { keyPath: 'id' });
                 store.createIndex('projectId', 'projectId', { unique: false });
+            }
+            if (!db.objectStoreNames.contains(AUDIO_BLOBS_STORE)) {
+                db.createObjectStore(AUDIO_BLOBS_STORE, { keyPath: 'id' });
             }
         };
     });
@@ -158,5 +162,47 @@ export async function getDictionaryEntries(projectId: number): Promise<Dictionar
         request.onerror = (event) => {
             reject((event.target as IDBRequest).error);
         };
+    });
+}
+
+// --- Audio Blobs Operations ---
+
+export async function saveAudioBlob(blob: Blob): Promise<string> {
+    const db = await initDB();
+    const id = crypto.randomUUID();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([AUDIO_BLOBS_STORE], 'readwrite');
+        const store = transaction.objectStore(AUDIO_BLOBS_STORE);
+        const request = store.add({ id, blob });
+
+        request.onsuccess = () => resolve(id);
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function getAudioBlob(id: string): Promise<Blob | undefined> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([AUDIO_BLOBS_STORE], 'readonly');
+        const store = transaction.objectStore(AUDIO_BLOBS_STORE);
+        const request = store.get(id);
+
+        request.onsuccess = (event) => {
+            const result = (event.target as IDBRequest).result;
+            resolve(result ? result.blob : undefined);
+        };
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function deleteAudioBlob(id: string): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([AUDIO_BLOBS_STORE], 'readwrite');
+        const store = transaction.objectStore(AUDIO_BLOBS_STORE);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
     });
 }

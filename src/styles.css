@@ -239,7 +239,7 @@ textarea, input, select {
     z-index: 100;
 }
 
-#modal-content, #audition-modal #modal-content, #dictionary-modal #modal-content {
+#modal-content, #project-modal #modal-content, #audition-modal #modal-content, #voice-memo-modal #modal-content, #dictionary-modal-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -438,7 +438,7 @@ body.dark-mode { background-color: var(--gray-1000); color: var(--gray-100); }
 body.dark-mode #app, body.dark-mode #settings-container { background: var(--gray-950); }
 body.dark-mode .character-card { background: var(--gray-900); border-color: var(--gray-800); }
 body.dark-mode textarea, body.dark-mode input, body.dark-mode select { background-color: var(--gray-975); color: var(--gray-100); border-color: var(--gray-800); }
-body.dark-mode #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #dictionary-modal #modal-content { background: var(--gray-950); }
+body.dark-mode #modal-content, body.dark-mode #project-modal #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #voice-memo-modal #modal-content, body.dark-mode #dictionary-modal-content { background: var(--gray-950); }
 body.dark-mode .modal-footer { border-top-color: var(--gray-850); }
 body.dark-mode .dictionary-header { border-bottom-color: var(--gray-850); }
 body.dark-mode .dictionary-row { border-bottom-color: var(--gray-875); }
