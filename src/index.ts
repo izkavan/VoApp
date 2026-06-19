@@ -257,7 +257,7 @@ initializeNavigation();
 initializeVoiceActorView();
 initializeLineReader(characters, projects, currentSettings, openModal);
 initializeDungeonMasterView(characters, projects, openModal);
-initializeUtilityView();
+initializeUtilityView(currentSettings);
 initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;
     saveToLocalStorage(characters, projects, auditions, currentSettings);

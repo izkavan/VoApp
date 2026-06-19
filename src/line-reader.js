@@ -128,7 +128,8 @@ export function initializeLineReader(characters, projects, settings, openCharact
                 <li class="take-item" data-index="${index}">
                     <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
                     <div class="take-audio-controls">
-                        <audio controls src="${take.audioData}"></audio>
+                        <audio controls controlsList="nodownload" src="${take.audioData}"></audio>
+                        <span class="download-take" title="Download Take">⬇️</span>
                         <span class="delete-take">🗑️</span>
                     </div>
                     <div class="take-metadata">
@@ -156,6 +157,22 @@ export function initializeLineReader(characters, projects, settings, openCharact
             const index = Number(e.currentTarget.closest('.take-item')?.getAttribute('data-index'));
             details.takes.splice(index, 1);
             renderDetails(lineText);
+        }));
+        document.querySelectorAll('.download-take').forEach(btn => btn.addEventListener('click', async (e) => {
+            const index = Number(e.currentTarget.closest('.take-item')?.getAttribute('data-index'));
+            const take = details.takes[index];
+            const a = document.createElement('a');
+            const safeTitle = (take.title || `take_${index + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            if (settings.exportFormat === 'wav') {
+                const wavBlob = await convertWebMToWav(take.audioData);
+                a.href = URL.createObjectURL(wavBlob);
+                a.download = `${safeTitle}.wav`;
+            }
+            else {
+                a.href = take.audioData;
+                a.download = `${safeTitle}.webm`;
+            }
+            a.click();
         }));
         document.querySelectorAll('.take-note-input').forEach(input => input.addEventListener('input', (e) => {
             const index = Number(e.currentTarget.closest('.take-item')?.getAttribute('data-index'));

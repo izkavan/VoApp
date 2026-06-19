@@ -1,11 +1,12 @@
 import { loadFromLocalStorage } from './storage.js';
 import { saveVoiceMemo, getVoiceMemos, deleteVoiceMemos, updateVoiceMemo } from './indexeddb.js';
-import { VoiceMemo } from './types.js';
+import { VoiceMemo, SystemSettings } from './types.js';
+import { convertWebMToWav } from './audio-utils.js';
 import JSZip from 'jszip';
 
-export function initializeUtilityView(): void {
+export function initializeUtilityView(settings: SystemSettings): void {
     initializeWarmUps();
-    initializeVoiceMemos();
+    initializeVoiceMemos(settings);
 }
 
 function initializeWarmUps() {
@@ -77,7 +78,7 @@ function initializeWarmUps() {
     recordButton.addEventListener('click', toggleRecording);
 }
 
-function initializeVoiceMemos() {
+function initializeVoiceMemos(settings: SystemSettings) {
     const newMemoBtn = document.getElementById('new-voice-memo-button');
     const modal = document.getElementById('voice-memo-modal');
     const closeBtn = document.getElementById('voice-memo-modal-close');
@@ -425,10 +426,16 @@ function initializeVoiceMemos() {
         const selected = memos.filter(m => ids.includes(m.id));
 
         const zip = new JSZip();
-        selected.forEach(m => {
-            const filename = `${m.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${m.id}.webm`;
-            zip.file(filename, m.blob);
-        });
+        for (const m of selected) {
+            if (settings.exportFormat === 'wav') {
+                const wavBlob = await convertWebMToWav(URL.createObjectURL(m.blob));
+                const filename = `${m.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${m.id}.wav`;
+                zip.file(filename, wavBlob);
+            } else {
+                const filename = `${m.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${m.id}.webm`;
+                zip.file(filename, m.blob);
+            }
+        }
 
         const content = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(content);

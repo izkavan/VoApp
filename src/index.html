@@ -165,7 +165,7 @@
                                 <option value="none">Unassigned</option>
                             </select>
                         </div>
-                        <button id="dm-generator-button" style="padding: 10px 20px; font-size: 1.2rem; font-weight: bold; background: var(--primary-color, #4a90e2); color: white; border-radius: 5px; border: none; cursor: pointer;">Generate Random Character</button>
+                        <button id="dm-generator-button" style="padding: 10px 20px; font-size: 1.2rem; font-weight: bold; background: var(--primary-color, #744abd); color: white; border-radius: 5px; border: none; cursor: pointer;">Generate Random Character</button>
                     </div>
                 </div>
             </div>
@@ -219,6 +219,53 @@
                         <!-- Voice memos will be dynamically inserted here -->
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="settings-view" class="view hidden">
+            <div id="settings-container">
+                <header style="background-color: #744abd; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h1 style="margin: 0;">Settings</h1>
+                </header>
+                <main style="padding: 20px;">
+                    <div class="settings-section">
+                        <h3>Export Settings</h3>
+                        <div class="form-group">
+                            <label for="settings-export-format">Audio Export Format</label>
+                            <select id="settings-export-format">
+                                <option value="webm">WebM (Fast, browser native)</option>
+                                <option value="wav">WAV (Uncompressed)</option>
+                            </select>
+                            <small style="color: #666; display: block; margin-top: 5px;">* Note: Additional formats like MP3 and FLAC could be implemented in the future if there's enough request.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-export-path">Audio Export Root Path (in zip)</label>
+                            <input type="text" id="settings-export-path" placeholder="audio" />
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-export-grouping">Script Export Grouping</label>
+                            <select id="settings-export-grouping">
+                                <option value="line">By Line</option>
+                                <option value="character">By Character</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-recording-gear">Recording Gear (auto-appended to JSON metadata)</label>
+                            <textarea id="settings-recording-gear" rows="3" placeholder="E.g. Scarlett 2i2 USB, Neumann TLM 102..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+                        <h3>System Backup</h3>
+                        <p>Backup all your characters, projects, scripts, takes, and voice memos.</p>
+                        <button id="settings-full-backup-btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Download Full Backup</button>
+                        
+                        <div style="margin-top: 20px;">
+                            <label for="settings-restore-file" style="display: block; margin-bottom: 5px;">Restore from Backup</label>
+                            <input type="file" id="settings-restore-file" accept=".zip" />
+                            <button id="settings-restore-btn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Restore Backup</button>
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>
@@ -295,53 +342,7 @@
         <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </div>
 
-    <div id="settings-view" class="view hidden">
-        <div style="max-width: 800px; margin: 0 auto; background: var(--bg-color, #dddddd); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
-            <header style="background-color: #744abd; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h1 style="margin: 0;">Settings</h1>
-            </header>
-            <main style="padding: 20px;">
-                <div class="settings-section">
-                    <h3>Export Settings</h3>
-                    <div class="form-group">
-                        <label for="settings-export-format">Audio Export Format</label>
-                        <select id="settings-export-format">
-                            <option value="webm">WebM (Fast, browser native)</option>
-                            <option value="wav">WAV (Uncompressed)</option>
-                        </select>
-                        <small style="color: #666; display: block; margin-top: 5px;">* Note: Additional formats like MP3 and FLAC could be implemented in the future if there's enough request.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="settings-export-path">Audio Export Root Path (in zip)</label>
-                        <input type="text" id="settings-export-path" placeholder="audio" />
-                    </div>
-                    <div class="form-group">
-                        <label for="settings-export-grouping">Script Export Grouping</label>
-                        <select id="settings-export-grouping">
-                            <option value="line">By Line</option>
-                            <option value="character">By Character</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="settings-recording-gear">Recording Gear (auto-appended to JSON metadata)</label>
-                        <textarea id="settings-recording-gear" rows="3" placeholder="E.g. Scarlett 2i2 USB, Neumann TLM 102..."></textarea>
-                    </div>
-                </div>
 
-                <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
-                    <h3>System Backup</h3>
-                    <p>Backup all your characters, projects, scripts, takes, and voice memos.</p>
-                    <button id="settings-full-backup-btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Download Full Backup</button>
-                    
-                    <div style="margin-top: 20px;">
-                        <label for="settings-restore-file" style="display: block; margin-bottom: 5px;">Restore from Backup</label>
-                        <input type="file" id="settings-restore-file" accept=".zip" />
-                        <button id="settings-restore-btn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Restore Backup</button>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
 
     <script type="importmap">
     {
