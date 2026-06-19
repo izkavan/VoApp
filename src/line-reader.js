@@ -1,5 +1,6 @@
+import { convertWebMToWav } from './audio-utils.js';
 import JSZip from 'jszip';
-export function initializeLineReader(characters, projects, openCharacterModal) {
+export function initializeLineReader(characters, projects, settings, openCharacterModal) {
     const fileInput = document.getElementById('script-file-input');
     const scriptNameInput = document.getElementById('script-name-input');
     const projectSelect = document.getElementById('script-project-select');
@@ -351,7 +352,9 @@ export function initializeLineReader(characters, projects, openCharacterModal) {
     });
     saveButton?.addEventListener('click', async () => {
         const zip = new JSZip();
-        const audioFolder = zip.folder('audio');
+        // Use custom root path from settings, defaulting to 'audio'
+        const rootPath = settings.audioExportPath || 'audio';
+        const audioFolder = zip.folder(rootPath);
         if (!audioFolder)
             return;
         const readLinesDetails = Array.from(lineDetails.values());
@@ -363,18 +366,43 @@ export function initializeLineReader(characters, projects, openCharacterModal) {
             return;
         }
         const jsonLineDetails = [];
+        let hasAudio = false;
         for (const detail of readLinesDetails) {
-            const lineFolder = audioFolder.folder(detail.lineName);
-            if (!lineFolder)
-                continue;
+            let targetFolder = audioFolder;
+            if (settings.scriptExportGrouping === 'character') {
+                const char = characters.find(c => c.id === detail.characterId);
+                const folderName = char ? char.name.replace(/[^a-zA-Z0-9]/g, '_') : 'Unassigned';
+                targetFolder = audioFolder.folder(folderName) || audioFolder;
+            }
+            else {
+                targetFolder = audioFolder.folder(detail.lineName) || audioFolder;
+            }
             const jsonTakes = [];
             for (let i = 0; i < detail.takes.length; i++) {
+                hasAudio = true;
                 const take = detail.takes[i];
-                const path = `audio/${detail.lineName}/${i + 1}.webm`;
+                const format = settings.exportFormat === 'wav' ? 'wav' : 'webm';
+                let fileName = `${i + 1}.${format}`;
+                if (settings.scriptExportGrouping === 'character') {
+                    fileName = `${detail.lineName}_${i + 1}.${format}`;
+                }
+                // Path for JSON
+                let path = `${rootPath}/${detail.lineName}/${fileName}`;
+                if (settings.scriptExportGrouping === 'character') {
+                    const char = characters.find(c => c.id === detail.characterId);
+                    const folderName = char ? char.name.replace(/[^a-zA-Z0-9]/g, '_') : 'Unassigned';
+                    path = `${rootPath}/${folderName}/${fileName}`;
+                }
                 jsonTakes.push({ path, rating: take.rating, notes: take.notes, title: take.title });
-                const response = await fetch(take.audioData);
-                const blob = await response.blob();
-                lineFolder.file(`${i + 1}.webm`, blob);
+                if (format === 'wav') {
+                    const wavBlob = await convertWebMToWav(take.audioData);
+                    targetFolder.file(fileName, wavBlob);
+                }
+                else {
+                    const response = await fetch(take.audioData);
+                    const blob = await response.blob();
+                    targetFolder.file(fileName, blob);
+                }
             }
             jsonLineDetails.push({ text: detail.text, lineName: detail.lineName, characterId: detail.characterId, notes: detail.notes, takes: jsonTakes });
         }
@@ -387,6 +415,9 @@ export function initializeLineReader(characters, projects, openCharacterModal) {
             lines: linesToSave,
             lineDetails: jsonLineDetails
         };
+        if (hasAudio && settings.recordingGear) {
+            saveData.recordingGear = settings.recordingGear;
+        }
         zip.file('script.json', JSON.stringify(saveData, null, 2));
         const zipBlob = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(zipBlob);

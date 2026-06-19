@@ -57,3 +57,10 @@ export interface VoiceMemo {
     isHighImportance: boolean;
     date: number; // timestamp
 }
+
+export interface SystemSettings {
+    exportFormat: 'webm' | 'wav';
+    audioExportPath: string; // e.g., "audio"
+    scriptExportGrouping: 'character' | 'line';
+    recordingGear: string;
+}

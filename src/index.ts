@@ -12,11 +12,14 @@ import { initializeUtilityView } from './utility-view.js';
 import { initializeAuditionView } from './audition-view.js';
 import { initializeTeleprompter } from './teleprompt.js';
 import { initializeDungeonMasterView, refreshDungeonMasterView } from './dungeon-master-view.js';
+import { initializeSettingsView } from './settings-view.js';
+import { SystemSettings } from './types.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
 let projects: Project[] = [];
 let auditions: Audition[] = [];
+let currentSettings: SystemSettings;
 
 // --- Main Page Elements ---
 const characterListElement = document.getElementById('character-list');
@@ -54,7 +57,7 @@ function onCharacterDrop(characterId: number, projectId?: number) {
     const charIndex = characters.findIndex(c => c.id === characterId);
     if (charIndex > -1) {
         characters[charIndex].projectId = projectId;
-        saveToLocalStorage(characters, projects, auditions);
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
         renderApp();
     }
 }
@@ -87,7 +90,7 @@ async function saveCharacter(character: Character, artworkFile?: File, sampleFil
         characters.push(character);
     }
 
-    saveToLocalStorage(characters, projects, auditions);
+    saveToLocalStorage(characters, projects, auditions, currentSettings);
     renderApp();
     closeModal();
 }
@@ -118,16 +121,11 @@ function deleteCharacter(id: number) {
 
 function deleteProject(id: number) {
     if (confirm('Are you sure you want to delete this project? All characters within this project will be moved to "Unassigned".')) {
-        const indexToDelete = projects.findIndex(p => p.id === id);
-        if (indexToDelete > -1) {
-            projects.splice(indexToDelete, 1);
-        }
+        projects = projects.filter(p => p.id !== id);
         characters.forEach(c => {
-            if (c.projectId === id) {
-                c.projectId = undefined;
-            }
+            if (c.projectId === id) c.projectId = undefined;
         });
-        saveToLocalStorage(characters, projects, auditions);
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
         renderApp();
         closeProjectModal();
     }
@@ -204,10 +202,11 @@ importProjectButton?.addEventListener('click', () => {
 });
 
 
-const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions } = loadFromLocalStorage();
+const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings } = loadFromLocalStorage();
 characters = loadedCharacters;
 projects = loadedProjects;
 auditions = loadedAuditions;
+currentSettings = loadedSettings;
 
 initializeCharacterRenderer(openModal, openProjectModal);
 
@@ -232,11 +231,12 @@ initializeProjectModal(
     deleteProjectButton,
     projects,
     characters,
+    currentSettings,
     renderApp,
     (id) => deleteProject(id),
     (updatedProjects) => {
         projects = updatedProjects;
-        saveToLocalStorage(characters, projects, auditions);
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
     }
 );
 
@@ -255,12 +255,38 @@ initializeFilterSearch(
 initializeTheme();
 initializeNavigation();
 initializeVoiceActorView();
-initializeLineReader(characters, projects, openModal);
+initializeLineReader(characters, projects, currentSettings, openModal);
 initializeDungeonMasterView(characters, projects, openModal);
 initializeUtilityView();
 initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;
-    saveToLocalStorage(characters, projects, auditions);
+    saveToLocalStorage(characters, projects, auditions, currentSettings);
 });
 initializeTeleprompter();
+initializeSettingsView(
+    currentSettings,
+    characters,
+    projects,
+    auditions,
+    (newSettings) => {
+        currentSettings = newSettings;
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        // Force re-initialize modules that depend on settings if needed, 
+        // though lineReader/projectModal get the currentSettings ref via initialization closure
+        // Wait, they only get the object reference. If we replace `currentSettings = newSettings`, 
+        // the closure in line-reader won't see the new object.
+        // We should instead update properties of currentSettings to preserve the reference.
+        Object.assign(currentSettings, newSettings);
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
+    },
+    (newChars, newProjs, newAuds, newSets) => {
+        characters = newChars;
+        projects = newProjs;
+        auditions = newAuds;
+        Object.assign(currentSettings, newSets);
+        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        renderApp();
+        location.reload(); // Hard reload to reinitialize all states properly
+    }
+);
 renderApp();

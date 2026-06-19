@@ -6,11 +6,13 @@ export function initializeNavigation() {
     const navVoiceActors = document.getElementById('nav-voice-actors');
     const navDungeonMaster = document.getElementById('nav-dungeon-master');
     const navUtilities = document.getElementById('nav-utilities');
+    const navSettings = document.getElementById('nav-settings');
 
     const characterLibraryView = document.getElementById('character-library-view');
     const voiceActorView = document.getElementById('voice-actor-view');
     const dungeonMasterView = document.getElementById('dungeon-master-view');
     const utilityView = document.getElementById('utility-view');
+    const settingsView = document.getElementById('settings-view');
 
     const showView = (viewToShow: HTMLElement) => {
         views.forEach(view => (view as HTMLElement).classList.add('hidden'));
@@ -32,6 +34,8 @@ export function initializeNavigation() {
                 showView(dungeonMasterView);
             } else if (id === 'nav-utilities' && utilityView) {
                 showView(utilityView);
+            } else if (id === 'nav-settings' && settingsView) {
+                showView(settingsView);
             }
         });
     });

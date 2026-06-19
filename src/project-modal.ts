@@ -1,4 +1,5 @@
-import { Project, Character } from './types.js';
+import { Project, Character, SystemSettings } from './types.js';
+import { convertWebMToWav } from './audio-utils.js';
 
 declare var JSZip: any;
 
@@ -6,6 +7,7 @@ declare var JSZip: any;
 let projects: Project[] = [];
 let characters: Character[] = [];
 let currentProjectId: number | null = null;
+let currentSettings: SystemSettings;
 let renderAppCallback: () => void;
 let deleteProjectCallback: (id: number) => void;
 let saveCallback: (projects: Project[]) => void;
@@ -31,6 +33,7 @@ export function initializeProjectModal(
     deleteBtn: HTMLButtonElement,
     initialProjects: Project[],
     initialCharacters: Character[],
+    settings: SystemSettings,
     renderAppCb: () => void,
     deleteCb: (id: number) => void,
     onSave: (projects: Project[]) => void
@@ -45,6 +48,7 @@ export function initializeProjectModal(
     deleteProjectButton = deleteBtn;
     projects = initialProjects;
     characters = initialCharacters;
+    currentSettings = settings;
     renderAppCallback = renderAppCb;
     deleteProjectCallback = deleteCb;
     saveCallback = onSave;
@@ -113,7 +117,7 @@ export function saveProject() {
     closeProjectModal();
 }
 
-function exportProject() {
+async function exportProject() {
     if (currentProjectId === null) return;
 
     const project = projects.find(p => p.id === currentProjectId);
@@ -122,11 +126,11 @@ function exportProject() {
     const projectCharacters = characters.filter(c => c.projectId === currentProjectId);
     const zip = new JSZip();
 
-    zip.file('project.json', JSON.stringify(project, null, 2));
+    let hasAudio = false;
 
     const charactersFolder = zip.folder('characters');
     if (charactersFolder) {
-        projectCharacters.forEach(character => {
+        for (const character of projectCharacters) {
             const charFolder = charactersFolder.folder(character.name.replace(/[^a-zA-Z0-9]/g, '_'));
             if (charFolder) {
                 charFolder.file('character.json', JSON.stringify(character, null, 2));
@@ -135,17 +139,28 @@ function exportProject() {
                     charFolder.file(character.artworkFilename || 'artwork.png', artworkData, { base64: true });
                 }
                 if (character.voice_sample) {
-                    const voiceData = character.voice_sample.split(',')[1];
-                    charFolder.file('voice_sample.webm', voiceData, { base64: true });
+                    hasAudio = true;
+                    if (currentSettings.exportFormat === 'wav') {
+                        const wavBlob = await convertWebMToWav(character.voice_sample);
+                        charFolder.file('voice_sample.wav', wavBlob);
+                    } else {
+                        const voiceData = character.voice_sample.split(',')[1];
+                        charFolder.file('voice_sample.webm', voiceData, { base64: true });
+                    }
                 }
             }
-        });
+        }
     }
 
-    zip.generateAsync({ type: 'blob' }).then((zipContent: any) => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(zipContent);
-        a.download = `${project.name.replace(/[^a-zA-Z0-9]/g, '_')}.zip`;
-        a.click();
-    });
+    const projectJsonData: any = { ...project };
+    if (hasAudio && currentSettings.recordingGear) {
+        projectJsonData.recordingGear = currentSettings.recordingGear;
+    }
+    zip.file('project.json', JSON.stringify(projectJsonData, null, 2));
+
+    const zipContent = await zip.generateAsync({ type: 'blob' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipContent);
+    a.download = `${project.name.replace(/[^a-zA-Z0-9]/g, '_')}.zip`;
+    a.click();
 }

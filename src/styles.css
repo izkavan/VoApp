@@ -17,6 +17,14 @@ body {
     color: #f0f0f0;
     padding: 20px;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#main-nav .nav-settings {
+    margin-top: auto;
+    list-style: none;
+    padding: 0;
 }
 
 #main-nav ul {
