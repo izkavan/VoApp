@@ -242,8 +242,34 @@
                     </div>
                 </div>
                 <div id="vp-sides" class="tab-content">
-                    <h2>Sides</h2>
-                    <p>The Sides exporter loads a script, lets you annotate the characters on it, and export all the lines that each person needs.</p>
+                    <!-- Sides View -->
+                    <div id="vp-sides-view">
+                        <div class="action-bar" style="justify-content: space-between; display: flex; padding: 10px 0;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="file" id="vp-sides-import-input" accept=".json,.zip" style="display: none;" />
+                                <button id="vp-sides-import-btn" class="secondary">Upload Script</button>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <label class="toggle-switch-label" style="display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                                    <input type="checkbox" id="vp-sides-include-context" checked />
+                                    Include Scene and Title Information
+                                </label>
+                                <button id="vp-sides-export-btn" class="primary" style="margin-left: 10px;">Export Sides</button>
+                            </div>
+                        </div>
+
+                        <div class="sides-split-container" style="display: flex; gap: 20px; height: calc(100vh - 200px);">
+                            <!-- Left Column: Characters -->
+                            <div id="vp-sides-characters" style="flex: 1; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white);">
+                                <div style="text-align: center; color: var(--gray-500); margin-top: 20px;">Upload a script to view characters</div>
+                            </div>
+                            
+                            <!-- Right Column: Lines -->
+                            <div id="vp-sides-lines" style="flex: 2; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white); display: flex; flex-direction: column; gap: 5px;">
+                                <div style="text-align: center; color: var(--gray-500); margin-top: 20px;">Upload a script to view lines</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="vp-auditions" class="tab-content">
                     <h2>Auditions</h2>

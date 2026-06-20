@@ -19,6 +19,7 @@ import { initializeWarmupView } from './warmup-view.js';
 import { initializeEffectLibrary } from './effect-library.js';
 import { initializeVoiceProductionFeedback } from './vp-feedback.js';
 import { initializeScriptView, refreshScriptView } from './vp-script.js';
+import { initializeSidesView, refreshSidesView } from './vp-sides.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
@@ -65,6 +66,7 @@ export function renderApp() {
     filterCharacters();
     refreshDungeonMasterView();
     refreshScriptView(projects, characters);
+    refreshSidesView(characters);
 }
 
 function onCharacterDrop(characterId: number, projectId?: number) {
@@ -336,6 +338,7 @@ async function initApp() {
     initializeDungeonMasterView(characters, projects, openModal);
     initializeUtilityView(currentSettings);
     initializeScriptView(projects, characters, openDictionaryModal);
+    initializeSidesView(characters);
     
     initializeAuditionView(auditions, characters, (updatedAuditions) => {
         auditions = updatedAuditions;
