@@ -4,6 +4,11 @@ Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you k
 
 As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on. I sort of want this to be the "connective tissue" of the industry, for teams that feel that it's a good fit!
 
+I have no interest in selling this idea to a corporation. 
+I have no interest in making a "Premium" tier and gating features behind it-- The exception being if there's a central networked system at play for the community "pipedream" features. I'm not going to shell out money for web hosting out of the kindness of my heart. 
+
+I'm in it for a love of the game. If you want to kick a few dollars my way, my Ko-Fi link is at the bottom of this readme!
+
 ## What can you do right now?
 
 Vo-App is designed to be your go-to place for voice-work related items. Here is a breakdown of the app by its main views and features:
@@ -126,6 +131,7 @@ Here are some of the features that I thought up for the app that could be coming
 
 * **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
 * Time-stamped waveform feedback should also allows multiple audio files to be selected from a list on the left, waveform on the right, and then comments for that waveform below. This should allow, for example, feedback on an entire Teleprompter session. 
+* It might be a good idea to also allow a script to bundle with it a project/character library, so that if you are sending it to someone you don't need to remember to do that as well. This gets into more and more complex data formats, so it's in the backlog for now.
 * **Sides Exporter**: Have a giant script, annotate it with the characters, and then when you select "generate sides", it splits each character's lines into their own zip file/script that you can send off. Could also include the project and character details (And mood board!).
 * **Asynchronous slate builder** : A director can create a project, create empty "placeholder" takes for lines they need, attach reference audio or notes to each line, and export it. The actor imports this "checklist," records their audio directly into the empty slots, and exports it back.
 * **Non-destructive imports**: In the director's "Script" mode, they can import the output of multiple actors into the same script view. This lets them see the project in its whole. This will likely require a heavy understanding of workflows.

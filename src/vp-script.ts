@@ -200,7 +200,6 @@ function renderLines() {
                 descInput.type = 'text';
                 descInput.placeholder = 'e.g. whispered';
                 descInput.value = line.descriptor;
-                descInput.style.marginTop = '5px';
                 descInput.addEventListener('input', (e) => {
                     line.descriptor = (e.target as HTMLInputElement).value;
                 });
@@ -220,6 +219,8 @@ function renderLines() {
 
             const textInput = document.createElement('textarea');
             textInput.value = line.text;
+            textInput.rows = 1;
+            textInput.style.resize = 'none';
             textInput.placeholder = line.characterId === 'scene' ? 'Describe the scene...' : 'Dialogue...';
             textInput.addEventListener('input', (e) => {
                 line.text = (e.target as HTMLTextAreaElement).value;
@@ -321,8 +322,8 @@ async function saveScript() {
             const desc = line.descriptor ? ` [${line.descriptor}]` : '';
             const mdDesc = line.descriptor ? ` *${line.descriptor}*` : '';
             
-            txtContent += `${charName}${desc}\n${line.text}\n\n`;
-            mdContent += `[[${charName}]]${mdDesc}\n${line.text}\n\n`;
+            txtContent += `${charName}${desc}: ${line.text}\n\n`;
+            mdContent += `[[${charName}]]${mdDesc}: ${line.text}\n\n`;
         }
     });
 

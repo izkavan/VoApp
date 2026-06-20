@@ -489,7 +489,7 @@ body.dark-mode .vp-comment-item {
 .script-line-item {
     display: flex;
     gap: 10px;
-    align-items: flex-start;
+    align-items: center;
     background: var(--gray-100);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -508,9 +508,12 @@ body.dark-mode .script-line-item {
 }
 .script-drag-handle {
     cursor: grab;
-    font-size: 1.5em;
+    font-size: 1.2em;
     color: var(--gray-500);
-    padding-top: 5px;
+    width: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .script-drag-handle:active {
     cursor: grabbing;
@@ -527,9 +530,9 @@ body.dark-mode .script-line-item {
 }
 .script-line-header {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    min-width: 150px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 .script-character-avatar {
     width: 40px;
@@ -543,8 +546,11 @@ body.dark-mode .script-line-item {
     flex-direction: column;
 }
 .script-line-content textarea {
-    resize: vertical;
-    min-height: 60px;
+    min-height: auto;
+    padding: 5px;
+    font-size: 1rem;
+    line-height: 1.5;
+    flex-grow: 1;
 }
 body.dark-mode .vp-comment-timestamp {
     color: var(--gray-300);
