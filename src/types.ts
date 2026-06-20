@@ -67,6 +67,15 @@ export interface VoiceMemo {
     date: number; // timestamp
 }
 
+export interface Warmup {
+    id: number;
+    title: string;
+    text: string;
+    rating: number; // 0 to 5 stars
+    tags: string[];
+    characterIds: number[];
+}
+
 export interface SystemSettings {
     exportFormat: 'webm' | 'wav';
     audioExportPath: string; // e.g., "audio"

@@ -38,6 +38,7 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 
 ### Voice Memos & Utilities
 * **Voice Memos**: Record and save ad-hoc voice memos to capture spontaneous ideas, tagging them to specific projects or marking them as high importance.
+* **Vocal Warmups**: A dedicated practice dashboard where you can read text, filter by tags or ratings, and attach characters for targeted practice. Includes an Audio Scratchpad to record and review temporary takes.
 * **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
 
 ## I'm a voice actor. What is this and how do I use it?
@@ -74,7 +75,6 @@ Here are some of the features that I thought up for the app that could be coming
 
 ### Utilities to add
 * Have a viewer for active memory management. Should allow a single view of all the data the application stores in local memory, with options to delete that data if the user wants.
-* **Vocal Warmup/Practice updates**: Record and play back multiple different vocal warmups, flag them as your favorites, or tag them with specific voices that you prefer to work with or that need more practice. Probably a dropdown of the "common" ones, or a list selector that lets you store your ratings like elsewhere in the system
 * **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
 * **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
 **Effort & Grunt Library:** A special category for recording and tagging non-dialogue vocalizations (grunts, yells, laughs, etc.) to build a reusable library for action-heavy roles. I don't know if this needs to be per character, or if a different tagging system should be put in place. Tag back to vocal recipes, and let there be a search system so you can cross reference "how did I do that before?"

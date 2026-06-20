@@ -183,11 +183,36 @@
                     <button class="tab-link" data-tab="voice-memos">Voice Memos</button>
                 </div>
                 <div id="warm-ups" class="tab-content active">
-                    <h2>Vocal Warm Ups</h2>
-                    <div id="warm-up-text" class="warm-up-container"></div>
-                    <div class="warm-up-controls">
-                        <button id="warm-up-record-button" class="record-button">●</button>
-                        <div id="warm-up-audio-player"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Warmups</h2>
+                        <button id="new-warmup-button">New Warmup</button>
+                    </div>
+                    
+                    <div class="warmup-filters" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
+                        <input type="text" id="warmup-tag-search" placeholder="Search by tag..." style="flex: 1; min-width: 200px;">
+                        
+                        <div class="warmup-rating-filter" style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-weight: bold;">Ratings:</span>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="5" checked> 5★</label>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="4" checked> 4★</label>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="3" checked> 3★</label>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="2" checked> 2★</label>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="1" checked> 1★</label>
+                            <label><input type="checkbox" class="warmup-rating-cb" value="0" checked> 0★</label>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <select id="warmup-project-select">
+                                <option value="none">-- Filter by Project --</option>
+                            </select>
+                            <select id="warmup-character-select">
+                                <option value="none">-- Filter by Character --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="warmup-cards-grid" class="warmup-cards-grid">
+                        <!-- Cards injected dynamically -->
                     </div>
                 </div>
                 <div id="voice-memos" class="tab-content">
@@ -359,6 +384,52 @@
     <!-- Dictionary Modal -->
     <div id="dictionary-modal" class="hidden">
         <div id="dictionary-modal-content" class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;"></div>
+    </div>
+
+    <!-- Warmup Modal -->
+    <div id="warmup-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <span id="warmup-modal-close" style="float: right; cursor: pointer; font-size: 24px;">&times;</span>
+            <div id="warmup-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 id="warmup-modal-title" style="margin: 0;"></h2>
+                <input type="text" id="warmup-modal-title-input" class="hidden" style="flex: 1; margin-right: 10px; font-size: 1.5rem; font-weight: bold;">
+                <div id="warmup-modal-rating" class="warmup-modal-rating" style="cursor: pointer; color: gold; font-size: 1.2rem;"></div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <p id="warmup-modal-text" style="font-size: 1.1rem; line-height: 1.5;"></p>
+                <textarea id="warmup-modal-text-input" class="hidden" style="width: 100%; min-height: 100px; font-size: 1.1rem;"></textarea>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <div id="warmup-modal-tags" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
+                <input type="text" id="warmup-modal-tags-input" class="hidden" placeholder="Comma-separated tags (e.g. breath, pitch)" style="width: 100%;">
+            </div>
+            
+            <div class="voice-memo-record-section" style="margin-bottom: 20px; background: var(--bg-color-light); padding: 15px; border-radius: 8px;">
+                <h3 style="margin-top: 0;">Practice Scratchpad</h3>
+                <button id="warmup-record-button" class="record-button">●</button>
+                <span id="warmup-record-status">Ready to record</span>
+                <div id="warmup-audio-preview" style="margin-top: 10px;"></div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3>Associated Characters</h3>
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                    <select id="warmup-modal-character-select">
+                        <option value="none">-- Select Character to Add --</option>
+                    </select>
+                    <button id="warmup-modal-add-character">+</button>
+                </div>
+                <div id="warmup-modal-character-list" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="warmup-modal-edit-btn">Edit</button>
+                <button id="warmup-modal-save-btn" class="hidden">Save</button>
+                <button id="warmup-modal-delete-btn" style="background: #d9534f; color: white;">Delete</button>
+            </div>
+        </div>
     </div>
     <script src="index.js" type="module"></script>
 </body>

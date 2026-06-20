@@ -15,12 +15,14 @@ import { initializeDungeonMasterView, refreshDungeonMasterView } from './dungeon
 import { initializeSettingsView } from './settings-view.js';
 import { initializeDictionaryModal, openDictionaryModal } from './dictionary-modal.js';
 import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
-import { SystemSettings } from './types.js';
+import { initializeWarmupView } from './warmup-view.js';
+import { SystemSettings, Warmup } from './types.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
 let projects: Project[] = [];
 let auditions: Audition[] = [];
+let warmups: Warmup[] = [];
 let currentSettings: SystemSettings;
 
 // --- Main Page Elements ---
@@ -96,7 +98,7 @@ async function saveCharacter(character: Character, artworkFile?: File, sampleFil
         characters.push(character);
     }
 
-    saveToLocalStorage(characters, projects, auditions, currentSettings);
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
     renderApp();
     closeModal();
 }
@@ -108,7 +110,7 @@ function duplicateCharacter(characterToDuplicate: Character) {
         name: `${characterToDuplicate.name} (Copy)`
     };
     characters.push(newCharacter);
-    saveToLocalStorage(characters, projects, auditions);
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
     renderApp();
     closeModal();
 }
@@ -119,7 +121,7 @@ function deleteCharacter(id: number) {
         if (indexToDelete > -1) {
             characters.splice(indexToDelete, 1);
         }
-        saveToLocalStorage(characters, projects, auditions);
+        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
         renderApp();
         closeModal();
     }
@@ -208,10 +210,11 @@ importProjectButton?.addEventListener('click', () => {
 });
 
 
-const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings } = loadFromLocalStorage();
+const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings, warmups: loadedWarmups } = loadFromLocalStorage();
 characters = loadedCharacters;
 projects = loadedProjects;
 auditions = loadedAuditions;
+warmups = loadedWarmups;
 currentSettings = loadedSettings;
 
 initializeCharacterRenderer(openModal, openProjectModal, openDictionaryModal);
@@ -244,7 +247,7 @@ initializeProjectModal(
     (id) => deleteProject(id),
     (updatedProjects) => {
         projects = updatedProjects;
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
     }
 );
 
@@ -268,10 +271,14 @@ initializeDungeonMasterView(characters, projects, openModal);
 initializeUtilityView(currentSettings);
 initializeAuditionView(auditions, characters, (updatedAuditions) => {
     auditions = updatedAuditions;
-    saveToLocalStorage(characters, projects, auditions, currentSettings);
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
 });
 initializeDictionaryHighlighter();
 initializeTeleprompter(projects);
+initializeWarmupView(warmups, characters, projects, (updatedWarmups) => {
+    warmups = updatedWarmups;
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+});
 initializeSettingsView(
     currentSettings,
     characters,
@@ -279,7 +286,7 @@ initializeSettingsView(
     auditions,
     (newSettings) => {
         currentSettings = newSettings;
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
         // Force re-initialize modules that depend on settings if needed, 
         // though lineReader/projectModal get the currentSettings ref via initialization closure
         // Wait, they only get the object reference. If we replace `currentSettings = newSettings`, 
