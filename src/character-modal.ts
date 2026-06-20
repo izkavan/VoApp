@@ -10,6 +10,8 @@ let saveCharacterCallback: (character: Character, artworkFile?: File, sampleFile
 let duplicateCharacterCallback: (character: Character) => void;
 let deleteCharacterCallback: (id: number) => void;
 
+let currentMoodboardMedia: any[] = [];
+
 // --- DOM Elements ---
 let modalElement: HTMLElement;
 let modalContentElement: HTMLElement;
@@ -36,6 +38,22 @@ export function openModal(character?: Character, isEditMode = false) {
     if (!modalElement || !modalContentElement) return;
 
     const projectOptions = projects.map(p => `<option value="${p.id}" ${character?.projectId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+    currentMoodboardMedia = character?.moodboardMedia ? [...character.moodboardMedia] : [];
+    
+    const moodboardEditHtml = `
+        <div class="collapsible-section" style="margin-top: 20px;">
+            <h3 class="collapsible-header">Mood Board (Edit)</h3>
+            <div class="collapsible-content" style="display: none;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <label for="moodboard-upload" class="custom-file-input" style="cursor: pointer; padding: 5px 10px; background: var(--primary-color); color: white; border-radius: 4px;">Upload Images</label>
+                    <input type="file" id="moodboard-upload" multiple accept="image/*" style="display: none;">
+                    <input type="text" id="moodboard-link-input" placeholder="Paste YouTube link here..." style="flex: 1; padding: 5px;">
+                    <button id="moodboard-link-btn" style="padding: 5px 10px;">Add Link</button>
+                </div>
+                <div id="moodboard-edit-grid" class="moodboard-masonry"></div>
+            </div>
+        </div>
+    `;
 
     if (character) {
         if (isEditMode) {
@@ -91,6 +109,7 @@ export function openModal(character?: Character, isEditMode = false) {
                 <p><strong>Tags:</strong></p>
                 <div id="tag-container"></div>
                 <input id="tag-input" placeholder="Add tags (space-separated)">
+                ${moodboardEditHtml}
                 <div class="modal-footer"></div>
             `;
             const footer = modalContentElement.querySelector('.modal-footer');
@@ -99,6 +118,7 @@ export function openModal(character?: Character, isEditMode = false) {
             renderTagsForEdit(character.tags || []);
             document.getElementById('edit-artwork')?.addEventListener('change', handleArtworkPreview);
             document.getElementById('record-button')?.addEventListener('click', recordAudio);
+            bindMoodboardEditEvents();
         } else {
             let artworkDisplay = '';
             if (character.artwork) {
@@ -111,6 +131,25 @@ export function openModal(character?: Character, isEditMode = false) {
             let tagsDisplay = '';
             if (character.tags && character.tags.length > 0) {
                 tagsDisplay = `<p><strong>Tags:</strong></p><div class="tag-view">${character.tags.map(tag => `<span class="tag-item">${tag}</span>`).join('')}</div>`;
+            }
+            let moodboardDisplay = '';
+            if (character.moodboardMedia && character.moodboardMedia.length > 0) {
+                const items = character.moodboardMedia.map(media => {
+                    if (media.type === 'video_link') {
+                        return `<div class="moodboard-item"><iframe src="${media.urlOrId}" frameborder="0" allowfullscreen></iframe></div>`;
+                    } else if (media.objectUrl) {
+                        return `<div class="moodboard-item"><img src="${media.objectUrl}" title="${media.filename || ''}"></div>`;
+                    }
+                    return '';
+                }).join('');
+                moodboardDisplay = `
+                    <div class="collapsible-section" style="margin-top: 20px;">
+                        <h3 class="collapsible-header">Mood Board</h3>
+                        <div class="collapsible-content moodboard-masonry" style="display: none;">
+                            ${items}
+                        </div>
+                    </div>
+                `;
             }
             modalContentElement.innerHTML = `
                 <h2>${character.name}</h2>
@@ -141,6 +180,7 @@ export function openModal(character?: Character, isEditMode = false) {
                 </div>
                 ${tagsDisplay}
                 ${audioPlayer}
+                ${moodboardDisplay}
                 <div class="modal-footer"></div>
             `;
             const footer = modalContentElement.querySelector('.modal-footer');
@@ -198,6 +238,7 @@ export function openModal(character?: Character, isEditMode = false) {
             <p><strong>Tags:</strong></p>
             <div id="tag-container"></div>
             <input id="tag-input" placeholder="Add tags (space-separated)">
+            ${moodboardEditHtml}
             <div class="modal-footer"></div>
         `;
         const footer = modalContentElement.querySelector('.modal-footer');
@@ -205,7 +246,20 @@ export function openModal(character?: Character, isEditMode = false) {
         renderTagsForEdit([]);
         document.getElementById('edit-artwork')?.addEventListener('change', handleArtworkPreview);
         document.getElementById('record-button')?.addEventListener('click', recordAudio);
+        bindMoodboardEditEvents();
     }
+    
+    // Bind collapsible headers
+    modalContentElement.querySelectorAll('.collapsible-header').forEach(header => {
+        header.addEventListener('click', () => {
+            header.classList.toggle('active');
+            const content = header.nextElementSibling as HTMLElement;
+            if (content) {
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+    });
+
     modalElement.classList.remove('hidden');
     
     // Background click to close
@@ -334,15 +388,89 @@ function renderTagsForEdit(tags: string[]) {
     updateTagsDisplay();
 }
 
+import { saveImageBlob } from './indexeddb.js';
+
+function bindMoodboardEditEvents() {
+    renderMoodboardEditGrid();
+
+    document.getElementById('moodboard-upload')?.addEventListener('change', async (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (!files) return;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const id = await saveImageBlob(file);
+            currentMoodboardMedia.push({
+                id: 'img_' + Date.now() + Math.random(),
+                type: 'image',
+                urlOrId: id,
+                filename: file.name,
+                objectUrl: URL.createObjectURL(file)
+            });
+        }
+        renderMoodboardEditGrid();
+    });
+
+    document.getElementById('moodboard-link-btn')?.addEventListener('click', () => {
+        const input = document.getElementById('moodboard-link-input') as HTMLInputElement;
+        const url = input.value.trim();
+        if (!url) return;
+        
+        let embedUrl = url;
+        // Basic YouTube conversion
+        if (url.includes('youtube.com/watch?v=')) {
+            const vidId = new URL(url).searchParams.get('v');
+            if (vidId) embedUrl = `https://www.youtube.com/embed/${vidId}`;
+        } else if (url.includes('youtu.be/')) {
+            const vidId = url.split('youtu.be/')[1].split('?')[0];
+            if (vidId) embedUrl = `https://www.youtube.com/embed/${vidId}`;
+        }
+
+        currentMoodboardMedia.push({
+            id: 'vid_' + Date.now() + Math.random(),
+            type: 'video_link',
+            urlOrId: embedUrl
+        });
+        input.value = '';
+        renderMoodboardEditGrid();
+    });
+}
+
+function renderMoodboardEditGrid() {
+    const grid = document.getElementById('moodboard-edit-grid');
+    if (!grid) return;
+    grid.innerHTML = currentMoodboardMedia.map((media, index) => {
+        let content = '';
+        if (media.type === 'video_link') {
+            content = `<iframe src="${media.urlOrId}" frameborder="0" allowfullscreen style="width: 100%; border-radius: 8px;"></iframe>`;
+        } else if (media.objectUrl) {
+            content = `<img src="${media.objectUrl}" title="${media.filename || ''}" style="width: 100%; border-radius: 8px;">`;
+        }
+        return `
+            <div class="moodboard-item" style="position: relative; margin-bottom: 15px; break-inside: avoid;">
+                ${content}
+                <button data-index="${index}" class="delete-moodboard-item" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+            </div>
+        `;
+    }).join('');
+
+    grid.querySelectorAll('.delete-moodboard-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt((e.currentTarget as HTMLButtonElement).getAttribute('data-index') || '0');
+            currentMoodboardMedia.splice(idx, 1);
+            renderMoodboardEditGrid();
+        });
+    });
+}
+
 async function saveCharacterHandler(characterId: number | null) {
     const name = (document.getElementById('edit-name') as HTMLInputElement).value;
     const description = (document.getElementById('edit-description') as HTMLTextAreaElement).value;
     const voice_description = (document.getElementById('edit-voice') as HTMLTextAreaElement).value;
+    
     const artworkFile = (document.getElementById('edit-artwork') as HTMLInputElement).files?.[0];
     const projectId = parseInt((document.getElementById('character-project') as HTMLSelectElement).value);
     const tagElements = document.querySelectorAll('#tag-container .tag-item');
     const tags = Array.from(tagElements).map(el => el.textContent?.replace(/×$/, '').trim() || '').filter(Boolean);
-
     const pitch = parseInt((document.getElementById('edit-pitch') as HTMLInputElement)?.value || '50', 10);
     const pace = parseInt((document.getElementById('edit-pace') as HTMLInputElement)?.value || '50', 10);
     const placement = parseInt((document.getElementById('edit-placement') as HTMLInputElement)?.value || '50', 10);
@@ -365,6 +493,7 @@ async function saveCharacterHandler(characterId: number | null) {
         pace: pace,
         placement: placement,
         timbre: timbre,
+        moodboardMedia: currentMoodboardMedia
     };
 
     await saveCharacterCallback(characterToSave, artworkFile, undefined, recordedSample);

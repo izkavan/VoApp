@@ -16,6 +16,7 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 ### Character Library
 * **Vocal Recipe & Creation**: Define a voice beyond a simple description. Create reproducible blueprints using sliders for Pitch, Pace, Placement, and Timbre.
 * **Artwork & Voice Samples**: Upload images and voice samples (or record a clip on the fly) to bring your characters to life.
+* **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. This section is for visual inspiration for the artist to play with. Not trying to replace Pinterest, but having it more centrally located is a great little addon! 
 * **Advanced Organization**: Use space-separated tags, advanced filtering (inclusive/OR, exclusive/AND), and drag-and-drop to categorize and assign characters to projects.
 * **Persistent Storage**: All characters, projects, and samples are saved automatically in your browser's local storage.
 
@@ -83,10 +84,10 @@ Here are some of the features that I thought up for the app that could be coming
 * **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
 * **Voice Memos** Would pair really well with that sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
 * Tie ins to common note taking apps (Obsidian, Notion, World Anvil?)
+* Can we link a pinterest board and have that in a view for the moodboard?
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 
 ### Changes to the Character and Project Management
-* **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. Not trying to replace Pinterest.
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
 
 ### Changes for Voice Actors

@@ -23,8 +23,16 @@ export interface Character {
     voice_description: string;
     tags: string[];
     projectId?: number;
-    artwork?: string;
+    artwork?: string; // Memory object URL or legacy base64
+    artworkId?: string; // IndexedDB ID
     artworkFilename?: string;
+    moodboardMedia?: {
+        id: string;
+        type: 'image' | 'video_link';
+        urlOrId: string;
+        filename?: string;
+        objectUrl?: string;
+    }[];
     voice_sample?: string;
     pitch?: number;
     pace?: number;

@@ -18,6 +18,7 @@ import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
 import { initializeWarmupView } from './warmup-view.js';
 import { initializeEffectLibrary } from './effect-library.js';
 import { SystemSettings, Warmup } from './types.js';
+import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -88,8 +89,13 @@ async function saveCharacter(character: Character, artworkFile?: File, sampleFil
     }
 
     if (artworkFile) {
-        character.artwork = await readFileAsDataURL(artworkFile);
+        if (character.artworkId) {
+            await deleteImageBlob(character.artworkId).catch(e => console.warn(e));
+        }
+        const id = await saveImageBlob(artworkFile);
+        character.artworkId = id;
         character.artworkFilename = artworkFile.name;
+        character.artwork = URL.createObjectURL(artworkFile);
     }
 
     const charIndex = characters.findIndex(c => c.id === character.id);
@@ -116,12 +122,20 @@ function duplicateCharacter(characterToDuplicate: Character) {
     closeModal();
 }
 
-function deleteCharacter(id: number) {
-    if (confirm('Are you sure you want to delete this character? This action cannot be undone.')) {
-        const indexToDelete = characters.findIndex(char => char.id === id);
-        if (indexToDelete > -1) {
-            characters.splice(indexToDelete, 1);
+async function deleteCharacter(characterId: number) {
+    if (confirm('Are you sure you want to delete this character?')) {
+        const charToDelete = characters.find(c => c.id === characterId);
+        if (charToDelete?.artworkId) {
+            await deleteImageBlob(charToDelete.artworkId).catch(e => console.warn(e));
         }
+        if (charToDelete?.moodboardMedia) {
+            for (const media of charToDelete.moodboardMedia) {
+                if (media.type === 'image' && media.urlOrId) {
+                    await deleteImageBlob(media.urlOrId).catch(e => console.warn(e));
+                }
+            }
+        }
+        characters = characters.filter(c => c.id !== characterId);
         saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
         renderApp();
         closeModal();
@@ -211,105 +225,152 @@ importProjectButton?.addEventListener('click', () => {
 });
 
 
-const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings, warmups: loadedWarmups } = loadFromLocalStorage();
-characters = loadedCharacters;
-projects = loadedProjects;
-auditions = loadedAuditions;
-warmups = loadedWarmups;
-currentSettings = loadedSettings;
+async function initApp() {
+    const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings, warmups: loadedWarmups } = loadFromLocalStorage();
 
-initializeCharacterRenderer(openModal, openProjectModal, openDictionaryModal);
+    // Migrate legacy artwork and load blob URLs
+    for (const char of loadedCharacters) {
+        if (char.artwork && char.artwork.startsWith('data:')) {
+            try {
+                const res = await fetch(char.artwork);
+                const blob = await res.blob();
+                const id = await saveImageBlob(blob);
+                char.artworkId = id;
+                char.artwork = undefined; // Will be set to object URL below
+            } catch (e) {
+                console.warn("Failed to migrate artwork for", char.name, e);
+            }
+        }
+        
+        if (char.artworkId) {
+            try {
+                const blob = await getImageBlob(char.artworkId);
+                if (blob) {
+                    char.artwork = URL.createObjectURL(blob);
+                }
+            } catch (e) {
+                console.warn("Failed to load artwork blob for", char.name, e);
+            }
+        }
 
-initializeCharacterModal(
-    modalElement as HTMLElement,
-    modalContentElement as HTMLElement,
-    characters,
-    projects,
-    (char, art, samp, rec) => saveCharacter(char, art, samp, rec),
-    duplicateCharacter,
-    deleteCharacter
-);
-
-initializeDictionaryModal(dictionaryModalElement, dictionaryModalContentElement);
-
-initializeProjectModal(
-    projectModalElement as HTMLElement,
-    projectNameInput,
-    projectDescriptionInput,
-    projectLicensingInput,
-    projectStartDateInput,
-    projectEndDateInput,
-    exportProjectButton,
-    deleteProjectButton,
-    projects,
-    characters,
-    currentSettings,
-    renderApp,
-    (id) => deleteProject(id),
-    (updatedProjects) => {
-        projects = updatedProjects;
-        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        if (char.moodboardMedia) {
+            for (const media of char.moodboardMedia) {
+                if (media.type === 'image' && media.urlOrId) {
+                    try {
+                        const blob = await getImageBlob(media.urlOrId);
+                        if (blob) {
+                            media.objectUrl = URL.createObjectURL(blob);
+                        }
+                    } catch (e) {
+                        console.warn("Failed to load moodboard blob", e);
+                    }
+                }
+            }
+        }
     }
-);
 
-initializeFilterSearch(
-    filterTagsInput,
-    tagSuggestionsElement as HTMLElement,
-    activeTagsContainer as HTMLElement,
-    exclusiveToggle,
-    characterListElement as HTMLElement,
-    characters,
-    projects,
-    onCharacterDrop,
-    renderApp
-);
+    characters = loadedCharacters;
+    projects = loadedProjects;
+    auditions = loadedAuditions;
+    warmups = loadedWarmups;
+    currentSettings = loadedSettings;
+    
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
 
-initializeTheme();
-initializeNavigation();
-applyFeatureVisibility(currentSettings);
-initializeVoiceActorView();
-initializeLineReader(characters, projects, currentSettings, openModal);
-initializeDungeonMasterView(characters, projects, openModal);
-initializeUtilityView(currentSettings);
-initializeAuditionView(auditions, characters, (updatedAuditions) => {
-    auditions = updatedAuditions;
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
-});
-initializeDictionaryHighlighter();
-initializeTeleprompter(projects);
-initializeWarmupView(warmups, characters, projects, (updatedWarmups) => {
-    warmups = updatedWarmups;
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
-});
-initializeEffectLibrary(characters, projects, currentSettings, (updatedSettings) => {
-    Object.assign(currentSettings, updatedSettings);
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
-});
-initializeSettingsView(
-    currentSettings,
-    characters,
-    projects,
-    auditions,
-    (newSettings) => {
-        currentSettings = newSettings;
+    initializeCharacterRenderer(openModal, openProjectModal, openDictionaryModal);
+
+    initializeCharacterModal(
+        modalElement as HTMLElement,
+        modalContentElement as HTMLElement,
+        characters,
+        projects,
+        (char, art, samp, rec) => saveCharacter(char, art, samp, rec),
+        duplicateCharacter,
+        deleteCharacter
+    );
+
+    initializeDictionaryModal(dictionaryModalElement, dictionaryModalContentElement);
+
+    initializeProjectModal(
+        projectModalElement as HTMLElement,
+        projectNameInput,
+        projectDescriptionInput,
+        projectLicensingInput,
+        projectStartDateInput,
+        projectEndDateInput,
+        exportProjectButton,
+        deleteProjectButton,
+        projects,
+        characters,
+        currentSettings,
+        renderApp,
+        (id) => deleteProject(id),
+        (updatedProjects) => {
+            projects = updatedProjects;
+            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        }
+    );
+
+    initializeFilterSearch(
+        filterTagsInput,
+        tagSuggestionsElement as HTMLElement,
+        activeTagsContainer as HTMLElement,
+        exclusiveToggle,
+        characterListElement as HTMLElement,
+        characters,
+        projects,
+        onCharacterDrop,
+        renderApp
+    );
+
+    initializeTheme();
+    initializeNavigation();
+    applyFeatureVisibility(currentSettings);
+    initializeVoiceActorView();
+    initializeLineReader(characters, projects, currentSettings, openModal);
+    initializeDungeonMasterView(characters, projects, openModal);
+    initializeUtilityView(currentSettings);
+    
+    initializeAuditionView(auditions, characters, (updatedAuditions) => {
+        auditions = updatedAuditions;
         saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
-        // Force re-initialize modules that depend on settings if needed, 
-        // though lineReader/projectModal get the currentSettings ref via initialization closure
-        // Wait, they only get the object reference. If we replace `currentSettings = newSettings`, 
-        // the closure in line-reader won't see the new object.
-        // We should instead update properties of currentSettings to preserve the reference.
-        Object.assign(currentSettings, newSettings);
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
-        applyFeatureVisibility(currentSettings);
-    },
-    (newChars, newProjs, newAuds, newSets) => {
-        characters = newChars;
-        projects = newProjs;
-        auditions = newAuds;
-        Object.assign(currentSettings, newSets);
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
-        renderApp();
-        location.reload(); // Hard reload to reinitialize all states properly
-    }
-);
-renderApp();
+    });
+
+    initializeDictionaryHighlighter();
+    initializeTeleprompter(projects);
+
+    initializeWarmupView(warmups, characters, projects, (updatedWarmups) => {
+        warmups = updatedWarmups;
+        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+    });
+
+    initializeEffectLibrary(characters, projects, currentSettings, (updatedSettings) => {
+        Object.assign(currentSettings, updatedSettings);
+        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+    });
+
+    initializeSettingsView(
+        currentSettings,
+        characters,
+        projects,
+        auditions,
+        (newSettings) => {
+            Object.assign(currentSettings, newSettings);
+            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+            applyFeatureVisibility(currentSettings);
+        },
+        (newChars, newProjs, newAuds, newSets) => {
+            characters = newChars;
+            projects = newProjs;
+            auditions = newAuds;
+            Object.assign(currentSettings, newSets);
+            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+            renderApp();
+            location.reload(); 
+        }
+    );
+
+    renderApp();
+}
+
+initApp();

@@ -1078,3 +1078,33 @@ body.dark-mode .dict-highlight {
     box-shadow: 0 4px 8px var(--shadow-light);
     cursor: pointer;
 }
+
+/* Moodboard Styles */
+.moodboard-masonry {
+    column-count: 2;
+    column-gap: 15px;
+    padding: 10px 0;
+}
+@media (min-width: 768px) {
+    .moodboard-masonry {
+        column-count: 3;
+    }
+}
+@media (min-width: 1024px) {
+    .moodboard-masonry {
+        column-count: 4;
+    }
+}
+.moodboard-item {
+    break-inside: avoid;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--gray-100);
+}
+.moodboard-item img, .moodboard-item iframe {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: none;
+}

@@ -1,11 +1,12 @@
 import { VoiceMemo, DictionaryEntry, Effect } from './types.js';
 
 const DB_NAME = 'VoAppDatabase';
-const DB_VERSION = 4; // Incremented for effects store
+const DB_VERSION = 5; // Incremented for images store
 const VOICE_MEMOS_STORE = 'voice_memos';
 const DICTIONARY_STORE = 'dictionary';
 const AUDIO_BLOBS_STORE = 'audio_blobs';
 const EFFECTS_STORE = 'effects';
+const IMAGE_BLOBS_STORE = 'image_blobs';
 
 export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -34,6 +35,9 @@ export function initDB(): Promise<IDBDatabase> {
             }
             if (!db.objectStoreNames.contains(EFFECTS_STORE)) {
                 db.createObjectStore(EFFECTS_STORE, { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(IMAGE_BLOBS_STORE)) {
+                db.createObjectStore(IMAGE_BLOBS_STORE, { keyPath: 'id' });
             }
         };
     });
@@ -167,6 +171,49 @@ export async function deleteEffect(id: number): Promise<void> {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([EFFECTS_STORE], 'readwrite');
         const store = transaction.objectStore(EFFECTS_STORE);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+// --- Image Blobs ---
+export async function saveImageBlob(blob: Blob): Promise<string> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([IMAGE_BLOBS_STORE], 'readwrite');
+        const store = transaction.objectStore(IMAGE_BLOBS_STORE);
+        const id = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const request = store.put({ id, blob });
+
+        request.onsuccess = () => resolve(id);
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function getImageBlob(id: string): Promise<Blob | null> {
+    if (!id) return null;
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([IMAGE_BLOBS_STORE], 'readonly');
+        const store = transaction.objectStore(IMAGE_BLOBS_STORE);
+        const request = store.get(id);
+
+        request.onsuccess = (event) => {
+            const result = (event.target as IDBRequest).result;
+            resolve(result ? result.blob : null);
+        };
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function deleteImageBlob(id: string): Promise<void> {
+    if (!id) return;
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([IMAGE_BLOBS_STORE], 'readwrite');
+        const store = transaction.objectStore(IMAGE_BLOBS_STORE);
         const request = store.delete(id);
 
         request.onsuccess = () => resolve();
