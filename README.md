@@ -2,7 +2,7 @@
 
 Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
 
-As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on.
+As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on. I sort of want this to be the "connective tissue" of the industry, for teams that feel that it's a good fit!
 
 ## What can you do right now?
 
@@ -81,28 +81,67 @@ Here are some of the features that I thought up for the app that could be coming
 
 ### Changes to the core System
 * Get a Docker Image put together that can pull this repo and get it running.
+* rebundle with pkg, NodeJS, NPM to make an EXE version that can just be executed
 * **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
 * **Voice Memos** Would pair really well with that sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
 * Tie ins to common note taking apps (Obsidian, Notion, World Anvil?)
 * Can we link a pinterest board and have that in a view for the moodboard?
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
+* Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
+* A setting that lets you change the system wide default-- OpenDyslexic, Arial, times, etc. 
+
 
 ### Changes to the Character and Project Management
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
+* An update to the dictionary: "Accent rulebooks". Like, "this society has what we would consider rhoticism." or "All words with a hard G are glottal stopped".
+* A spot to list where characters were seen-- Scripts they are used in, specific books/chapters they are used in
+* Possibly a "related characters" tab that you can relate characters together for quicker cross linking. Gets more into "writing" than acting, though
 
 ### Changes for Voice Actors
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
 * An extension for the Audition that lets a user compose a set of takes or reads for the characters being linked, with the clean slate read either interjected or whatnot. Would need to interview some Voice Actors to see how they typically work and what they would want out of that.
 * Script/Line Management; Would be great to possibly split existing audio takes?
-* We should support more script formats-- I don't know what people are using for professional scripts, so this would be some research/interview.
+* We should support more script formats-- I don't know what people are using for professional scripts(FDX? PDF?), so this would be some research/interview. Should look at ways to get epub or other ebook formats also. 
+  * As an extension of the script formats, If we can have a more robust way of handling imports we can identify "This character is referenced as 'jones'" and the filtering systems can let the Voice Actor focus on the character they are playing more easily. 
+  * Also, scripts usually have keywords and formatting that convey the emotion and energy that the actor should be bringing-- We should look at ways to portray this in VoApp
+* Develop a way that we can split large files or long lines into discrete subunits. Split a chapter out of a book, do your reads against that (whether line or Teleprompter). Could be a new tab for "script formatter" and then have an option for "export to line reader" and "Export to Teleprompter".
+* A "scene select" in the teleprompter, so that for a large project you can jump around. This gets closer to the "line reader" functionality, but with substantially larger blocks of text that are meant to be recorded in more lengthy formats.
+* "Timer mode" that shows how long the user has spent recording. Every time they start a timer it clicks up, every time they stop a recording it pauses. It shows at the top of the screen, and has a reset button.
+* Could look into lightweight VSTs, like radio/telephone, some compression, for exports.
+* An overlay widget that shows pitch? Could be good for characters who sing, or who thematically need to sit in a specific range of tone. Could also be useful for replication purposes if you say "sits at a C5".
+* An update to the Teleprompter that lets you change line-spacing, not just font size. 
+* An update to the teleprompter to select how you want the font color and background to be set, for higher/lower contrast. 
+* IPA Keyboard overlay/underlay with the dictionary-- I know this is over in VA section rather than the Character/project system, but I've met very few people who know of, understand, or care about the IPA symbols that aren't knee deep in linguistics of D'ni, or voice actors. Tishmah shorah!
 
 ### Changes for Dungeon Masters
 * **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 
+* A lore page - Could be good to have world lore at your fingertips as well, so you know what to reference as a character. Could even have "deep lore" for a specific character-- Especially for things like liveplay twitch streams or podcasts where the podcasters are video calling each other, it could be good to display this lore using OBS on the window or something.
+* Could expand characters to have a "lineage/faction" tag system... Could use the core tags for that now though.
+* Live session view can have so many additional features added to it-- Soundboards, idle soundscapes, etc. would be a big one, but I don't know if we want to compete with things like Syrinscape. 
+
+### Changes for Directors/Writers/producers
+
+* **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
+* Time-stamped waveform notes so when a director opens a project, they can select a take to load, and then annotate that take (especially useful for long ones). This might be a new view where it displays the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes. It should also display a list of all the notes below the waveform, not just annotations/lines on the visual.
+* **Sides Exporter**: Have a giant script, annotate it with the characters, and then when you select "generate sides", it splits each character's lines into their own zip file/script that you can send off. Could also include the project and character details (And mood board!).
+* **Asynchronous slate builder** : A director can create a project, create empty "placeholder" takes for lines they need, attach reference audio or notes to each line, and export it. The actor imports this "checklist," records their audio directly into the empty slots, and exports it back.
+* **Non-destructive imports**: In the director's "Script" mode, they can import the output of multiple actors into the same script view. This lets them see the project in its whole. This will likely require a heavy understanding of workflows.
+* **Table-Read Simulator**: When you have a script with lines filled in with takes, you can identify a "golden take" (or, if there's one take, it defaults). Then you can press "table read" and it will read through the script, using the golden take from each line. 
+* **Actual writing of the script**: Or, at least, an editor for common script uploads. This way the writer doesn't need to leave the same app everyone else is using. 
+* **Blind Audition Listener**: Remove bias, have the casting director listen to the various auditions without names associated,  and let them listen to and rate the audio performances. 
+* **Chemistry/Contrast Matrix**: A visual grid where a CD can place their top 3 picks for Character A next to their top 3 picks for Character B. They can play the samples back-to-back to ensure the two leads don't have identical vocal timbres, ensuring a well-balanced sonic cast before making final offers.
+* **Franken-bite**: Often, a director loves the first half of Take 1, and the second half of Take 3. Instead of just starring both and confusing the editor, the director could highlight specific words in the script text attached to each take. This generates an "Edit Decision List" (EDL) so the editor knows exactly which pieces to stitch together.
+* **DAW Drag and drop**: tie ins to DAW projects could give the ability to literally click a starred take in the Vo-App browser/UI and drag it directly onto a timeline in Pro Tools, Reaper, or Audacity as a clean .wav file, bringing the character name metadata with it.
 
 ### Utilities to add
 * Have a viewer for active memory management. Should allow a single view of all the data the application stores in local memory, with options to delete that data if the user wants.
 * **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
 * **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
+* **Accent/voice Coach**: A curated list of accents, with examples from professionals or natives, who are giving breakdowns on what makes the accent unique and how to reproduce it. Would need a way to provide these as bundles, a way for the user to manage which bundles they want, etc. 
+* An extension of the waveform view for individual audio files, it would be cool to have an "overlayer", where the user can select two waveforms, click "overlay" and see them layered on top of each other to see where pitches and such differed. 
+* **Overall Statistics**: "You've recorded 13 hours of audio", "90% of your characters have high pitches", "You booked 18% of your auditions this month", "The project you've spent the most time on ever is Phoenix Brothers."
+* **Auditory Gymnastic Challenge**: A daily challenge mode for the warm ups that pulls what the user has identified as good practice for a character, as well as something that they haven't used in a while, or some other curveball. "Say it sad", or "like you're on fire". Could even have it pull from random public domain text. "Here's a shakespeare sonnet, use X Character, in a whisper."
+* **Vocal Range Mapper**: could be fun to have the user track what their highest and lowest comfortable notes are, map those on a keyboard, and then when they are making a character it can flag, "This pitch is outside your comfort zone"
 
 ### Community Platform
 
@@ -111,6 +150,8 @@ Here are some of the features that I thought up for the app that could be coming
 2. **Community Assistance**: Be able to post a voice to get feedback and review on the work-- Tag it with assistance tags or requests on specific features (Breath control, recovery, etc)
 3. **Gamified Practice Tracking:** A personal dashboard to track your practice habits and earn badges for milestones, encouraging consistent vocal work. Could have a leaderboard?
 4. **Recruiter Browser**: Oh man, it would be sick if an extension of the sharing and assistance allowed headhunters a centralized location to be able to browse through people's samples or profiles and send messages. We'd need a way to vet who is a recruiter, that isn't prohibitive. 
+5. **Live Dialect and Accent Coaches**: as an extension of the Utility Section of accents, To help people connect and work on the way that they portray accents and dialects, to ensure accuracy and reduce "stereotype". Could have a coach upload their sample sets, give a background on why they are trustworthy, let users rate their coach, etc. 
+
 
 
 # THANKS!
