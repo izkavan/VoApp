@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoApp - The Voice Over Application</title>
+    <title>Voice Production App</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -62,7 +63,7 @@
                 <div id="scripts" class="tab-content active">
                     <h2>Line Reader</h2>
                     <label for="script-file-input" class="custom-file-input">Upload Script</label>
-                    <input type="file" id="script-file-input" accept=".txt,.zip">
+                    <input type="file" id="script-file-input" accept=".txt,.zip,.json">
                     <input type="text" id="script-name-input" placeholder="Script Name..." />
                     <select id="script-project-select"></select>
                     <select id="line-filter-select" style="margin-top: 10px;">
@@ -224,8 +225,15 @@
                         <button id="vp-script-save-btn" class="icon-btn" title="Save & Export Script">💾 Export Script</button>
                     </div>
 
-                    <div id="vp-script-lines" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; min-height: 200px;">
-                        <!-- Lines will be dynamically inserted here -->
+                    <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
+                        <div id="vp-script-toc" style="width: 250px; max-height: 600px; overflow-y: auto; background: var(--gray-100); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 10px; display: none;">
+                            <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1em;">Table of Contents</h3>
+                            <ul id="vp-script-toc-list" style="list-style-type: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;"></ul>
+                        </div>
+                        
+                        <div id="vp-script-lines" style="flex-grow: 1; max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-right: 10px;">
+                            <!-- Lines will be dynamically inserted here -->
+                        </div>
                     </div>
 
                     <div style="display: flex; justify-content: center; gap: 10px; border-top: 2px dashed var(--border-color); padding-top: 20px;">

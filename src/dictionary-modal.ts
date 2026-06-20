@@ -142,6 +142,9 @@ function renderModal() {
             return e;
         });
         await saveDictionaryEntries(finalEntries);
+        if (currentProject) {
+            window.dispatchEvent(new CustomEvent('dictionaryUpdated', { detail: { projectId: currentProject.id } }));
+        }
         closeDictionaryModal();
     });
 }

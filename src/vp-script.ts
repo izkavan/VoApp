@@ -1,5 +1,7 @@
-import { Project, Character } from './types.js';
+import { Project, Character, DictionaryEntry } from './types.js';
 import JSZip from 'jszip';
+import { highlightDictionaryWords } from './dictionary-highlighter.js';
+import { getDictionaryEntries } from './indexeddb.js';
 
 interface ScriptLine {
     id: string;
@@ -11,10 +13,58 @@ interface ScriptLine {
 
 let projects: Project[] = [];
 let characters: Character[] = [];
+let currentDictionary: DictionaryEntry[] = [];
 let openDictionaryCallback: (project: Project) => void = () => {};
 
 let scriptLines: ScriptLine[] = [];
 let dragSourceId: string | null = null;
+
+function getCaretCharacterOffsetWithin(element: HTMLElement): number {
+    let caretOffset = 0;
+    const doc = element.ownerDocument || element.ownerDocument;
+    const win = doc.defaultView || window;
+    const sel = win.getSelection();
+    if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        caretOffset = preCaretRange.toString().length;
+    }
+    return caretOffset;
+}
+
+function setCaretPosition(el: HTMLElement, pos: number) {
+    const doc = el.ownerDocument || document;
+    const win = doc.defaultView || window;
+    let found = false;
+
+    function walk(node: Node) {
+        if (found) return;
+        if (node.nodeType === Node.TEXT_NODE) {
+            const len = (node as Text).length;
+            if (pos <= len) {
+                const range = doc.createRange();
+                range.setStart(node, pos);
+                range.collapse(true);
+                const sel = win.getSelection();
+                if (sel) {
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+                found = true;
+            } else {
+                pos -= len;
+            }
+        } else {
+            for (const child of Array.from(node.childNodes)) {
+                walk(child);
+                if (found) break;
+            }
+        }
+    }
+    walk(el);
+}
 
 // DOM Elements
 let nameInput: HTMLInputElement;
@@ -24,7 +74,10 @@ let importBtn: HTMLButtonElement;
 let importInput: HTMLInputElement;
 let saveBtn: HTMLButtonElement;
 let linesContainer: HTMLElement;
+let tocContainer: HTMLElement;
+let tocList: HTMLElement;
 let addLineBtn: HTMLButtonElement;
+let scrollInterval: number | null = null;
 let addTitleBtn: HTMLButtonElement;
 
 export function initializeScriptView(
@@ -43,6 +96,8 @@ export function initializeScriptView(
     importInput = document.getElementById('vp-script-import-input') as HTMLInputElement;
     saveBtn = document.getElementById('vp-script-save-btn') as HTMLButtonElement;
     linesContainer = document.getElementById('vp-script-lines') as HTMLElement;
+    tocContainer = document.getElementById('vp-script-toc') as HTMLElement;
+    tocList = document.getElementById('vp-script-toc-list') as HTMLElement;
     addLineBtn = document.getElementById('vp-script-add-line-btn') as HTMLButtonElement;
     addTitleBtn = document.getElementById('vp-script-add-title-btn') as HTMLButtonElement;
 
@@ -55,6 +110,44 @@ export function initializeScriptView(
     addLineBtn.addEventListener('click', () => addLine('line'));
     addTitleBtn.addEventListener('click', () => addLine('title'));
     saveBtn.addEventListener('click', saveScript);
+
+    linesContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const rect = linesContainer.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        if (y < 50) {
+            if (!scrollInterval) scrollInterval = window.setInterval(() => linesContainer.scrollTop -= 10, 20);
+        } else if (y > rect.height - 50) {
+            if (!scrollInterval) scrollInterval = window.setInterval(() => linesContainer.scrollTop += 10, 20);
+        } else {
+            if (scrollInterval) {
+                clearInterval(scrollInterval);
+                scrollInterval = null;
+            }
+        }
+    });
+
+    linesContainer.addEventListener('drop', () => {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    });
+
+    linesContainer.addEventListener('dragleave', () => {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    });
+
+    window.addEventListener('dictionaryUpdated', async (e: Event) => {
+        const customEvent = e as CustomEvent;
+        if (projectSelect.value !== 'none' && parseInt(projectSelect.value) === customEvent.detail.projectId) {
+            currentDictionary = await getDictionaryEntries(customEvent.detail.projectId);
+            renderLines();
+        }
+    });
 
     refreshScriptView(projects, characters);
 }
@@ -82,12 +175,14 @@ export function refreshScriptView(newProjects: Project[], newCharacters: Charact
     renderLines();
 }
 
-function handleProjectChange() {
+async function handleProjectChange() {
     const projectId = projectSelect.value;
     if (projectId !== 'none') {
         dictionaryBtn.classList.remove('hidden');
+        currentDictionary = await getDictionaryEntries(parseInt(projectId));
     } else {
         dictionaryBtn.classList.add('hidden');
+        currentDictionary = [];
     }
 
     renderLines();
@@ -128,17 +223,36 @@ function deleteLine(id: string) {
 
 function renderLines() {
     linesContainer.innerHTML = '';
+    tocList.innerHTML = '';
     
     const projectId = projectSelect.value;
     const availableCharacters = projectId === 'none' 
         ? characters 
         : characters.filter(c => c.projectId === parseInt(projectId));
 
+    const titles = scriptLines.filter(l => l.type === 'title');
+    if (titles.length > 0) {
+        tocContainer.style.display = 'block';
+    } else {
+        tocContainer.style.display = 'none';
+    }
+
     scriptLines.forEach((line, index) => {
         const lineEl = document.createElement('div');
         lineEl.className = 'script-line-item';
+        let tocLi: HTMLElement | null = null;
         if (line.type === 'title') {
             lineEl.classList.add('script-title-card');
+            
+            tocLi = document.createElement('li');
+            tocLi.textContent = line.text || 'Untitled Title Card';
+            tocLi.style.cursor = 'pointer';
+            tocLi.style.color = 'var(--primary-color)';
+            tocLi.style.textDecoration = 'underline';
+            tocLi.addEventListener('click', () => {
+                lineEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            tocList.appendChild(tocLi);
         } else if (line.characterId === 'scene') {
             lineEl.classList.add('script-scene-details');
         }
@@ -166,6 +280,9 @@ function renderLines() {
             titleInput.rows = 2;
             titleInput.addEventListener('input', (e) => {
                 line.text = (e.target as HTMLTextAreaElement).value;
+                if (tocLi) {
+                    tocLi.textContent = line.text || 'Untitled Title Card';
+                }
             });
             content.appendChild(titleInput);
             
@@ -217,14 +334,37 @@ function renderLines() {
             const content = document.createElement('div');
             content.className = 'script-line-content';
 
-            const textInput = document.createElement('textarea');
-            textInput.value = line.text;
-            textInput.rows = 1;
-            textInput.style.resize = 'none';
-            textInput.placeholder = line.characterId === 'scene' ? 'Describe the scene...' : 'Dialogue...';
+            const textInput = document.createElement('div');
+            textInput.contentEditable = 'true';
+            textInput.className = 'script-text-input';
+            
+            const dict = currentDictionary;
+            
+            textInput.innerHTML = highlightDictionaryWords(line.text || '', dict);
+            if (!line.text) {
+                textInput.dataset.placeholder = line.characterId === 'scene' ? 'Describe the scene...' : 'Dialogue...';
+            }
+
             textInput.addEventListener('input', (e) => {
-                line.text = (e.target as HTMLTextAreaElement).value;
+                const target = e.target as HTMLElement;
+                const rawText = target.textContent || '';
+                line.text = rawText;
+
+                // Check if last character typed was space or punctuation
+                const lastChar = rawText.slice(-1);
+                if (/[ \.,!\?;:\]\)]/.test(lastChar)) {
+                    const caretPos = getCaretCharacterOffsetWithin(target);
+                    target.innerHTML = highlightDictionaryWords(rawText, dict);
+                    setCaretPosition(target, caretPos);
+                }
             });
+            
+            // To emulate textarea styling:
+            textInput.style.minHeight = '1.5em';
+            textInput.style.whiteSpace = 'pre-wrap';
+            textInput.style.padding = '10px';
+            textInput.style.color = 'var(--text-color)';
+            textInput.style.flexGrow = '1';
             
             content.appendChild(textInput);
             lineEl.appendChild(content);
@@ -287,6 +427,11 @@ function handleDragEnd(e: DragEvent) {
     const items = linesContainer.querySelectorAll('.script-line-item');
     items.forEach(item => item.classList.remove('drag-over'));
     dragSourceId = null;
+
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+        scrollInterval = null;
+    }
 }
 
 async function saveScript() {
@@ -299,10 +444,30 @@ async function saveScript() {
 
     const zip = new JSZip();
 
+    const exportLines = scriptLines.map(line => {
+        let charName = 'scene';
+        let charId: string | null = null;
+
+        if (line.type !== 'title' && line.characterId !== 'scene') {
+            const char = availableCharacters.find(c => c.id.toString() === line.characterId);
+            charName = char ? char.name : 'Unknown';
+            charId = line.characterId;
+        }
+
+        return {
+            id: line.id,
+            type: line.type,
+            characterId: charId,
+            characterName: charName,
+            descriptor: line.descriptor,
+            text: line.text
+        };
+    });
+
     const metadata = {
         name: name,
         projectId: projectId === 'none' ? null : parseInt(projectId),
-        lines: scriptLines
+        lines: exportLines
     };
     zip.file('script.json', JSON.stringify(metadata, null, 2));
 

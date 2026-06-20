@@ -234,7 +234,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
         });
     };
 
-    filterSelect?.addEventListener('change', updateLineContainerUI);
+    filterSelect?.addEventListener('change', () => {
+        if (selectedReadLine) {
+            selectedReadLine.classList.remove('selected');
+            selectedReadLine = null;
+        }
+        if (readDetailsContainer) readDetailsContainer.innerHTML = '';
+        updateLineContainerUI();
+    });
 
     const renderDetails = async (lineText: string) => {
         if (!readDetailsContainer) return;
@@ -473,13 +480,18 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 return;
             }
 
-            const scriptData: SavedScript = JSON.parse(await scriptFile.async('string'));
+            const scriptData: any = JSON.parse(await scriptFile.async('string'));
+
+            if (!scriptData.lineDetails) {
+                processJsonScriptData(scriptData);
+                return;
+            }
 
             if (projectSelect && scriptData.projectId) {
                 projectSelect.value = String(scriptData.projectId);
             }
 
-            scriptData.lines.forEach(lineInfo => {
+            scriptData.lines.forEach((lineInfo: any) => {
                 const lineDiv = document.createElement('div');
                 lineDiv.textContent = lineInfo.text;
                 lineDiv.className = 'line-entry';
@@ -522,12 +534,97 @@ export function initializeLineReader(characters: Character[], projects: Project[
         }
     };
 
+    const processJsonScriptData = (data: any) => {
+        let missingCharacters: string[] = [];
+
+        if (data.name) {
+                scriptNameInput.value = data.name;
+            }
+
+            if (data.projectId && projects.some(p => p.id === data.projectId)) {
+                projectSelect.value = data.projectId.toString();
+                projectSelect.dispatchEvent(new Event('change'));
+            } else if (data.projectId) {
+                alert(`Warning: The project linked to this script is not available. Character linking will be skipped.`);
+            }
+
+            const lineContainer = document.getElementById('line-container');
+            const readContainer = document.getElementById('read-container');
+            if (lineContainer) lineContainer.innerHTML = '';
+            if (readContainer) readContainer.innerHTML = '';
+            lineDetails.clear();
+
+            if (data.lines && Array.isArray(data.lines)) {
+                data.lines.forEach((line: any, index: number) => {
+                    const isCharLine = line.type !== 'title' && line.characterId !== 'scene' && line.characterId !== null && line.characterName !== 'scene' && line.characterName !== 'title';
+
+                    const lineDiv = document.createElement('div');
+                    lineDiv.textContent = line.text;
+                    lineDiv.className = 'line-entry';
+                    if (isCharLine) lineDiv.classList.add('read');
+                    lineDiv.addEventListener('click', () => selectLine(lineDiv, false));
+                    lineContainer?.appendChild(lineDiv);
+
+                    if (isCharLine) {
+                        const readLineDiv = document.createElement('div');
+                        readLineDiv.textContent = line.text;
+                        readLineDiv.className = 'line-entry';
+                        readLineDiv.addEventListener('click', () => selectLine(readLineDiv, true));
+                        readContainer?.appendChild(readLineDiv);
+
+                        const defaultLineName = `Line_${index + 1}`;
+                        
+                        let resolvedCharId = undefined;
+                        if (data.projectId && projects.some(p => p.id === data.projectId) && line.characterId) {
+                            const charIdNum = parseInt(line.characterId);
+                            const exists = characters.find(c => c.id === charIdNum && c.projectId === data.projectId);
+                            if (exists) {
+                                resolvedCharId = charIdNum;
+                            } else if (line.characterName) {
+                                if (!missingCharacters.includes(line.characterName)) missingCharacters.push(line.characterName);
+                            }
+                        } else if (data.projectId && projects.some(p => p.id === data.projectId) && line.characterName) {
+                            if (!missingCharacters.includes(line.characterName)) missingCharacters.push(line.characterName);
+                        }
+
+                        lineDetails.set(line.text, { 
+                            text: line.text, 
+                            lineName: defaultLineName, 
+                            notes: '', 
+                            takes: [],
+                            characterId: resolvedCharId
+                        });
+                    }
+                });
+            }
+
+            if (missingCharacters.length > 0) {
+                alert(`Characters ${missingCharacters.join(', ')} were not available for import linking.`);
+            }
+
+        updateLineContainerUI();
+        saveActiveSession();
+    };
+
+    const loadScriptFromJson = async (file: File) => {
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            processJsonScriptData(data);
+        } catch (error) {
+            console.error("Error loading script from json:", error);
+            alert("Failed to load script. The file may be corrupted or in the wrong format.");
+        }
+    };
+
     fileInput.addEventListener('change', (event: Event) => {
         const target = event.target as HTMLInputElement;
         if (!target.files) return;
         const file = target.files[0];
 
-        if (file.name.endsWith('.zip')) {
+        if (file.name.endsWith('.json')) {
+            loadScriptFromJson(file);
+        } else if (file.name.endsWith('.zip')) {
             loadScriptFromZip(file);
         } else {
             loadScriptFromTxt(file);

@@ -524,6 +524,7 @@ body.dark-mode .script-line-item {
     font-size: 1.2em;
     font-weight: bold;
     width: 100%;
+    background-color: var(--gray-100);
 }
 .script-scene-details textarea {
     font-weight: bold;
@@ -552,6 +553,37 @@ body.dark-mode .script-line-item {
     line-height: 1.5;
     flex-grow: 1;
 }
+body.dark-mode .dungeon-master-session-log p {
+    color: var(--gray-300);
+}
+
+body.dark-mode #vp-script-toc {
+    background: var(--gray-800) !important;
+}
+
+.script-text-input:empty:before {
+    content: attr(data-placeholder);
+    color: var(--gray-500);
+    pointer-events: none;
+    display: block; /* For Firefox */
+}
+.script-text-input {
+    background-color: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+}
+.script-text-input:focus {
+    outline: 2px solid var(--primary-color);
+}
+
+body.dark-mode .script-text-input {
+    background-color: var(--gray-975);
+    border-color: var(--gray-800);
+}
+body.dark-mode .script-title-card textarea {
+    background-color: var(--gray-900);
+}
+
 body.dark-mode .vp-comment-timestamp {
     color: var(--gray-300);
 }
