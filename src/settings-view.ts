@@ -1,5 +1,6 @@
 import { Character, Project, Audition, SystemSettings, VoiceMemo } from './types.js';
 import { getVoiceMemos, saveVoiceMemo, deleteVoiceMemos } from './indexeddb.js';
+import { convertWebMToWav } from './audio-utils.js';
 import JSZip from 'jszip';
 
 export function initializeSettingsView(
@@ -15,6 +16,20 @@ export function initializeSettingsView(
     const groupingSelect = document.getElementById('settings-export-grouping') as HTMLSelectElement;
     const gearInput = document.getElementById('settings-recording-gear') as HTMLTextAreaElement;
 
+    // Feature Visibility Toggles
+    const visViewVoiceActor = document.getElementById('visibility-view-voice-actor') as HTMLInputElement;
+    const visViewDungeonMaster = document.getElementById('visibility-view-dungeon-master') as HTMLInputElement;
+    const visViewUtility = document.getElementById('visibility-view-utility') as HTMLInputElement;
+    const visTabLineReader = document.getElementById('visibility-tab-line-reader') as HTMLInputElement;
+    const visTabTeleprompter = document.getElementById('visibility-tab-teleprompter') as HTMLInputElement;
+    const visTabAuditions = document.getElementById('visibility-tab-auditions') as HTMLInputElement;
+    const visTabEffectLibrary = document.getElementById('visibility-tab-effect-library') as HTMLInputElement;
+    const visTabWarmups = document.getElementById('visibility-tab-warmups') as HTMLInputElement;
+    const visTabVoiceMemos = document.getElementById('visibility-tab-voice-memos') as HTMLInputElement;
+
+    const storageUsageEl = document.getElementById('settings-storage-usage');
+    const clearCacheBtn = document.getElementById('settings-clear-cache-btn');
+
     const backupBtn = document.getElementById('settings-full-backup-btn') as HTMLButtonElement;
     const restoreFile = document.getElementById('settings-restore-file') as HTMLInputElement;
     const restoreBtn = document.getElementById('settings-restore-btn') as HTMLButtonElement;
@@ -25,13 +40,48 @@ export function initializeSettingsView(
     if (groupingSelect) groupingSelect.value = settings.scriptExportGrouping;
     if (gearInput) gearInput.value = settings.recordingGear;
 
+    if (settings.featureVisibility) {
+        if (visViewVoiceActor) visViewVoiceActor.checked = settings.featureVisibility.viewVoiceActor;
+        if (visViewDungeonMaster) visViewDungeonMaster.checked = settings.featureVisibility.viewDungeonMaster;
+        if (visViewUtility) visViewUtility.checked = settings.featureVisibility.viewUtility;
+        if (visTabLineReader) visTabLineReader.checked = settings.featureVisibility.tabLineReader;
+        if (visTabTeleprompter) visTabTeleprompter.checked = settings.featureVisibility.tabTeleprompter;
+        if (visTabAuditions) visTabAuditions.checked = settings.featureVisibility.tabAuditions;
+        if (visTabEffectLibrary) visTabEffectLibrary.checked = settings.featureVisibility.tabEffectLibrary;
+        if (visTabWarmups) visTabWarmups.checked = settings.featureVisibility.tabWarmups;
+        if (visTabVoiceMemos) visTabVoiceMemos.checked = settings.featureVisibility.tabVoiceMemos;
+    }
+
+    updateStorageUsageDisplay();
+
+    clearCacheBtn?.addEventListener('click', () => {
+        if (confirm("WARNING: This is a complete system reset! All local storage and audio database data will be completely erased. Are you sure you want to proceed?")) {
+            localStorage.clear();
+            indexedDB.deleteDatabase('VoAppDatabase');
+            alert("Cache cleared. The application will now reload.");
+            window.location.reload();
+        }
+    });
+
     // Attach listeners
     const triggerSave = () => {
         const newSettings: SystemSettings = {
+            ...settings, // preserve effectGroups, etc.
             exportFormat: (formatSelect?.value as 'webm' | 'wav') || 'webm',
             audioExportPath: pathInput?.value || 'audio',
             scriptExportGrouping: (groupingSelect?.value as 'character' | 'line') || 'line',
-            recordingGear: gearInput?.value || ''
+            recordingGear: gearInput?.value || '',
+            featureVisibility: {
+                viewVoiceActor: visViewVoiceActor?.checked ?? true,
+                viewDungeonMaster: visViewDungeonMaster?.checked ?? true,
+                viewUtility: visViewUtility?.checked ?? true,
+                tabLineReader: visTabLineReader?.checked ?? true,
+                tabTeleprompter: visTabTeleprompter?.checked ?? true,
+                tabAuditions: visTabAuditions?.checked ?? true,
+                tabEffectLibrary: visTabEffectLibrary?.checked ?? true,
+                tabWarmups: visTabWarmups?.checked ?? true,
+                tabVoiceMemos: visTabVoiceMemos?.checked ?? true
+            }
         };
         saveCallback(newSettings);
     };
@@ -40,6 +90,16 @@ export function initializeSettingsView(
     pathInput?.addEventListener('input', triggerSave);
     groupingSelect?.addEventListener('change', triggerSave);
     gearInput?.addEventListener('input', triggerSave);
+    
+    visViewVoiceActor?.addEventListener('change', triggerSave);
+    visViewDungeonMaster?.addEventListener('change', triggerSave);
+    visViewUtility?.addEventListener('change', triggerSave);
+    visTabLineReader?.addEventListener('change', triggerSave);
+    visTabTeleprompter?.addEventListener('change', triggerSave);
+    visTabAuditions?.addEventListener('change', triggerSave);
+    visTabEffectLibrary?.addEventListener('change', triggerSave);
+    visTabWarmups?.addEventListener('change', triggerSave);
+    visTabVoiceMemos?.addEventListener('change', triggerSave);
 
     backupBtn?.addEventListener('click', async () => {
         backupBtn.textContent = 'Generating Backup...';
@@ -64,9 +124,14 @@ export function initializeSettingsView(
 
             const memoFolder = zip.folder('memos');
             if (memoFolder) {
-                memos.forEach(m => {
-                    memoFolder.file(`${m.id}.webm`, m.blob);
-                });
+                for (const m of memos) {
+                    if (settings.exportFormat === 'wav') {
+                        const wavBlob = await convertWebMToWav(m.blob);
+                        memoFolder.file(`${m.id}.wav`, wavBlob);
+                    } else {
+                        memoFolder.file(`${m.id}.webm`, m.blob);
+                    }
+                }
             }
 
             const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -151,4 +216,29 @@ export function initializeSettingsView(
             restoreFile.value = ''; // clear input
         }
     });
+}
+
+export function updateStorageUsageDisplay() {
+    const storageUsageEl = document.getElementById('settings-storage-usage');
+    if (storageUsageEl) {
+        if (navigator.storage && navigator.storage.estimate) {
+            navigator.storage.estimate().then(estimate => {
+                if (estimate.usage !== undefined) {
+                    const bytes = estimate.usage;
+                    let formatted = '';
+                    if (bytes < 1024) formatted = bytes + ' B';
+                    else if (bytes < 1048576) formatted = (bytes / 1024).toFixed(2) + ' KB';
+                    else if (bytes < 1073741824) formatted = (bytes / 1048576).toFixed(2) + ' MB';
+                    else formatted = (bytes / 1073741824).toFixed(2) + ' GB';
+                    storageUsageEl.textContent = formatted;
+                } else {
+                    storageUsageEl.textContent = "Unknown";
+                }
+            }).catch(() => {
+                storageUsageEl.textContent = "Error calculating";
+            });
+        } else {
+            storageUsageEl.textContent = "Not supported in this browser";
+        }
+    }
 }

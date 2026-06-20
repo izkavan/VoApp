@@ -95,6 +95,7 @@ Here are some of the features that I thought up for the app that could be coming
 * A simple tool that lets an actor type their name and the character's name, then generates an audio "slate" (e.g., "Izzy Kav for the role of The Captain") in a clean, pre-recorded voice (or using text-to-speech?). This slate could then be automatically prepended to an audition file on export.
 * An extension for the Audition that lets a user compose a set of takes or reads for the characters being linked, with the clean slate read either interjected or whatnot. Would need to interview some Voice Actors to see how they typically work and what they would want out of that.
 * Script/Line Management; Would be great to possibly split existing audio takes?
+* We should support more script formats-- I don't know what people are using for professional scripts, so this would be some research/interview.
 
 ### Changes for Dungeon Masters
 * **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 

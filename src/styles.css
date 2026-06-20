@@ -236,7 +236,7 @@ textarea, input, select {
     width: 100%;
     height: 100%;
     background-color: var(--overlay-bg);
-    z-index: 100;
+    z-index: 9999;
 }
 
 #modal-content, #project-modal #modal-content, #audition-modal #modal-content, #voice-memo-modal #modal-content, #dictionary-modal-content, #warmup-modal .modal-content, #effect-modal .modal-content {

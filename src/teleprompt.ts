@@ -1,7 +1,9 @@
 import JSZip from 'jszip';
-import { Project, DictionaryEntry } from './types.js';
+import { convertWebMToWav } from './audio-utils.js';
+import { Project, DictionaryEntry, SystemSettings } from './types.js';
 import { getDictionaryEntries } from './indexeddb.js';
 import { highlightDictionaryWords } from './dictionary-highlighter.js';
+import { loadFromLocalStorage } from './storage.js';
 
 interface TakeDetail {
     audioData: string;
@@ -219,20 +221,25 @@ export function initializeTeleprompter(projects: Project[]) {
 
     // Save Session Logic
     saveButton.addEventListener('click', async () => {
+        const settings = loadFromLocalStorage().settings;
+        const format = settings.exportFormat === 'wav' ? 'wav' : 'webm';
         const zip = new JSZip();
         const sessionData = takes.map((take, index) => ({
             title: take.title,
             rating: take.rating,
             notes: take.notes,
-            audioFile: `take_${index + 1}.webm`
+            audioFile: `take_${index + 1}.${format}`
         }));
         
         zip.file('session.json', JSON.stringify(sessionData, null, 2));
 
         for (let i = 0; i < takes.length; i++) {
             const response = await fetch(takes[i].audioData);
-            const blob = await response.blob();
-            zip.file(`take_${i + 1}.webm`, blob);
+            let blob = await response.blob();
+            if (format === 'wav') {
+                blob = await convertWebMToWav(blob);
+            }
+            zip.file(`take_${i + 1}.${format}`, blob);
         }
 
         const zipBlob = await zip.generateAsync({ type: 'blob' });

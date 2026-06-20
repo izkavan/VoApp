@@ -316,6 +316,58 @@
                     </div>
 
                     <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+                        <h3>Feature Visibility</h3>
+                        <p style="margin-bottom: 15px; color: var(--gray-700);">Toggle entire views or specific tabs on/off to declutter your workspace.</p>
+                        
+                        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <h4 style="margin-bottom: 10px;">Views</h4>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-view-voice-actor"> Voice Actor View
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-view-dungeon-master"> Dungeon Master View
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-view-utility"> Utility View
+                                </label>
+                            </div>
+
+                            <div style="flex: 1; min-width: 200px;">
+                                <h4 style="margin-bottom: 10px;">Voice Actor Tabs</h4>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-line-reader"> Line Reader
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-teleprompter"> Teleprompter
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-auditions"> Auditions
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-effect-library"> Effect Library
+                                </label>
+                            </div>
+
+                            <div style="flex: 1; min-width: 200px;">
+                                <h4 style="margin-bottom: 10px;">Utility Tabs</h4>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-warmups"> Vocal Warm Ups
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="visibility-tab-voice-memos"> Voice Memos
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+                        <h3>Local Storage Management</h3>
+                        <p>Current local storage used: <strong id="settings-storage-usage">Calculating...</strong></p>
+                        <button id="settings-clear-cache-btn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Clear Local Cache</button>
+                    </div>
+
+                    <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
                         <h3>System Backup</h3>
                         <p>Backup all your characters, projects, scripts, takes, and voice memos.</p>
                         <button id="settings-full-backup-btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Download Full Backup</button>

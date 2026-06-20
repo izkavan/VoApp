@@ -1,4 +1,6 @@
-import { Warmup, Character, Project } from './types.js';
+import { Character, Project, Warmup, SystemSettings } from './types.js';
+import { loadFromLocalStorage } from './storage.js';
+import { convertWebMToWav } from './audio-utils.js';
 
 let currentWarmups: Warmup[] = [];
 let currentCharacters: Character[] = [];
@@ -467,7 +469,48 @@ function setupAudioRecorder() {
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    previewDiv.innerHTML = `<audio controls src="${audioUrl}" style="width: 100%;"></audio>`;
+                    
+                    const audioContainer = document.createElement('div');
+                    audioContainer.style.display = 'flex';
+                    audioContainer.style.alignItems = 'center';
+                    audioContainer.style.gap = '5px';
+                    audioContainer.style.marginTop = '10px';
+                    
+                    const audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.setAttribute('controlsList', 'nodownload');
+                    audio.src = audioUrl;
+                    audio.style.flex = '1';
+                    
+                    const downloadBtn = document.createElement('span');
+                    downloadBtn.textContent = '💾';
+                    downloadBtn.title = 'Download Warmup';
+                    downloadBtn.style.cursor = 'pointer';
+                    downloadBtn.style.fontSize = '1.2rem';
+                    
+                    downloadBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const settings = loadFromLocalStorage().settings;
+                        const ext = settings.exportFormat || 'webm';
+                        let exportBlob = audioBlob;
+                        if (ext === 'wav') {
+                            exportBlob = await convertWebMToWav(audioBlob);
+                        }
+                        const url = URL.createObjectURL(exportBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `warmup_take_${Date.now()}.${ext}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    });
+                    
+                    audioContainer.appendChild(audio);
+                    audioContainer.appendChild(downloadBtn);
+                    
+                    previewDiv.innerHTML = '';
+                    previewDiv.appendChild(audioContainer);
                 };
 
                 mediaRecorder.start();

@@ -87,10 +87,23 @@ export interface Effect {
     date: number; // timestamp
 }
 
+export interface FeatureVisibility {
+    viewVoiceActor: boolean;
+    viewDungeonMaster: boolean;
+    viewUtility: boolean;
+    tabLineReader: boolean;
+    tabTeleprompter: boolean;
+    tabAuditions: boolean;
+    tabEffectLibrary: boolean;
+    tabWarmups: boolean;
+    tabVoiceMemos: boolean;
+}
+
 export interface SystemSettings {
     exportFormat: 'webm' | 'wav';
     audioExportPath: string; // e.g., "audio"
     scriptExportGrouping: 'character' | 'line';
     recordingGear: string;
     effectGroups?: string[];
+    featureVisibility?: FeatureVisibility;
 }

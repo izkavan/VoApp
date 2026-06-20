@@ -1,6 +1,7 @@
 import { Effect, Character, Project, SystemSettings } from './types.js';
 import { getEffects, saveEffect, updateEffect, deleteEffect } from './indexeddb.js';
 import JSZip from 'jszip';
+import { convertWebMToWav } from './audio-utils.js';
 
 let currentEffects: Effect[] = [];
 let currentCharacters: Character[] = [];
@@ -190,12 +191,37 @@ function renderEffectGrid() {
             </div>
             <h3 class="effect-card-title">${effect.title}</h3>
             <div class="warmup-card-tags" style="margin-top: 10px;">${tagsHtml}</div>
-            <audio class="effect-card-audio" controls src="${audioUrl}" style="width: 100%; height: 30px; margin-top: 10px;"></audio>
+            <div style="display: flex; align-items: center; gap: 5px; margin-top: 10px;">
+                <audio class="effect-card-audio" controls controlsList="nodownload" src="${audioUrl}" style="flex: 1; height: 30px;"></audio>
+                <span class="effect-download-btn" data-id="${effect.id}" style="cursor: pointer; font-size: 1.2rem;" title="Download Effect">💾</span>
+            </div>
         `;
 
-        card.addEventListener('click', (e) => {
+        card.addEventListener('click', async (e) => {
             const target = e.target as HTMLElement;
             if (target.tagName === 'AUDIO') return;
+            if (target.classList.contains('effect-download-btn')) {
+                const downloadBtn = target as HTMLElement;
+                const eId = Number(downloadBtn.getAttribute('data-id'));
+                const effectToDownload = currentEffects.find(eff => eff.id === eId);
+                if (effectToDownload && effectToDownload.blob) {
+                    const ext = currentSettings.exportFormat || 'webm';
+                    let blob = effectToDownload.blob;
+                    if (ext === 'wav') {
+                        blob = await convertWebMToWav(blob);
+                    }
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const safeTitle = effectToDownload.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    a.download = `${safeTitle}_${effectToDownload.id}.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+                return;
+            }
             if (target.classList.contains('effect-card-checkbox')) {
                 const cb = target as HTMLInputElement;
                 if (cb.checked) {
@@ -612,7 +638,12 @@ async function downloadSelectedEffects() {
         const safeTitle = effect.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         const filename = `${safeTitle}_${effect.id}.${ext}`;
         
-        folder.file(filename, effect.blob);
+        let fileBlob = effect.blob;
+        if (ext === 'wav') {
+            fileBlob = await convertWebMToWav(fileBlob);
+        }
+        
+        folder.file(filename, fileBlob);
 
         descriptorFile.push({
             id: effect.id,

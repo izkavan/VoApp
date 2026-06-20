@@ -5,7 +5,7 @@ import { initializeCharacterModal, openModal, closeModal } from './character-mod
 import { initializeProjectModal, openProjectModal, closeProjectModal, saveProject } from './project-modal.js';
 import { initializeFilterSearch, filterCharacters } from './filter-search.js';
 import { initializeTheme } from './theme.js';
-import { initializeNavigation } from './navigation.js';
+import { initializeNavigation, applyFeatureVisibility } from './navigation.js';
 import { initializeVoiceActorView } from './voice-actor-view.js';
 import { initializeLineReader } from './line-reader.js';
 import { initializeUtilityView } from './utility-view.js';
@@ -266,6 +266,7 @@ initializeFilterSearch(
 
 initializeTheme();
 initializeNavigation();
+applyFeatureVisibility(currentSettings);
 initializeVoiceActorView();
 initializeLineReader(characters, projects, currentSettings, openModal);
 initializeDungeonMasterView(characters, projects, openModal);
@@ -299,6 +300,7 @@ initializeSettingsView(
         // We should instead update properties of currentSettings to preserve the reference.
         Object.assign(currentSettings, newSettings);
         saveToLocalStorage(characters, projects, auditions, currentSettings);
+        applyFeatureVisibility(currentSettings);
     },
     (newChars, newProjs, newAuds, newSets) => {
         characters = newChars;

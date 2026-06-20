@@ -18,7 +18,18 @@ export const defaultSettings: SystemSettings = {
     audioExportPath: 'audio',
     scriptExportGrouping: 'line',
     recordingGear: '',
-    effectGroups: ['Laugh', 'Grunt', 'Pain']
+    effectGroups: ['Laugh', 'Grunt', 'Pain'],
+    featureVisibility: {
+        viewVoiceActor: true,
+        viewDungeonMaster: true,
+        viewUtility: true,
+        tabLineReader: true,
+        tabTeleprompter: true,
+        tabAuditions: true,
+        tabEffectLibrary: true,
+        tabWarmups: true,
+        tabVoiceMemos: true
+    }
 };
 
 export function saveToLocalStorage(characters: Character[], projects: Project[], auditions: Audition[], settings: SystemSettings = defaultSettings, warmups?: Warmup[]): void {

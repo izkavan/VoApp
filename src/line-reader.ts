@@ -32,6 +32,7 @@ interface SavedLineDetail {
     text: string;
     lineName: string;
     characterId?: number;
+    characterName?: string;
     notes: string;
     takes: SavedTakeDetail[];
 }
@@ -261,8 +262,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
                     <div class="take-audio-controls">
                         <audio controls controlsList="nodownload" src="${audioUrls.get(take.audioId) || ''}"></audio>
-                        <span class="download-take" title="Download Take">⬇️</span>
-                        <span class="delete-take">🗑️</span>
+                        <span class="download-take" title="Download Take" style="cursor: pointer; font-size: 1.2rem;">💾</span>
+                        <span class="delete-take" style="cursor: pointer; font-size: 1.2rem;">🗑️</span>
                     </div>
                     <div class="take-metadata">
                         <div class="star-rating">
@@ -567,9 +568,10 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 const take = detail.takes[i];
                 
                 const format = settings.exportFormat === 'wav' ? 'wav' : 'webm';
-                let fileName = `${i + 1}.${format}`;
+                const takeIdentifier = take.title ? take.title.replace(/[^a-zA-Z0-9]/g, '_') : `${i + 1}`;
+                let fileName = `${takeIdentifier}.${format}`;
                 if (settings.scriptExportGrouping === 'character') {
-                    fileName = `${detail.lineName}_${i + 1}.${format}`;
+                    fileName = `${detail.lineName}_${takeIdentifier}.${format}`;
                 }
 
                 // Path for JSON
@@ -597,7 +599,16 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     }
                 }
             }
-            jsonLineDetails.push({ text: detail.text, lineName: detail.lineName, characterId: detail.characterId, notes: detail.notes, takes: jsonTakes });
+            
+            const detailChar = characters.find(c => c.id === detail.characterId);
+            jsonLineDetails.push({ 
+                text: detail.text, 
+                lineName: detail.lineName, 
+                characterId: detail.characterId, 
+                characterName: detailChar ? detailChar.name : undefined,
+                notes: detail.notes, 
+                takes: jsonTakes 
+            });
         }
 
         const linesToSave = Array.from(lineContainer?.querySelectorAll('.line-entry') || []).map(line => {

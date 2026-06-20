@@ -1,5 +1,7 @@
 import { Project, Character } from './types.js';
 import { handleArtworkPreview, createButton } from './dom-utils.js';
+import { convertWebMToWav } from './audio-utils.js';
+import { loadFromLocalStorage } from './storage.js';
 
 // --- Module State ---
 let characters: Character[] = [];
@@ -81,7 +83,11 @@ export function openModal(character?: Character, isEditMode = false) {
                 </div>
                 <p><strong>Voice Sample:</strong></p>
                 <div id="recording-status"></div>
-                <button id="record-button">Record (10s)</button>
+                <button id="record-button" class="record-button">● Record</button>
+                <div id="character-audio-preview" style="display: none; margin-top: 10px; align-items: center; gap: 5px;">
+                    <audio id="character-audio-player" controls controlsList="nodownload" style="flex: 1; height: 30px;"></audio>
+                    <span id="character-download-sample" style="cursor: pointer; font-size: 1.2rem;" title="Download Sample">💾</span>
+                </div>
                 <p><strong>Tags:</strong></p>
                 <div id="tag-container"></div>
                 <input id="tag-input" placeholder="Add tags (space-separated)">
@@ -184,7 +190,11 @@ export function openModal(character?: Character, isEditMode = false) {
             </div>
             <p><strong>Voice Sample:</strong></p>
             <div id="recording-status"></div>
-            <button id="record-button">Record (10s)</button>
+            <button id="record-button" class="record-button">● Record</button>
+            <div id="character-audio-preview" style="display: none; margin-top: 10px; align-items: center; gap: 5px;">
+                <audio id="character-audio-player" controls controlsList="nodownload" style="flex: 1; height: 30px;"></audio>
+                <span id="character-download-sample" style="cursor: pointer; font-size: 1.2rem;" title="Download Sample">💾</span>
+            </div>
             <p><strong>Tags:</strong></p>
             <div id="tag-container"></div>
             <input id="tag-input" placeholder="Add tags (space-separated)">
@@ -210,30 +220,77 @@ export function closeModal() {
 }
 
 let recordedSample: string | undefined;
+let characterMediaRecorder: MediaRecorder | null = null;
+let characterAudioChunks: Blob[] = [];
+let characterAudioStream: MediaStream | null = null;
 
 async function recordAudio() {
     const statusEl = document.getElementById('recording-status');
-    if (!statusEl) return;
+    const recordBtn = document.getElementById('record-button') as HTMLButtonElement;
+    const previewContainer = document.getElementById('character-audio-preview');
+    const player = document.getElementById('character-audio-player') as HTMLAudioElement;
+    const downloadBtn = document.getElementById('character-download-sample');
+    
+    if (!statusEl || !recordBtn) return;
+
+    if (characterMediaRecorder && characterMediaRecorder.state === 'recording') {
+        // Stop recording
+        characterMediaRecorder.stop();
+        if (characterAudioStream) {
+            characterAudioStream.getTracks().forEach(track => track.stop());
+            characterAudioStream = null;
+        }
+        recordBtn.textContent = '● Record';
+        recordBtn.classList.remove('recording');
+        statusEl.textContent = 'Recording finished. Click Save.';
+        return;
+    }
+
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-        const chunks: Blob[] = [];
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'audio/webm' });
+        characterAudioChunks = [];
+        characterAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        characterMediaRecorder = new MediaRecorder(characterAudioStream);
+        
+        characterMediaRecorder.ondataavailable = e => characterAudioChunks.push(e.data);
+        characterMediaRecorder.onstop = () => {
+            const blob = new Blob(characterAudioChunks, { type: 'audio/webm' });
+            if (previewContainer && player && downloadBtn) {
+                previewContainer.style.display = 'flex';
+                player.src = URL.createObjectURL(blob);
+                
+                // Set up download button
+                downloadBtn.onclick = async () => {
+                    const settings = loadFromLocalStorage().settings;
+                    const ext = settings.exportFormat || 'webm';
+                    let exportBlob = blob;
+                    if (ext === 'wav') {
+                        exportBlob = await convertWebMToWav(blob);
+                    }
+                    const url = URL.createObjectURL(exportBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const nameInput = document.getElementById('edit-name') || document.getElementById('new-name');
+                    const charName = nameInput ? (nameInput as HTMLInputElement).value : 'character';
+                    a.download = `${charName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_sample.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
+            }
             const reader = new FileReader();
             reader.onload = () => {
                 recordedSample = reader.result as string;
-                statusEl.textContent = 'Recording finished. Click Save.';
             };
             reader.readAsDataURL(blob);
         };
-        recorder.start();
-        statusEl.textContent = 'Recording... (10 seconds)';
-        setTimeout(() => {
-            recorder.stop();
-            stream.getTracks().forEach(track => track.stop());
-        }, 10000);
+        
+        characterMediaRecorder.start();
+        recordBtn.textContent = '■ Stop';
+        recordBtn.classList.add('recording');
+        statusEl.textContent = 'Recording...';
+        if (previewContainer) previewContainer.style.display = 'none';
+        
     } catch (err) {
         statusEl.textContent = 'Could not access microphone.';
         console.error('Error recording audio:', err);

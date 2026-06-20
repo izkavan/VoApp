@@ -368,9 +368,25 @@ function initializeVoiceMemos(settings: SystemSettings) {
             infoDiv.appendChild(dateDiv);
 
             const audioUrl = URL.createObjectURL(memo.blob);
+            const audioContainer = document.createElement('div');
+            audioContainer.style.display = 'flex';
+            audioContainer.style.alignItems = 'center';
+            audioContainer.style.gap = '5px';
+            
             const audio = document.createElement('audio');
             audio.controls = true;
+            audio.setAttribute('controlsList', 'nodownload');
             audio.src = audioUrl;
+            audio.style.flex = '1';
+            
+            const downloadBtn = document.createElement('span');
+            downloadBtn.textContent = '💾';
+            downloadBtn.title = 'Download Memo';
+            downloadBtn.style.cursor = 'pointer';
+            downloadBtn.style.fontSize = '1.2rem';
+            
+            audioContainer.appendChild(audio);
+            audioContainer.appendChild(downloadBtn);
 
             // Click interactions
             div.addEventListener('click', (e) => {
@@ -380,8 +396,26 @@ function initializeVoiceMemos(settings: SystemSettings) {
                 }
             });
 
-            audio.addEventListener('click', (e) => {
+            audioContainer.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevents bubbling to the div
+            });
+
+            downloadBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const ext = settings.exportFormat || 'webm';
+                let exportBlob = memo.blob;
+                if (ext === 'wav') {
+                    exportBlob = await convertWebMToWav(memo.blob);
+                }
+                const url = URL.createObjectURL(exportBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                const safeTitle = memo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                a.download = `${safeTitle}_${memo.id}.${ext}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             });
 
             div.addEventListener('dblclick', () => {
@@ -401,7 +435,7 @@ function initializeVoiceMemos(settings: SystemSettings) {
                 // Show audio preview
                 const audioUrl = URL.createObjectURL(currentBlob);
                 if (audioPreview) {
-                    audioPreview.innerHTML = `<audio controls src="${audioUrl}"></audio>`;
+                    audioPreview.innerHTML = `<audio controls controlsList="nodownload" src="${audioUrl}" style="width: 100%;"></audio>`;
                 }
                 if (saveBtn) saveBtn.disabled = false;
                 
@@ -410,7 +444,7 @@ function initializeVoiceMemos(settings: SystemSettings) {
 
             div.appendChild(checkbox);
             div.appendChild(infoDiv);
-            div.appendChild(audio);
+            div.appendChild(audioContainer);
             
             listContainer.appendChild(div);
         });
