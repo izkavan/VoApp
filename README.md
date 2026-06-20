@@ -79,13 +79,11 @@ Yes! While Vo-App is highly tailored for actors, it serves as an excellent refer
 Here are some of the features that I thought up for the app that could be coming in the future-- Feel free to leave comments or message me about getting something moved up in priority, or if there are ideas that you'd like to see, I can add them to the backlog and attribute you!
 
 ### Changes to the core System
-* Get a Docker Image put together that can pull this repo and get it running. 
-* Organize this readme so that groups of functionality are explained, rather than my ramblings of a madman and copy/pasted when I finish a specific section. Would be nice to have a section for "I am a dungeon master, how do I use this?", "I am a voice actor, how do I use this?", "I am a director/producer, how do I use this?"
+* Get a Docker Image put together that can pull this repo and get it running.
 * **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
 * **Voice Memos** Would pair really well with that sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
 * Tie ins to common note taking apps (Obsidian, Notion, World Anvil?)
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
-* A configuration system in the settings to turn off specific views if they aren't of use to the person running the application.
 
 ### Changes to the Character and Project Management
 * **Mood Board**: Some character voices are less "this is the character" and more "this is the mood they fit". They might not have character art. It would be useful to have a section that is just, "Visual inspiration for the audio". This could also include a text area for additional notes, or links to music or videos that help make a good reference. Not trying to replace Pinterest.
