@@ -17,6 +17,7 @@ import { initializeDictionaryModal, openDictionaryModal } from './dictionary-mod
 import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
 import { initializeWarmupView } from './warmup-view.js';
 import { initializeEffectLibrary } from './effect-library.js';
+import { initializeVoiceProductionFeedback } from './vp-feedback.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
@@ -327,6 +328,7 @@ async function initApp() {
     initializeNavigation();
     applyFeatureVisibility(currentSettings);
     initializeVoiceActorView();
+    initializeVoiceProductionFeedback();
     initializeLineReader(characters, projects, currentSettings, openModal);
     initializeDungeonMasterView(characters, projects, openModal);
     initializeUtilityView(currentSettings);

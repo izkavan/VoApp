@@ -229,7 +229,7 @@ textarea, input, select {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-#modal, #project-modal, #audition-modal, #voice-memo-modal, #dictionary-modal, #warmup-modal, #effect-modal {
+.modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -239,7 +239,7 @@ textarea, input, select {
     z-index: 9999;
 }
 
-#modal-content, #project-modal #modal-content, #audition-modal #modal-content, #voice-memo-modal #modal-content, #dictionary-modal-content, #warmup-modal .modal-content, #effect-modal .modal-content {
+.modal-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -438,9 +438,87 @@ body.dark-mode { background-color: var(--gray-1000); color: var(--gray-100); }
 body.dark-mode #app, body.dark-mode #settings-container { background: var(--gray-950); }
 body.dark-mode .character-card { background: var(--gray-900); border-color: var(--gray-800); }
 body.dark-mode textarea, body.dark-mode input, body.dark-mode select { background-color: var(--gray-975); color: var(--gray-100); border-color: var(--gray-800); }
-body.dark-mode #modal-content, body.dark-mode #project-modal #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #voice-memo-modal #modal-content, body.dark-mode #dictionary-modal-content, body.dark-mode #warmup-modal .modal-content, body.dark-mode #effect-modal .modal-content { background: var(--gray-950); }
+body.dark-mode .modal-content { background: var(--gray-950); }
 body.dark-mode .modal-footer { border-top-color: var(--gray-850); }
 body.dark-mode .dictionary-header { border-bottom-color: var(--gray-850); }
+
+/* Voice Production Feedback Comments */
+.vp-comment-item {
+    background: var(--gray-100);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.vp-comment-item.vp-comment-hover-purple {
+    background-color: var(--gray-purple);
+    border-color: #8a2be2;
+}
+.vp-comment-item.vp-comment-active-orange {
+    border-color: orange;
+    background-color: #fff3e0;
+}
+body.dark-mode .vp-comment-item.vp-comment-hover-purple {
+    background-color: rgba(138, 43, 226, 0.2);
+    border-color: #ba55d3;
+}
+body.dark-mode .vp-comment-item.vp-comment-active-orange {
+    background-color: rgba(255, 165, 0, 0.1);
+    border-color: orange;
+}
+.vp-orange-marker {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: orange;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: width 0.25s ease;
+    z-index: 10;
+}
+.vp-orange-marker.vp-marker-hover {
+    width: 4px;
+}
+body.dark-mode .vp-comment-item {
+    background: var(--gray-800);
+}
+body.dark-mode .vp-comment-timestamp {
+    color: var(--gray-300);
+}
+body.dark-mode .vp-comment-text {
+    color: var(--gray-100);
+}
+body.dark-mode #comment-timestamp-input,
+body.dark-mode #comment-text-input {
+    background: var(--gray-900) !important;
+    color: var(--gray-100) !important;
+    border-color: var(--gray-700) !important;
+}
+.vp-comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: var(--gray-600);
+}
+.vp-comment-timestamp {
+    font-family: monospace;
+    font-weight: bold;
+    color: var(--gray-800);
+    cursor: pointer;
+}
+.vp-comment-timestamp:hover {
+    text-decoration: underline;
+}
+.vp-comment-text {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
 body.dark-mode .dictionary-row { border-bottom-color: var(--gray-875); }
 body.dark-mode .tag-item { background-color: var(--gray-800); }
 body.dark-mode .voice-memo-item .tag-item, body.dark-mode #voice-memo-modal .tag-item { background-color: var(--gray-850); }

@@ -7,12 +7,14 @@ export function initializeNavigation() {
 
     const navCharacterLibrary = document.getElementById('nav-character-library');
     const navVoiceActors = document.getElementById('nav-voice-actors');
+    const navVoiceProduction = document.getElementById('nav-voice-production');
     const navDungeonMaster = document.getElementById('nav-dungeon-master');
     const navUtilities = document.getElementById('nav-utilities');
     const navSettings = document.getElementById('nav-settings');
 
     const characterLibraryView = document.getElementById('character-library-view');
     const voiceActorView = document.getElementById('voice-actor-view');
+    const voiceProductionView = document.getElementById('voice-production-view');
     const dungeonMasterView = document.getElementById('dungeon-master-view');
     const utilityView = document.getElementById('utility-view');
     const settingsView = document.getElementById('settings-view');
@@ -33,6 +35,8 @@ export function initializeNavigation() {
                 showView(characterLibraryView);
             } else if (id === 'nav-voice-actors' && voiceActorView) {
                 showView(voiceActorView);
+            } else if (id === 'nav-voice-production' && voiceProductionView) {
+                showView(voiceProductionView);
             } else if (id === 'nav-dungeon-master' && dungeonMasterView) {
                 showView(dungeonMasterView);
             } else if (id === 'nav-utilities' && utilityView) {

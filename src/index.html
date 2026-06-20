@@ -12,6 +12,7 @@
             <ul>
                 <li><a href="#" id="nav-character-library" class="active">Character Library</a></li>
                 <li><a href="#" id="nav-voice-actors">Voice Actor View</a></li>
+                <li><a href="#" id="nav-voice-production">Voice Production</a></li>
                 <li><a href="#" id="nav-dungeon-master">Dungeon Master View</a></li>
                 <li><a href="#" id="nav-utilities">Utility View</a></li>
             </ul>
@@ -164,6 +165,66 @@
                     <div id="effect-cards-grid" class="effect-cards-grid">
                         <!-- Cards injected dynamically -->
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="voice-production-view" class="view hidden">
+            <div class="tab-container">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="vp-feedback">Feedback</button>
+                    <button class="tab-link" data-tab="vp-script">Script</button>
+                    <button class="tab-link" data-tab="vp-sides">Sides</button>
+                    <button class="tab-link" data-tab="vp-auditions">Auditions</button>
+                    <button class="tab-link" data-tab="vp-contraster">Contraster</button>
+                </div>
+                <div id="vp-feedback" class="tab-content active">
+                    <h2>Feedback Analyzer</h2>
+                    <p>Upload a .webm or .wav file to view the waveform and leave timestamped comments.</p>
+                    
+                    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <input type="file" id="vp-audio-upload" accept=".webm,.wav,.zip" class="custom-file-input" style="display: none;" />
+                        <label for="vp-audio-upload" class="custom-file-input">Upload Audio or Zip</label>
+                        <button id="vp-btn-export" title="Export Feedback" class="icon-btn" style="margin-left: auto;">Export Feedback</button>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <input type="text" id="vp-feedback-title" placeholder="Feedback Title..." style="width: 100%; font-size: 1.2em; font-weight: bold; padding: 5px; border: 1px solid transparent; background: transparent; color: inherit;" />
+                    </div>
+
+                    <div class="vp-waveform-container" style="position: relative; width: 100%; height: 150px; background: var(--gray-900); border-radius: var(--border-radius); overflow: hidden; margin-bottom: 10px; cursor: pointer;">
+                        <canvas id="vp-waveform-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                        <div id="vp-progress-bar" style="position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: yellow; pointer-events: none; display: none;"></div>
+                    </div>
+
+                    <div class="vp-controls" style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                        <button id="vp-btn-start" title="Start from beginning" class="icon-btn">|&lt;&lt;</button>
+                        <button id="vp-btn-prev-comment" title="Start from last comment" class="icon-btn">|&lt;</button>
+                        <button id="vp-btn-play-pause" title="Play/Pause" class="icon-btn">▶</button>
+                        <button id="vp-btn-insert-comment" title="Insert Comment" class="icon-btn">💬 Insert Comment</button>
+                        <span id="vp-time-display" style="margin-left: auto; font-family: monospace;">00:00:00.000</span>
+                    </div>
+
+                    <h3>Comments</h3>
+                    <div id="vp-comment-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                        <p style="color: var(--gray-600); font-style: italic;">No comments yet.</p>
+                    </div>
+                </div>
+                <div id="vp-script" class="tab-content">
+                    <h2>Script</h2>
+                    <p>Slate builder, Non destructive imports plus table read, script modification</p>
+                </div>
+                <div id="vp-sides" class="tab-content">
+                    <h2>Sides</h2>
+                    <p>The Sides exporter loads a script, lets you annotate the characters on it, and export all the lines that each person needs.</p>
+                </div>
+                <div id="vp-auditions" class="tab-content">
+                    <h2>Auditions</h2>
+                    <p>A bias free audition system. Strips names from collections of auditions, lets you rank the auditions, and produce a "top 3".</p>
+                </div>
+                <div id="vp-contraster" class="tab-content">
+                    <h2>Contraster</h2>
+                    <p>Can load multiple characters, the auditions associated with each, and do comparisons between them to find a good cast</p>
                 </div>
             </div>
         </div>
@@ -467,6 +528,25 @@
     <!-- Dictionary Modal -->
     <div id="dictionary-modal" class="hidden">
         <div id="dictionary-modal-content" class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;"></div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div id="comment-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="margin-top: 0;">Insert Comment</h2>
+            <div style="margin-bottom: 15px;">
+                <label>Timestamp (HH:MM:SS.mmm)</label>
+                <input type="text" id="comment-timestamp-input" style="width: 100%; font-family: monospace; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color);" />
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Comment</label>
+                <textarea id="comment-text-input" rows="4" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color);"></textarea>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button id="comment-cancel-btn" style="background: var(--gray-300); color: var(--gray-800);">Cancel</button>
+                <button id="comment-save-btn" style="background: var(--primary-color); color: white;">Save</button>
+            </div>
+        </div>
     </div>
 
     <!-- Warmup Modal -->

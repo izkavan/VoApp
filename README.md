@@ -43,6 +43,9 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 * **Effect Library**: Record and tag non-dialogue vocalizations (laughs, grunts, yells, etc.) into a categorized, filterable grid. Attach these sounds to specific characters or projects, and easily batch export them as ZIP files to send straight to your producer.
 * **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
 
+### Voice Production tools
+* Time-stamped waveform notes so when a director opens a project, they can select a take to load, and then annotate that take. You can display the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes.
+
 ## I'm a voice actor. What is this and how do I use it?
 
 Vo-App acts as your personal vocal library! It helps you manage the dozens or even hundreds of different voices and character archetypes you might use across various games, audiobooks, podcasts, and animations.
@@ -122,7 +125,7 @@ Here are some of the features that I thought up for the app that could be coming
 ### Changes for Directors/Writers/producers
 
 * **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
-* Time-stamped waveform notes so when a director opens a project, they can select a take to load, and then annotate that take (especially useful for long ones). This might be a new view where it displays the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes. It should also display a list of all the notes below the waveform, not just annotations/lines on the visual.
+* Time-stamped waveform feedback should also allows multiple audio files to be selected from a list on the left, waveform on the right, and then comments for that waveform below. This should allow, for example, feedback on an entire Teleprompter session. 
 * **Sides Exporter**: Have a giant script, annotate it with the characters, and then when you select "generate sides", it splits each character's lines into their own zip file/script that you can send off. Could also include the project and character details (And mood board!).
 * **Asynchronous slate builder** : A director can create a project, create empty "placeholder" takes for lines they need, attach reference audio or notes to each line, and export it. The actor imports this "checklist," records their audio directly into the empty slots, and exports it back.
 * **Non-destructive imports**: In the director's "Script" mode, they can import the output of multiple actors into the same script view. This lets them see the project in its whole. This will likely require a heavy understanding of workflows.
