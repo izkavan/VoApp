@@ -76,9 +76,21 @@ export interface Warmup {
     characterIds: number[];
 }
 
+export interface Effect {
+    id: number;
+    blob: Blob;
+    title: string;
+    group: string;
+    tags: string[];
+    characterIds: number[];
+    projectIds: number[];
+    date: number; // timestamp
+}
+
 export interface SystemSettings {
     exportFormat: 'webm' | 'wav';
     audioExportPath: string; // e.g., "audio"
     scriptExportGrouping: 'character' | 'line';
     recordingGear: string;
+    effectGroups?: string[];
 }

@@ -229,7 +229,7 @@ textarea, input, select {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-#modal, #project-modal, #audition-modal, #voice-memo-modal, #dictionary-modal, #warmup-modal {
+#modal, #project-modal, #audition-modal, #voice-memo-modal, #dictionary-modal, #warmup-modal, #effect-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -239,7 +239,7 @@ textarea, input, select {
     z-index: 100;
 }
 
-#modal-content, #project-modal #modal-content, #audition-modal #modal-content, #voice-memo-modal #modal-content, #dictionary-modal-content, #warmup-modal .modal-content {
+#modal-content, #project-modal #modal-content, #audition-modal #modal-content, #voice-memo-modal #modal-content, #dictionary-modal-content, #warmup-modal .modal-content, #effect-modal .modal-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -438,7 +438,7 @@ body.dark-mode { background-color: var(--gray-1000); color: var(--gray-100); }
 body.dark-mode #app, body.dark-mode #settings-container { background: var(--gray-950); }
 body.dark-mode .character-card { background: var(--gray-900); border-color: var(--gray-800); }
 body.dark-mode textarea, body.dark-mode input, body.dark-mode select { background-color: var(--gray-975); color: var(--gray-100); border-color: var(--gray-800); }
-body.dark-mode #modal-content, body.dark-mode #project-modal #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #voice-memo-modal #modal-content, body.dark-mode #dictionary-modal-content, body.dark-mode #warmup-modal .modal-content { background: var(--gray-950); }
+body.dark-mode #modal-content, body.dark-mode #project-modal #modal-content, body.dark-mode #audition-modal #modal-content, body.dark-mode #voice-memo-modal #modal-content, body.dark-mode #dictionary-modal-content, body.dark-mode #warmup-modal .modal-content, body.dark-mode #effect-modal .modal-content { background: var(--gray-950); }
 body.dark-mode .modal-footer { border-top-color: var(--gray-850); }
 body.dark-mode .dictionary-header { border-bottom-color: var(--gray-850); }
 body.dark-mode .dictionary-row { border-bottom-color: var(--gray-875); }
@@ -456,6 +456,8 @@ body.dark-mode #line-container, body.dark-mode #read-container, body.dark-mode #
 body.dark-mode .warm-up-container { background-color: var(--gray-975); border-color: var(--gray-800); }
 body.dark-mode .warmup-card { background-color: var(--gray-900); border-color: var(--gray-800); }
 body.dark-mode .warmup-attached-char { background-color: var(--gray-850); }
+body.dark-mode .effect-card { background-color: var(--gray-900); border-color: var(--gray-800); }
+body.dark-mode .effect-selection-actions { background-color: var(--gray-900); }
 body.dark-mode .audition-card { background-color: var(--gray-950); border-color: var(--gray-800); }
 
 /* --- Theme Toggle --- */
@@ -1009,4 +1011,68 @@ body.dark-mode .dict-highlight {
     background: var(--gray-200);
     padding: 5px 10px;
     border-radius: 15px;
+}
+
+/* Effect UI Styles */
+.effect-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.effect-selection-actions {
+    background: var(--gray-150);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.effect-card {
+    background-color: var(--white);
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px var(--shadow-light);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.effect-card-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.effect-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-left: 25px; /* Leave space for the checkbox */
+}
+
+.effect-card-group {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.effect-card-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.effect-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-light);
+    cursor: pointer;
 }

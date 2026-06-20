@@ -17,7 +17,8 @@ export const defaultSettings: SystemSettings = {
     exportFormat: 'webm',
     audioExportPath: 'audio',
     scriptExportGrouping: 'line',
-    recordingGear: ''
+    recordingGear: '',
+    effectGroups: ['Laugh', 'Grunt', 'Pain']
 };
 
 export function saveToLocalStorage(characters: Character[], projects: Project[], auditions: Audition[], settings: SystemSettings = defaultSettings, warmups?: Warmup[]): void {

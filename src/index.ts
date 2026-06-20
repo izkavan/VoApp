@@ -16,6 +16,7 @@ import { initializeSettingsView } from './settings-view.js';
 import { initializeDictionaryModal, openDictionaryModal } from './dictionary-modal.js';
 import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
 import { initializeWarmupView } from './warmup-view.js';
+import { initializeEffectLibrary } from './effect-library.js';
 import { SystemSettings, Warmup } from './types.js';
 import JSZip from 'jszip';
 
@@ -277,6 +278,10 @@ initializeDictionaryHighlighter();
 initializeTeleprompter(projects);
 initializeWarmupView(warmups, characters, projects, (updatedWarmups) => {
     warmups = updatedWarmups;
+    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+});
+initializeEffectLibrary(characters, projects, currentSettings, (updatedSettings) => {
+    Object.assign(currentSettings, updatedSettings);
     saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
 });
 initializeSettingsView(

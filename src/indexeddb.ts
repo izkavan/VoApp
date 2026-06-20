@@ -1,10 +1,11 @@
-import { VoiceMemo, DictionaryEntry } from './types.js';
+import { VoiceMemo, DictionaryEntry, Effect } from './types.js';
 
 const DB_NAME = 'VoAppDatabase';
-const DB_VERSION = 3; // Incremented for audio blobs store
+const DB_VERSION = 4; // Incremented for effects store
 const VOICE_MEMOS_STORE = 'voice_memos';
 const DICTIONARY_STORE = 'dictionary';
 const AUDIO_BLOBS_STORE = 'audio_blobs';
+const EFFECTS_STORE = 'effects';
 
 export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -30,6 +31,9 @@ export function initDB(): Promise<IDBDatabase> {
             }
             if (!db.objectStoreNames.contains(AUDIO_BLOBS_STORE)) {
                 db.createObjectStore(AUDIO_BLOBS_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(EFFECTS_STORE)) {
+                db.createObjectStore(EFFECTS_STORE, { keyPath: 'id', autoIncrement: true });
             }
         };
     });
@@ -117,6 +121,56 @@ export async function deleteVoiceMemos(ids: number[]): Promise<void> {
         transaction.onerror = (event) => {
             reject((event.target as IDBTransaction).error);
         };
+    });
+}
+
+// --- Effects Operations ---
+
+export async function saveEffect(effect: Omit<Effect, 'id'>): Promise<number> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([EFFECTS_STORE], 'readwrite');
+        const store = transaction.objectStore(EFFECTS_STORE);
+        const request = store.add(effect);
+
+        request.onsuccess = (event) => resolve((event.target as IDBRequest<number>).result);
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function updateEffect(effect: Effect): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([EFFECTS_STORE], 'readwrite');
+        const store = transaction.objectStore(EFFECTS_STORE);
+        const request = store.put(effect);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function getEffects(): Promise<Effect[]> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([EFFECTS_STORE], 'readonly');
+        const store = transaction.objectStore(EFFECTS_STORE);
+        const request = store.getAll();
+
+        request.onsuccess = (event) => resolve((event.target as IDBRequest<Effect[]>).result);
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function deleteEffect(id: number): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([EFFECTS_STORE], 'readwrite');
+        const store = transaction.objectStore(EFFECTS_STORE);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
     });
 }
 

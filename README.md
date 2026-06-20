@@ -39,14 +39,40 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 ### Voice Memos & Utilities
 * **Voice Memos**: Record and save ad-hoc voice memos to capture spontaneous ideas, tagging them to specific projects or marking them as high importance.
 * **Vocal Warmups**: A dedicated practice dashboard where you can read text, filter by tags or ratings, and attach characters for targeted practice. Includes an Audio Scratchpad to record and review temporary takes.
+* **Effect Library**: Record and tag non-dialogue vocalizations (laughs, grunts, yells, etc.) into a categorized, filterable grid. Attach these sounds to specific characters or projects, and easily batch export them as ZIP files to send straight to your producer.
 * **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
 
 ## I'm a voice actor. What is this and how do I use it?
-//TODO, I'm working on it. There's a lot of moving pieces here.
+
+Vo-App acts as your personal vocal library! It helps you manage the dozens or even hundreds of different voices and character archetypes you might use across various games, audiobooks, podcasts, and animations.
+
+**Typical Workflow:**
+1. **Create your Projects and Characters**: Start by defining the show or game you are working on. Create characters for that project and give them a "Vocal Recipe" (pitch, pace, placement, timbre) so you remember *exactly* how they sound six months later. Add character art and record a quick reference anchor phrase!
+2. **Setup your Dictionary**: If your project has complex fantasy names or scientific jargon, define them in the Pronunciation Dictionary so you can record the correct pronunciation.
+3. **Read your Scripts**: Use the Line Reader or Teleprompter to upload your script. If your project has dictionary words in the script, they will automatically highlight! You can hover over them to read the phonetics or play your audio reference. Record multiple takes of your lines and star the ones you like best.
+4. **Manage Auditions**: Track what characters you submitted for which casting directors using the Audition Tracker, so you never lose track of what voice you used for that callback.
+5. **Warmups and Efforts**: Head to the Vocal Warmups tab to run through your daily tongue twisters, and build a reusable catalog of fight grunts and dying breaths in the Effect Library.
+
 ## I'm a dungeon master. What is this and how do I use it?
-//TODO, I'm working on it. There's a lot of moving pieces here.
+
+Running a tabletop RPG campaign requires juggling dozens of NPCs, and keeping their voices consistent across months of gameplay can be tough. Vo-App helps you organize your world's cast of characters and gives you the tools to recall exactly how they sound at a moment's notice. You won't have to say, "Oh shoot, how did the mayor talk again?" again!
+
+**Typical Workflow:**
+1. **Build Your Campaign**: Create a Project for your campaign (e.g., "Curse of Strahd" or "Homebrew: The Shattered Sky").
+2. **Populate the World**: As you prep your sessions, create characters for your important NPCs. Use the "Vocal Recipe" sliders to define their pitch and pace so you can quickly get into character. Record a short anchor phrase (like their most famous quote) to listen to right before they speak.
+3. **Lore Consistency**: Add difficult-to-pronounce city names, ancient deities, or fantasy races into the Pronunciation Dictionary so you never slip up on your own world's lore.
+4. **Run the Game**: When game day arrives, switch to the **Dungeon Master (Live Session) View**. Select your campaign project to get a streamlined dashboard of all your NPCs, giving you instant access to their voice samples and notes without cluttering your screen.
+5. **Handle the Unexpected**: Party went totally off the rails and talked to a random guard? Hit the **Improvised NPC Generator** in the Live Session view to instantly generate a random name, trait, and vocal recipe so you have a fully-fleshed out character on the fly!
+
 ## I'm a director or producer, is this useful for me?
-//TODO, I'm working on it. There's a lot of moving pieces here.
+
+Yes! While Vo-App is highly tailored for actors, it serves as an excellent reference bible and casting tool for directors and producers managing audio dramas, games, or animation. I'd love to hear from you on ways this can better suit your needs, though!
+
+**Typical Workflow:**
+1. **Create the Project Bible**: Set up your production as a Project. As you write or develop the script, build out the Character Library for your cast.
+2. **Define the Sound**: Instead of just writing "He sounds gruff," use the Vocal Recipe sliders to build the exact sonic profile you want. You can record your own temporary voice samples as scratch audio to demonstrate the intended vibe.
+3. **Standardize Pronunciations**: Fill out the Pronunciation Dictionary with the canon pronunciations of your sci-fi or fantasy terms. When actors import your project and load their scripts into the Line Reader, the app will automatically highlight those terms and play your canon audio so they don't have to guess.
+4. **Share with Talent**: Use the **Export Project** feature to package the entire project (including character profiles, artwork, and your scratch audio) into a single ZIP file. Send this to your voice actors so they can import it into their own Vo-App and know exactly what you're looking for.
 
 ## What's Coming Next?
 
@@ -77,7 +103,6 @@ Here are some of the features that I thought up for the app that could be coming
 * Have a viewer for active memory management. Should allow a single view of all the data the application stores in local memory, with options to delete that data if the user wants.
 * **Demo Reel Builder:** A dedicated workspace to assemble, your best recordings into a professional demo reel, ready for export. I don't want to add editing tools to this application, but getting them consolidated into a file could be useful.
 * **Export Annotations**: to go along with the above, there should be a good way to link/annotate the recordings, and export that data alongside the audio. I'm imagining a single markdown sheet that references each file by name and displays artist remarks for the editor to follow through on-- Even if it's all the same person, it comes in handy when changing mental workspaces.
-**Effort & Grunt Library:** A special category for recording and tagging non-dialogue vocalizations (grunts, yells, laughs, etc.) to build a reusable library for action-heavy roles. I don't know if this needs to be per character, or if a different tagging system should be put in place. Tag back to vocal recipes, and let there be a search system so you can cross reference "how did I do that before?"
 
 ### Community Platform
 
