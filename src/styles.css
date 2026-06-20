@@ -517,6 +517,7 @@ body.dark-mode #comment-text-input {
     word-wrap: break-word;
     white-space: pre-wrap;
     overflow-wrap: break-word;
+    word-break: break-all;
 }
 
 body.dark-mode .dictionary-row { border-bottom-color: var(--gray-875); }
