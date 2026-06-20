@@ -95,6 +95,14 @@ export function saveProject() {
     const startDate = projectStartDateInput.value;
     const endDate = projectEndDateInput.value;
 
+    const nameExists = projects.some(p => p.name.trim().toLowerCase() === name.trim().toLowerCase() && p.id !== currentProjectId);
+
+    if (nameExists) {
+        if (!confirm("A project with this name already exists, and could cause confusion. Do you wish to proceed?")) {
+            return;
+        }
+    }
+
     if (currentProjectId !== null) {
         const projIndex = projects.findIndex(p => p.id === currentProjectId);
         if (projIndex > -1) {

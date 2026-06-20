@@ -517,6 +517,8 @@ body.dark-mode .theme-toggle svg { color: var(--gray-100); }
     padding: 10px;
     margin-top: 10px;
     min-height: 150px;
+    max-height: 50vh;
+    overflow-y: auto;
     background-color: var(--white);
     color: var(--black);
 }

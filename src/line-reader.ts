@@ -18,6 +18,7 @@ interface LineDetail {
     characterId?: number;
     notes: string;
     takes: TakeDetail[]; // Array of TakeDetail
+    state?: 'Not Started' | 'In Progress' | 'Done';
 }
 
 // JSON representation
@@ -35,6 +36,7 @@ interface SavedLineDetail {
     characterName?: string;
     notes: string;
     takes: SavedTakeDetail[];
+    state?: 'Not Started' | 'In Progress' | 'Done';
 }
 
 interface SavedScript {
@@ -211,15 +213,22 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 }
                 lineDiv.style.display = visible ? 'flex' : 'none';
 
+                let stateDot = '';
+                if (lineDiv.classList.contains('read')) {
+                    if (detail?.state === 'Done') stateDot = '🟢 ';
+                    else if (detail?.state === 'In Progress') stateDot = '🟡 ';
+                    else stateDot = '🔴 ';
+                }
+
                 if (lineDiv.classList.contains('read') && charId !== undefined && !isNaN(charId)) {
                     const char = characters.find(c => c.id === charId);
                     if (char && char.artwork) {
-                        lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
+                        lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
                     } else {
-                        lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
+                        lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                     }
                 } else {
-                    lineDiv.innerHTML = `<span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
+                    lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                 }
             });
         });
@@ -248,6 +257,14 @@ export function initializeLineReader(characters: Character[], projects: Project[
         readDetailsContainer.innerHTML = `
             <label for="line-name-input">Line Name:</label>
             <input type="text" id="line-name-input" value="${details.lineName}" />
+            <div class="line-state-container" style="margin-top: 10px;">
+                <label for="line-state-select">Status:</label>
+                <select id="line-state-select">
+                    <option value="Not Started" ${(!details.state || details.state === 'Not Started') ? 'selected' : ''}>Not Started</option>
+                    <option value="In Progress" ${details.state === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Done" ${details.state === 'Done' ? 'selected' : ''}>Done</option>
+                </select>
+            </div>
             <div class="character-selector">
                 <select id="line-character-select">
                     <option value="">--Select Character--</option>
@@ -286,6 +303,11 @@ export function initializeLineReader(characters: Character[], projects: Project[
         });
         document.getElementById('line-character-art')?.addEventListener('click', () => { if (associatedCharacter) openCharacterModal(associatedCharacter); });
         document.getElementById('line-notes')?.addEventListener('input', (e) => { details.notes = (e.target as HTMLTextAreaElement).value; });
+        document.getElementById('line-state-select')?.addEventListener('change', (e) => {
+            details.state = (e.target as HTMLSelectElement).value as any;
+            updateLineContainerUI();
+            saveActiveSession();
+        });
         document.querySelectorAll('.delete-take').forEach(btn => btn.addEventListener('click', async (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             const take = details.takes[index];
@@ -382,8 +404,12 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     const details = lineDetails.get(lineText);
                     if (details) {
                         details.takes.unshift({ audioId, rating: 0, notes: '', title: '' });
+                        if (!details.state || details.state === 'Not Started') {
+                            details.state = 'In Progress';
+                        }
                         saveActiveSession();
                         renderDetails(lineText);
+                        updateLineContainerUI();
                     }
                 }
                 stream.getTracks().forEach(track => track.stop());
@@ -607,7 +633,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 characterId: detail.characterId, 
                 characterName: detailChar ? detailChar.name : undefined,
                 notes: detail.notes, 
-                takes: jsonTakes 
+                takes: jsonTakes,
+                state: detail.state
             });
         }
 
