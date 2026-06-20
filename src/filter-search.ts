@@ -146,3 +146,8 @@ export function filterCharacters() {
         );
     }
 }
+
+export function updateFilterData(newCharacters: Character[], newProjects: Project[]) {
+    characters = newCharacters;
+    projects = newProjects;
+}

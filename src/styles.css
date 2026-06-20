@@ -486,6 +486,66 @@ body.dark-mode .vp-comment-item.vp-comment-active-orange {
 body.dark-mode .vp-comment-item {
     background: var(--gray-800);
 }
+.script-line-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--gray-100);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.script-line-item.dragging {
+    opacity: 0.5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.script-line-item.drag-over {
+    border-top: 2px solid var(--primary-color);
+}
+body.dark-mode .script-line-item {
+    background: var(--gray-800);
+}
+.script-drag-handle {
+    cursor: grab;
+    font-size: 1.5em;
+    color: var(--gray-500);
+    padding-top: 5px;
+}
+.script-drag-handle:active {
+    cursor: grabbing;
+}
+.script-title-card textarea {
+    text-align: center;
+    font-family: monospace;
+    font-size: 1.2em;
+    font-weight: bold;
+    width: 100%;
+}
+.script-scene-details textarea {
+    font-weight: bold;
+}
+.script-line-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 150px;
+}
+.script-character-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.script-line-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.script-line-content textarea {
+    resize: vertical;
+    min-height: 60px;
+}
 body.dark-mode .vp-comment-timestamp {
     color: var(--gray-300);
 }

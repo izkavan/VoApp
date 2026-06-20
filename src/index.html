@@ -24,7 +24,7 @@
         <div id="character-library-view" class="view">
             <div id="app">
                 <header>
-                    <h1>Vocal Characters</h1>
+                    <h1>Character Library</h1>
                     <div class="header-buttons">
                         <button id="new-character-button">New Character</button>
                         <button id="new-project-button">New Project</button>
@@ -177,6 +177,8 @@
                     <button class="tab-link" data-tab="vp-sides">Sides</button>
                     <button class="tab-link" data-tab="vp-auditions">Auditions</button>
                     <button class="tab-link" data-tab="vp-contraster">Contraster</button>
+                    <button class="tab-link" data-tab="vp-slate-builder">Slate Builder</button>
+                    <button class="tab-link" data-tab="vp-table-read">Table Read</button>
                 </div>
                 <div id="vp-feedback" class="tab-content active">
                     <h2>Feedback Analyzer</h2>
@@ -211,8 +213,25 @@
                     </div>
                 </div>
                 <div id="vp-script" class="tab-content">
-                    <h2>Script</h2>
-                    <p>Slate builder, Non destructive imports plus table read, script modification</p>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                        <input type="text" id="vp-script-name" placeholder="Script Name..." style="flex-grow: 1; font-size: 1.5em; font-weight: bold; padding: 5px; border: 1px solid transparent; background: transparent; color: inherit;" />
+                        <select id="vp-script-project-select">
+                            <option value="none">No Project</option>
+                        </select>
+                        <button id="vp-script-dictionary-btn" class="hidden icon-btn" title="Open Project Dictionary">📖</button>
+                        <button id="vp-script-import-btn" class="icon-btn" title="Import Script">📂 Import Script</button>
+                        <input type="file" id="vp-script-import-input" accept=".json,.zip" class="hidden" />
+                        <button id="vp-script-save-btn" class="icon-btn" title="Save & Export Script">💾 Export Script</button>
+                    </div>
+
+                    <div id="vp-script-lines" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; min-height: 200px;">
+                        <!-- Lines will be dynamically inserted here -->
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 10px; border-top: 2px dashed var(--border-color); padding-top: 20px;">
+                        <button id="vp-script-add-line-btn" class="primary-btn">+ Add Line</button>
+                        <button id="vp-script-add-title-btn" class="secondary-btn">+ Add Title Card</button>
+                    </div>
                 </div>
                 <div id="vp-sides" class="tab-content">
                     <h2>Sides</h2>
@@ -225,6 +244,14 @@
                 <div id="vp-contraster" class="tab-content">
                     <h2>Contraster</h2>
                     <p>Can load multiple characters, the auditions associated with each, and do comparisons between them to find a good cast</p>
+                </div>
+                <div id="vp-slate-builder" class="tab-content">
+                    <h2>Slate Builder</h2>
+                    <p>Arrange and export a script for specific characters, building out sides/slates for an actor to read from.</p>
+                </div>
+                <div id="vp-table-read" class="tab-content">
+                    <h2>Table Read</h2>
+                    <p>Import multiple copies of a script and associated reads/takes from various artists, and combine them into one master file. With this, you can select a "golden copy" for each line, and play through the script. We can maybe add a default tone for lines that have no line reads associated.</p>
                 </div>
             </div>
         </div>
@@ -444,15 +471,15 @@
         </div>
     </div>
 
-    <div id="modal" class="hidden">
-        <div id="modal-content">
+    <div id="modal" class="modal hidden">
+        <div id="modal-content" class="modal-content">
             <span id="modal-close">&times;</span>
             <div id="modal-view-content"></div>
         </div>
     </div>
 
-    <div id="project-modal" class="hidden">
-        <div id="modal-content">
+    <div id="project-modal" class="modal hidden">
+        <div class="modal-content">
             <span id="project-modal-close">&times;</span>
             <h2>Edit Project</h2>
             <input id="project-name" placeholder="Project Name">
@@ -470,15 +497,15 @@
         </div>
     </div>
 
-    <div id="audition-modal" class="hidden">
-        <div id="modal-content">
+    <div id="audition-modal" class="modal hidden">
+        <div class="modal-content">
             <span id="audition-modal-close">&times;</span>
             <div id="audition-modal-content"></div>
         </div>
     </div>
 
-    <div id="voice-memo-modal" class="hidden">
-        <div id="modal-content">
+    <div id="voice-memo-modal" class="modal hidden">
+        <div class="modal-content">
             <span id="voice-memo-modal-close">&times;</span>
             <h2>New Voice Memo</h2>
             
@@ -526,7 +553,7 @@
     }
     </script>
     <!-- Dictionary Modal -->
-    <div id="dictionary-modal" class="hidden">
+    <div id="dictionary-modal" class="modal hidden">
         <div id="dictionary-modal-content" class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;"></div>
     </div>
 

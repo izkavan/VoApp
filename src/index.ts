@@ -3,7 +3,7 @@ import { loadFromLocalStorage, saveToLocalStorage } from './storage.js';
 import { initializeCharacterRenderer } from './character-renderer.js';
 import { initializeCharacterModal, openModal, closeModal } from './character-modal.js';
 import { initializeProjectModal, openProjectModal, closeProjectModal, saveProject } from './project-modal.js';
-import { initializeFilterSearch, filterCharacters } from './filter-search.js';
+import { initializeFilterSearch, filterCharacters, updateFilterData } from './filter-search.js';
 import { initializeTheme } from './theme.js';
 import { initializeNavigation, applyFeatureVisibility } from './navigation.js';
 import { initializeVoiceActorView } from './voice-actor-view.js';
@@ -18,6 +18,7 @@ import { initializeDictionaryHighlighter } from './dictionary-highlighter.js';
 import { initializeWarmupView } from './warmup-view.js';
 import { initializeEffectLibrary } from './effect-library.js';
 import { initializeVoiceProductionFeedback } from './vp-feedback.js';
+import { initializeScriptView, refreshScriptView } from './vp-script.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
@@ -60,8 +61,10 @@ const dictionaryModalElement = document.getElementById('dictionary-modal') as HT
 const dictionaryModalContentElement = document.getElementById('dictionary-modal-content') as HTMLElement;
 
 export function renderApp() {
+    updateFilterData(characters, projects);
     filterCharacters();
     refreshDungeonMasterView();
+    refreshScriptView(projects, characters);
 }
 
 function onCharacterDrop(characterId: number, projectId?: number) {
@@ -332,6 +335,7 @@ async function initApp() {
     initializeLineReader(characters, projects, currentSettings, openModal);
     initializeDungeonMasterView(characters, projects, openModal);
     initializeUtilityView(currentSettings);
+    initializeScriptView(projects, characters, openDictionaryModal);
     
     initializeAuditionView(auditions, characters, (updatedAuditions) => {
         auditions = updatedAuditions;
