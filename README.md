@@ -37,6 +37,8 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 ### Audition Tracker
 * **Log Submissions**: Keep track of audition details including project name, casting director, due date, script sides, and status (e.g., Submitted, Callback, Booked, Rejected). 
 * **Character Linking**: Link characters from your library to the auditions you used them for.
+* **Profile & Live Recording**: Save your global "About Me" profile so your contact info is always ready. Record your audition directly in the app using your microphone, or upload an existing file.
+* **Export for Casting**: Easily export your audition as a standardized ZIP file containing your audio and a metadata JSON (including your rates and availability) that drops perfectly into the Voice Production Blind Review system.
 
 ### Dungeon Master (Live Session) View
 * **Game Day Dashboard**: A simplified view tailored for running a game. Select a project to instantly access its assigned characters, voice samples, and notes without searching the full library.
@@ -49,7 +51,10 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 * **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
 
 ### Voice Production tools
-* Time-stamped waveform notes so when a director opens a project, they can select a take to load, and then annotate that take. You can display the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes.
+* **Sides Converter**: Upload a script and easily export customized "Sides" (condensed scripts) for individual characters. Select the characters you want, and the app generates a ZIP containing a master script of just their lines, plus individualized folders and scripts for each character.
+* **Blind Audition Review**: Remove bias from the casting process! Casting directors can upload a ZIP of auditions (or import them manually), and the app will display them randomly without actor names. Directors can listen to the audio, leave 5-star ratings and comments, and then export the finalized "Top Choices" to send to producers.
+* **Chemistry Contraster**: A visual grid where a Casting Director can place their top picks for multiple characters side-by-side. Play the samples back-to-back to ensure the leads have distinct vocal timbres, ensuring a well-balanced sonic cast before making final offers.
+* **Time-stamped waveform notes**: When a director opens a project, they can select a take to load, and then annotate that take. You can display the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes.
 
 ## I'm a voice actor. What is this and how do I use it?
 
@@ -132,13 +137,10 @@ Here are some of the features that I thought up for the app that could be coming
 * **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
 * Time-stamped waveform feedback should also allows multiple audio files to be selected from a list on the left, waveform on the right, and then comments for that waveform below. This should allow, for example, feedback on an entire Teleprompter session. 
 * It might be a good idea to also allow a script to bundle with it a project/character library, so that if you are sending it to someone you don't need to remember to do that as well. This gets into more and more complex data formats, so it's in the backlog for now.
-* **Sides Exporter**: Have a giant script, annotate it with the characters, and then when you select "generate sides", it splits each character's lines into their own zip file/script that you can send off. Could also include the project and character details (And mood board!).
 * **Asynchronous slate builder** : A director can create a project, create empty "placeholder" takes for lines they need, attach reference audio or notes to each line, and export it. The actor imports this "checklist," records their audio directly into the empty slots, and exports it back.
 * **Non-destructive imports**: In the director's "Script" mode, they can import the output of multiple actors into the same script view. This lets them see the project in its whole. This will likely require a heavy understanding of workflows.
 * **Table-Read Simulator**: When you have a script with lines filled in with takes, you can identify a "golden take" (or, if there's one take, it defaults). Then you can press "table read" and it will read through the script, using the golden take from each line. 
 * **Actual writing of the script**: Or, at least, an editor for common script uploads. This way the writer doesn't need to leave the same app everyone else is using. 
-* **Blind Audition Listener**: Remove bias, have the casting director listen to the various auditions without names associated,  and let them listen to and rate the audio performances. 
-* **Chemistry/Contrast Matrix**: A visual grid where a CD can place their top 3 picks for Character A next to their top 3 picks for Character B. They can play the samples back-to-back to ensure the two leads don't have identical vocal timbres, ensuring a well-balanced sonic cast before making final offers.
 * **Franken-bite**: Often, a director loves the first half of Take 1, and the second half of Take 3. Instead of just starring both and confusing the editor, the director could highlight specific words in the script text attached to each take. This generates an "Edit Decision List" (EDL) so the editor knows exactly which pieces to stitch together.
 * **DAW Drag and drop**: tie ins to DAW projects could give the ability to literally click a starred take in the Vo-App browser/UI and drag it directly onto a timeline in Pro Tools, Reaper, or Audacity as a clean .wav file, bringing the character name metadata with it.
 
