@@ -135,6 +135,7 @@ export interface FeatureVisibility {
     tabEffectLibrary: boolean;
     tabWarmups: boolean;
     tabVoiceMemos: boolean;
+    showRecordTimer: boolean;
 }
 
 export interface SystemSettings {
@@ -145,4 +146,5 @@ export interface SystemSettings {
     effectGroups?: string[];
     featureVisibility?: FeatureVisibility;
     actorProfile?: ActorProfile;
+    systemFont?: string;
 }

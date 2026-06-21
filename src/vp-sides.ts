@@ -31,6 +31,8 @@ let linesContainer: HTMLElement;
 
 let openModalCallback: ((char: Character) => void) | null = null;
 
+export let loadScriptIntoSides: ((data: any) => void) | null = null;
+
 export function initializeSidesView(initialCharacters: Character[], openCharacterModal: (char: Character) => void) {
     characters = initialCharacters;
     openModalCallback = openCharacterModal;
@@ -49,6 +51,18 @@ export function initializeSidesView(initialCharacters: Character[], openCharacte
     importInput.addEventListener('change', handleImport);
     exportBtn.addEventListener('click', handleExport);
     includeContextToggle.addEventListener('change', updateLinesFading);
+
+    loadScriptIntoSides = (data: any) => {
+        scriptData = data;
+        checkedCharacters.clear();
+        if (exportFilenameInput) {
+            exportFilenameInput.style.display = 'block';
+            const safeName = (scriptData?.name || 'Script').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            exportFilenameInput.value = `${safeName}_sides`;
+        }
+        renderCharacters();
+        renderLines();
+    };
 }
 
 export function refreshSidesView(newCharacters: Character[]) {

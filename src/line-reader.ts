@@ -48,6 +48,8 @@ interface SavedScript {
     lineDetails: SavedLineDetail[];
 }
 
+export let loadScriptIntoLineReader: ((data: any) => void) | null = null;
+
 export function initializeLineReader(characters: Character[], projects: Project[], settings: SystemSettings, openCharacterModal: (character: Character) => void): void {
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
@@ -637,6 +639,10 @@ export function initializeLineReader(characters: Character[], projects: Project[
             loadScriptFromTxt(file);
         }
     });
+
+    loadScriptIntoLineReader = (data: any) => {
+        processJsonScriptData(data);
+    };
 
     readButton?.addEventListener('click', () => {
         if (selectedLine) {

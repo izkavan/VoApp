@@ -25,6 +25,7 @@ import { initializeVPAuditionsView } from './vp-auditions.js';
 import { initializeTableReadView, setTableReadData } from './vp-table-read.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
+import { initializeRecordTimer } from './record-timer.js';
 import JSZip from 'jszip';
 
 let characters: Character[] = [];
@@ -254,6 +255,14 @@ async function initApp() {
     receivedAuditions = loadedReceivedAuditions;
     currentSettings = loadedSettings;
     warmups = loadedWarmups;
+
+    if (currentSettings.systemFont && currentSettings.systemFont !== 'default') {
+        document.documentElement.style.setProperty('--system-font', currentSettings.systemFont);
+    } else {
+        document.documentElement.style.setProperty('--system-font', "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif");
+    }
+
+    initializeRecordTimer(currentSettings);
 
     // Migrate legacy artwork and load blob URLs
     for (const char of loadedCharacters) {

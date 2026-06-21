@@ -17,6 +17,11 @@
                 <li><a href="#" id="nav-dungeon-master">Storytellers</a></li>
                 <li><a href="#" id="nav-utilities">Utilities</a></li>
             </ul>
+            <div style="flex-grow: 1;"></div>
+            <div id="record-timer-container" style="display: none; background: #000; color: #0f0; padding: 6px 8px; text-align: center; font-family: monospace; font-size: 1rem; align-items: center; justify-content: space-between; border-radius: 5px; margin: 0 0 15px -5px; border: 1px solid #333; width: 105%;">
+                <span id="record-timer-display" style="flex-grow: 1; letter-spacing: 1px;">00:00:00.000</span>
+                <button id="record-timer-reset" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 0.9rem; margin-left: 5px; padding: 0;" title="Reset Timer">🔄</button>
+            </div>
             <ul class="nav-settings">
                 <li><a href="#" id="nav-settings">Settings</a></li>
             </ul>
@@ -89,16 +94,28 @@
                 </div>
                 <div id="teleprompt" class="tab-content">
                     <h2>Teleprompter</h2>
-                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
-                        <label for="teleprompt-file-input" class="custom-file-input">Upload Text File</label>
-                        <input type="file" id="teleprompt-file-input" accept=".txt">
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <label for="teleprompt-file-input" class="custom-file-input">Upload File</label>
+                        <input type="file" id="teleprompt-file-input" accept=".txt,.json,.zip" multiple>
+                        <label for="teleprompt-project-select" style="margin-left: 10px;">Pull reference language from: </label>
                         <select id="teleprompt-project-select" style="padding: 8px; border-radius: 4px; max-width: 20vw; width: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             <option value="">--Select Project--</option>
                         </select>
                     </div>
-                    <div id="teleprompt-display" style="height: 40vh; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-top: 10px; font-size: 24px;"></div>
                     
-                    <div class="teleprompt-controls" style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <div style="display: flex; gap: 20px; align-items: flex-start;">
+                        <div id="teleprompt-sidebar">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color);">
+                                <h3 id="teleprompt-toc-title" style="margin: 0; font-size: 1.1em; white-space: nowrap; overflow: hidden;">Table of Contents</h3>
+                                <button id="teleprompt-toc-toggle" class="icon-btn" style="padding: 2px 5px;" title="Collapse/Expand">◀</button>
+                            </div>
+                            <ul id="teleprompt-toc-list" style="list-style-type: none; padding: 10px; margin: 0; display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto;"></ul>
+                        </div>
+
+                        <div id="teleprompt-main" style="flex-grow: 1; min-width: 0;">
+                            <div id="teleprompt-display" style="height: 40vh; overflow-y: auto; border: 1px solid #ccc; padding: 10px; font-size: 24px; position: relative;"></div>
+                            
+                            <div class="teleprompt-controls" style="display: flex; align-items: center; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
                         <div>
                             <label>Speed:</label>
                             <input type="range" id="teleprompt-speed" min="1" max="3" value="2" step="1">
@@ -109,6 +126,20 @@
                             <span id="teleprompt-font-label">24px</span>
                             <button id="teleprompt-font-plus">+</button>
                         </div>
+                        <div>
+                            <label>Line Spacing:</label>
+                            <button id="teleprompt-spacing-minus">-</button>
+                            <span id="teleprompt-spacing-label">1.5</span>
+                            <button id="teleprompt-spacing-plus">+</button>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label for="teleprompt-color">Text:</label>
+                            <input type="color" id="teleprompt-color" value="#333333" style="width: 30px; height: 30px; padding: 0; border: none;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <label for="teleprompt-bg-color">BG:</label>
+                            <input type="color" id="teleprompt-bg-color" value="#ffffff" style="width: 30px; height: 30px; padding: 0; border: none;">
+                        </div>
                         <div style="display: flex; align-items: center;">
                             <span style="font-size: 1.2rem; font-weight: bold; margin-right: 10px;">Read</span>
                             <label class="switch" style="margin: 0;">
@@ -116,10 +147,11 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <button id="teleprompt-record-button" class="record-button" style="margin-bottom: 0;">●</button>
+                            <button id="teleprompt-record-button" class="record-button" style="margin-bottom: 0;">●</button>
+                        </div>
+                        <ul id="teleprompt-takes-list" class="takes-list" style="margin-top: 20px;"></ul>
                     </div>
-
-                    <ul id="teleprompt-takes-list" class="takes-list" style="margin-top: 20px;"></ul>
+                </div>
                     
                     <button id="teleprompt-save-session" style="position: fixed; bottom: 20px; right: 20px; z-index: 100;">Save Session</button>
                 </div>
@@ -229,6 +261,8 @@
                         <button id="vp-script-import-btn" class="icon-btn" title="Import Script">📂 Import Script</button>
                         <input type="file" id="vp-script-import-input" accept=".json,.zip" class="hidden" />
                         <button id="vp-script-save-btn" class="icon-btn" title="Save & Export Script">💾 Export Script</button>
+                        <button id="vp-script-send-sides-btn" class="icon-btn" title="Send to Sides">➡️ Send to Sides</button>
+                        <button id="vp-script-send-line-read-btn" class="icon-btn" title="Send to Line Read">➡️ Send to Line Read</button>
                     </div>
 
                     <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
@@ -529,6 +563,22 @@
                     </div>
 
                     <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+                        <h3>Accessibility</h3>
+                        <div class="form-group" style="position: relative;">
+                            <label for="settings-system-font">System Font</label>
+                            <select id="settings-system-font">
+                                <option value="default">Default (System UI)</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                                <option value="OpenDyslexic, sans-serif">OpenDyslexic</option>
+                            </select>
+                            <small id="opendyslexic-warning" style="display: none; color: var(--danger-color); margin-top: 5px;">
+                                OpenDyslexic may not be installed. <a href="https://opendyslexic.org/" target="_blank" rel="noopener noreferrer">Download it here</a>.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="settings-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
                         <h3>Feature Visibility</h3>
                         <p style="margin-bottom: 15px; color: var(--gray-700);">Toggle entire views or specific tabs on/off to declutter your workspace.</p>
                         
@@ -543,6 +593,9 @@
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
                                     <input type="checkbox" id="visibility-view-utility"> Utility View
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+                                    <input type="checkbox" id="visibility-show-record-timer"> Show Record Timer (Nav Bar)
                                 </label>
                             </div>
 

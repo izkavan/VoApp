@@ -2,6 +2,8 @@ import { Project, Character, DictionaryEntry } from './types.js';
 import JSZip from 'jszip';
 import { highlightDictionaryWords } from './dictionary-highlighter.js';
 import { getDictionaryEntries } from './indexeddb.js';
+import { loadScriptIntoSides } from './vp-sides.js';
+import { loadScriptIntoLineReader } from './line-reader.js';
 
 interface ScriptLine {
     id: string;
@@ -72,8 +74,10 @@ let versionInput: HTMLInputElement;
 let projectSelect: HTMLSelectElement;
 let dictionaryBtn: HTMLButtonElement;
 let importBtn: HTMLButtonElement;
-let importInput: HTMLInputElement;
 let saveBtn: HTMLButtonElement;
+let sendSidesBtn: HTMLButtonElement;
+let sendLineReadBtn: HTMLButtonElement;
+let importInput: HTMLInputElement;
 let linesContainer: HTMLElement;
 let tocContainer: HTMLElement;
 let tocList: HTMLElement;
@@ -95,8 +99,10 @@ export function initializeScriptView(
     projectSelect = document.getElementById('vp-script-project-select') as HTMLSelectElement;
     dictionaryBtn = document.getElementById('vp-script-dictionary-btn') as HTMLButtonElement;
     importBtn = document.getElementById('vp-script-import-btn') as HTMLButtonElement;
-    importInput = document.getElementById('vp-script-import-input') as HTMLInputElement;
     saveBtn = document.getElementById('vp-script-save-btn') as HTMLButtonElement;
+    sendSidesBtn = document.getElementById('vp-script-send-sides-btn') as HTMLButtonElement;
+    sendLineReadBtn = document.getElementById('vp-script-send-line-read-btn') as HTMLButtonElement;
+    importInput = document.getElementById('vp-script-import-input') as HTMLInputElement;
     linesContainer = document.getElementById('vp-script-lines') as HTMLElement;
     tocContainer = document.getElementById('vp-script-toc') as HTMLElement;
     tocList = document.getElementById('vp-script-toc-list') as HTMLElement;
@@ -107,11 +113,13 @@ export function initializeScriptView(
 
     projectSelect.addEventListener('change', handleProjectChange);
     dictionaryBtn.addEventListener('click', openDictionary);
-    importBtn.addEventListener('click', () => importInput.click());
-    importInput.addEventListener('change', handleImport);
+    importBtn?.addEventListener('click', () => importInput.click());
+    importInput?.addEventListener('change', handleImport);
     addLineBtn.addEventListener('click', () => addLine('line'));
     addTitleBtn.addEventListener('click', () => addLine('title'));
-    saveBtn.addEventListener('click', saveScript);
+    saveBtn?.addEventListener('click', handleExport);
+    sendSidesBtn?.addEventListener('click', () => sendScriptToExternal('sides'));
+    sendLineReadBtn?.addEventListener('click', () => sendScriptToExternal('line-read'));
 
     linesContainer.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -152,6 +160,45 @@ export function initializeScriptView(
     });
 
     refreshScriptView(projects, characters);
+}
+
+function getScriptPayload() {
+    return {
+        name: (document.getElementById('vp-script-name') as HTMLInputElement)?.value || 'Script',
+        version: (document.getElementById('vp-script-version') as HTMLInputElement)?.value || '1.0',
+        projectId: projectSelect.value === 'none' ? null : parseInt(projectSelect.value),
+        lines: scriptLines.map(line => {
+            let charName = '';
+            if (line.characterId !== 'scene') {
+                const char = characters.find(c => c.id.toString() === line.characterId);
+                charName = char ? char.name : 'Unknown';
+            }
+            return {
+                id: line.id,
+                type: line.type,
+                characterId: line.characterId === 'scene' ? null : parseInt(line.characterId),
+                characterName: charName,
+                descriptor: line.descriptor,
+                text: line.text
+            };
+        })
+    };
+}
+
+function sendScriptToExternal(target: 'sides' | 'line-read') {
+    const payload = getScriptPayload();
+    if (target === 'sides') {
+        if (loadScriptIntoSides) {
+            loadScriptIntoSides(payload);
+            document.querySelector<HTMLElement>('[data-tab="vp-sides"]')?.click();
+        }
+    } else if (target === 'line-read') {
+        if (loadScriptIntoLineReader) {
+            loadScriptIntoLineReader(payload);
+            document.getElementById('nav-voice-actors')?.click();
+            document.querySelector<HTMLElement>('[data-tab="scripts"]')?.click();
+        }
+    }
 }
 
 export function refreshScriptView(newProjects: Project[], newCharacters: Character[]) {
@@ -438,47 +485,24 @@ function handleDragEnd(e: DragEvent) {
     }
 }
 
-async function saveScript() {
-    const name = nameInput.value.trim() || 'Untitled Script';
-    
+async function handleExport() {
+    if (scriptLines.length === 0) {
+        alert("Script is empty!");
+        return;
+    }
+
+    const payload = getScriptPayload();
+    const zip = new JSZip();
+
+    zip.file('script.json', JSON.stringify(payload, null, 2));
+
+    let txtContent = '';
+    let mdContent = '';
+
     const projectId = projectSelect.value;
     const availableCharacters = projectId === 'none' 
         ? characters 
         : characters.filter(c => c.projectId === parseInt(projectId));
-
-    const zip = new JSZip();
-
-    const exportLines = scriptLines.map(line => {
-        let charName = 'scene';
-        let charId: string | null = null;
-
-        if (line.type !== 'title' && line.characterId !== 'scene') {
-            const char = availableCharacters.find(c => c.id.toString() === line.characterId);
-            charName = char ? char.name : 'Unknown';
-            charId = line.characterId;
-        }
-
-        return {
-            id: line.id,
-            type: line.type,
-            characterId: charId,
-            characterName: charName,
-            descriptor: line.descriptor,
-            text: line.text
-        };
-    });
-
-    const metadata = {
-        name: name,
-        version: versionInput.value || '1.0',
-        projectId: projectId === 'none' ? null : parseInt(projectId),
-        lines: exportLines
-    };
-
-    zip.file('script.json', JSON.stringify(metadata, null, 2));
-
-    let txtContent = '';
-    let mdContent = '';
 
     scriptLines.forEach(line => {
         if (line.type === 'title') {

@@ -19,7 +19,8 @@ export const defaultSettings: SystemSettings = {
     audioExportPath: 'audio',
     scriptExportGrouping: 'line',
     recordingGear: '',
-    effectGroups: ['Laugh', 'Grunt', 'Pain'],
+    effectGroups: ['Laugh', 'Grunt', 'Pain', 'Breath', 'Scream', 'Cry'],
+    systemFont: 'default',
     featureVisibility: {
         viewVoiceActor: true,
         viewDungeonMaster: true,
@@ -29,7 +30,8 @@ export const defaultSettings: SystemSettings = {
         tabAuditions: true,
         tabEffectLibrary: true,
         tabWarmups: true,
-        tabVoiceMemos: true
+        tabVoiceMemos: true,
+        showRecordTimer: false
     }
 };
 

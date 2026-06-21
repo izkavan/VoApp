@@ -31,7 +31,7 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 * **Take Review**: Rate takes (with stars), add notes, and quickly A/B test recordings against each other.
 
 ### Teleprompter
-* **Distraction-Free Recording**: A full-screen view of a script that scrolls automatically. Control the speed and font size for maximum readability while recording takes.
+* **Distraction-Free Recording**: A full-screen view of a script that scrolls automatically. Control the speed, font size, line spacing, and text/background colors for maximum readability and accessibility while recording takes.
 * **Project Integration**: Select a project directly within the teleprompter to enable the same powerful dictionary highlighting, phonetic tooltips, and audio playback features found in the Line Reader.
 
 ### Audition Tracker
@@ -48,7 +48,7 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 * **Voice Memos**: Record and save ad-hoc voice memos to capture spontaneous ideas, tagging them to specific projects or marking them as high importance.
 * **Vocal Warmups**: A dedicated practice dashboard where you can read text, filter by tags or ratings, and attach characters for targeted practice. Includes an Audio Scratchpad to record and review temporary takes.
 * **Effect Library**: Record and tag non-dialogue vocalizations (laughs, grunts, yells, etc.) into a categorized, filterable grid. Attach these sounds to specific characters or projects, and easily batch export them as ZIP files to send straight to your producer.
-* **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear.
+* **System Preferences**: Customize your workspace by setting export formats (WAV/WebM), choosing script export groupings, and defining your recording gear. You can also customize your accessibility settings, including setting a system-wide font (such as OpenDyslexic) and toggling a global Record Timer in the navigation bar to track total active recording time across all your sessions.
 
 ### Voice Production tools
 * **Sides Converter**: Upload a script and easily export customized "Sides" (condensed scripts) for individual characters. Select the characters you want, and the app generates a ZIP containing a master script of just their lines, plus individualized folders and scripts for each character.
@@ -105,7 +105,8 @@ Here are some of the features that I thought up for the app that could be coming
 * Can we link a pinterest board and have that in a view for the moodboard?
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 * Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
-* A setting that lets you change the system wide default-- OpenDyslexic, Arial, times, etc. 
+
+
 
 
 ### Changes to the Character and Project Management
@@ -121,16 +122,15 @@ Here are some of the features that I thought up for the app that could be coming
 * We should support more script formats-- I don't know what people are using for professional scripts(FDX? PDF?), so this would be some research/interview. Should look at ways to get epub or other ebook formats also. 
   * As an extension of the script formats, If we can have a more robust way of handling imports we can identify "This character is referenced as 'jones'" and the filtering systems can let the Voice Actor focus on the character they are playing more easily. 
   * Also, scripts usually have keywords and formatting that convey the emotion and energy that the actor should be bringing-- We should look at ways to portray this in VoApp
-* Develop a way that we can split large files or long lines into discrete subunits. Split a chapter out of a book, do your reads against that (whether line or Teleprompter). Could be a new tab for "script formatter" and then have an option for "export to line reader" and "Export to Teleprompter".
+  * Some Script Software that I searched up: CeltX, Final Draft, WriterSolo/WriterDuet, FadeIn, StudioBinder, Trelby
+* Develop a way that we can split large files or long lines into discrete subunits. Would be great to do a line splitting thing in the script writer tab.
 * A "scene select" in the teleprompter, so that for a large project you can jump around. This gets closer to the "line reader" functionality, but with substantially larger blocks of text that are meant to be recorded in more lengthy formats.
-* "Timer mode" that shows how long the user has spent recording. Every time they start a timer it clicks up, every time they stop a recording it pauses. It shows at the top of the screen, and has a reset button.
 * Could look into lightweight VSTs, like radio/telephone, some compression, for exports.
 * An overlay widget that shows pitch? Could be good for characters who sing, or who thematically need to sit in a specific range of tone. Could also be useful for replication purposes if you say "sits at a C5".
-* An update to the Teleprompter that lets you change line-spacing, not just font size. 
-* An update to the teleprompter to select how you want the font color and background to be set, for higher/lower contrast. 
 * IPA Keyboard overlay/underlay with the dictionary-- I know this is over in VA section rather than the Character/project system, but I've met very few people who know of, understand, or care about the IPA symbols that aren't knee deep in linguistics of D'ni, or voice actors. Tishmah shorah!
+* The "timer" in the bottom left corner of the screen should change color at a user defined number-- 3 hours of recording yellow, 5 hours red, etc. so they don't strain themself.
 
-### Changes for Dungeon Masters
+### Changes for Story Tellers
 * **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 
 * A lore page - Could be good to have world lore at your fingertips as well, so you know what to reference as a character. Could even have "deep lore" for a specific character-- Especially for things like liveplay twitch streams or podcasts where the podcasters are video calling each other, it could be good to display this lore using OBS on the window or something.
 * Could expand characters to have a "lineage/faction" tag system... Could use the core tags for that now though.

@@ -2,6 +2,7 @@ import { Character, Project, Audition, SystemSettings, VoiceMemo } from './types
 import { getVoiceMemos, saveVoiceMemo, deleteVoiceMemos } from './indexeddb.js';
 import { convertWebMToWav } from './audio-utils.js';
 import JSZip from 'jszip';
+import { updateRecordTimerVisibility } from './record-timer.js';
 
 export function initializeSettingsView(
     settings: SystemSettings,
@@ -15,11 +16,14 @@ export function initializeSettingsView(
     const pathInput = document.getElementById('settings-export-path') as HTMLInputElement;
     const groupingSelect = document.getElementById('settings-export-grouping') as HTMLSelectElement;
     const gearInput = document.getElementById('settings-recording-gear') as HTMLTextAreaElement;
+    const fontSelect = document.getElementById('settings-system-font') as HTMLSelectElement;
+    const fontWarning = document.getElementById('opendyslexic-warning') as HTMLElement;
 
     // Feature Visibility Toggles
     const visViewVoiceActor = document.getElementById('visibility-view-voice-actor') as HTMLInputElement;
     const visViewDungeonMaster = document.getElementById('visibility-view-dungeon-master') as HTMLInputElement;
     const visViewUtility = document.getElementById('visibility-view-utility') as HTMLInputElement;
+    const visShowRecordTimer = document.getElementById('visibility-show-record-timer') as HTMLInputElement;
     const visTabLineReader = document.getElementById('visibility-tab-line-reader') as HTMLInputElement;
     const visTabTeleprompter = document.getElementById('visibility-tab-teleprompter') as HTMLInputElement;
     const visTabAuditions = document.getElementById('visibility-tab-auditions') as HTMLInputElement;
@@ -39,11 +43,25 @@ export function initializeSettingsView(
     if (pathInput) pathInput.value = settings.audioExportPath;
     if (groupingSelect) groupingSelect.value = settings.scriptExportGrouping;
     if (gearInput) gearInput.value = settings.recordingGear;
+    if (fontSelect) fontSelect.value = settings.systemFont || 'default';
+    
+    const checkFontWarning = () => {
+        if (fontSelect && fontWarning) {
+            if (fontSelect.value.includes('OpenDyslexic')) {
+                const isInstalled = isFontInstalled('OpenDyslexic');
+                fontWarning.style.display = isInstalled ? 'none' : 'block';
+            } else {
+                fontWarning.style.display = 'none';
+            }
+        }
+    };
+    checkFontWarning();
 
     if (settings.featureVisibility) {
         if (visViewVoiceActor) visViewVoiceActor.checked = settings.featureVisibility.viewVoiceActor;
         if (visViewDungeonMaster) visViewDungeonMaster.checked = settings.featureVisibility.viewDungeonMaster;
         if (visViewUtility) visViewUtility.checked = settings.featureVisibility.viewUtility;
+        if (visShowRecordTimer) visShowRecordTimer.checked = settings.featureVisibility.showRecordTimer || false;
         if (visTabLineReader) visTabLineReader.checked = settings.featureVisibility.tabLineReader;
         if (visTabTeleprompter) visTabTeleprompter.checked = settings.featureVisibility.tabTeleprompter;
         if (visTabAuditions) visTabAuditions.checked = settings.featureVisibility.tabAuditions;
@@ -75,14 +93,25 @@ export function initializeSettingsView(
                 viewVoiceActor: visViewVoiceActor?.checked ?? true,
                 viewDungeonMaster: visViewDungeonMaster?.checked ?? true,
                 viewUtility: visViewUtility?.checked ?? true,
+                showRecordTimer: visShowRecordTimer?.checked ?? false,
                 tabLineReader: visTabLineReader?.checked ?? true,
                 tabTeleprompter: visTabTeleprompter?.checked ?? true,
                 tabAuditions: visTabAuditions?.checked ?? true,
                 tabEffectLibrary: visTabEffectLibrary?.checked ?? true,
                 tabWarmups: visTabWarmups?.checked ?? true,
                 tabVoiceMemos: visTabVoiceMemos?.checked ?? true
-            }
+            },
+            systemFont: fontSelect?.value || 'default'
         };
+        
+        if (newSettings.systemFont && newSettings.systemFont !== 'default') {
+            document.documentElement.style.setProperty('--system-font', newSettings.systemFont);
+        } else {
+            document.documentElement.style.setProperty('--system-font', "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif");
+        }
+        
+        checkFontWarning();
+        updateRecordTimerVisibility(newSettings);
         saveCallback(newSettings);
     };
 
@@ -90,10 +119,12 @@ export function initializeSettingsView(
     pathInput?.addEventListener('input', triggerSave);
     groupingSelect?.addEventListener('change', triggerSave);
     gearInput?.addEventListener('input', triggerSave);
+    fontSelect?.addEventListener('change', triggerSave);
     
     visViewVoiceActor?.addEventListener('change', triggerSave);
     visViewDungeonMaster?.addEventListener('change', triggerSave);
     visViewUtility?.addEventListener('change', triggerSave);
+    visShowRecordTimer?.addEventListener('change', triggerSave);
     visTabLineReader?.addEventListener('change', triggerSave);
     visTabTeleprompter?.addEventListener('change', triggerSave);
     visTabAuditions?.addEventListener('change', triggerSave);
@@ -241,4 +272,19 @@ export function updateStorageUsageDisplay() {
             storageUsageEl.textContent = "Not supported in this browser";
         }
     }
+}
+
+function isFontInstalled(fontFamily: string): boolean {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) return true; // fallback
+    
+    const text = "abcdefghijklmnopqrstuvwxyz0123456789";
+    context.font = "72px monospace";
+    const baselineWidth = context.measureText(text).width;
+    
+    context.font = `72px "${fontFamily}", monospace`;
+    const newWidth = context.measureText(text).width;
+    
+    return baselineWidth !== newWidth;
 }
