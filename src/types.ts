@@ -63,6 +63,28 @@ export interface Audition {
     status: AuditionStatus;
     linkedCharacterIds: number[];
     files: AuditionFile[];
+    audioData?: string; // base64 encoded audio
+    audioFileName?: string;
+    actorRate?: string;
+    actorAvailability?: string;
+}
+
+export interface ReceivedAudition {
+    id: number;
+    actorFirstName: string;
+    actorLastName: string;
+    actorEmail: string;
+    actorRate: string;
+    actorPhone: string;
+    actorAddress: string;
+    actorAvailability: string;
+    character: string;
+    project: string;
+    dateSubmitted: string; // ISO date string
+    fileName: string;
+    audioData: string; // Base64 data URL
+    rating?: number;
+    comments?: string;
 }
 
 export interface VoiceMemo {
@@ -95,6 +117,14 @@ export interface Effect {
     date: number; // timestamp
 }
 
+export interface ActorProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address: string;
+}
+
 export interface FeatureVisibility {
     viewVoiceActor: boolean;
     viewDungeonMaster: boolean;
@@ -114,4 +144,5 @@ export interface SystemSettings {
     recordingGear: string;
     effectGroups?: string[];
     featureVisibility?: FeatureVisibility;
+    actorProfile?: ActorProfile;
 }

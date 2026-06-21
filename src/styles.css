@@ -614,6 +614,11 @@ body.dark-mode .sides-character-item:hover {
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.sides-character-avatar:hover {
+    transform: scale(1.1);
 }
 
 .sides-line-item {
@@ -623,9 +628,20 @@ body.dark-mode .sides-character-item:hover {
     display: flex;
     flex-direction: column;
     background-color: var(--gray-50);
+    opacity: 0.5;
 }
 body.dark-mode .sides-line-item {
     background-color: var(--gray-900);
+}
+
+.sides-line-item.selected {
+    opacity: 1;
+    background-color: #f3e8ff; /* slightly purple */
+    border-left: 4px solid var(--primary-color);
+}
+body.dark-mode .sides-line-item.selected {
+    background-color: #3b2a54; /* dark purple */
+    border-left: 4px solid var(--primary-color);
 }
 
 .sides-line-item.highlight {
@@ -633,10 +649,6 @@ body.dark-mode .sides-line-item {
 }
 body.dark-mode .sides-line-item.highlight {
     background-color: var(--gray-700);
-}
-
-.sides-line-item.faded {
-    opacity: 0.5;
 }
 
 .sides-line-metadata {
@@ -1351,3 +1363,174 @@ body.dark-mode .dict-highlight {
     display: block;
     border: none;
 }
+
+/* Contraster Tab */
+.contraster-board {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px 0;
+    height: calc(100vh - 200px);
+}
+
+.contraster-column {
+    min-width: 250px;
+    max-width: 300px;
+    flex-shrink: 0;
+    background-color: var(--gray-100);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+}
+body.dark-mode .contraster-column {
+    background-color: var(--gray-800);
+}
+
+.contraster-column-header {
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    text-align: center;
+}
+
+.contraster-column-content {
+    padding: 10px;
+    overflow-y: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.contraster-audition-item {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+body.dark-mode .contraster-audition-item {
+    background-color: var(--gray-900);
+}
+
+.contraster-audition-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.contraster-audition-item.selected {
+    background-color: #f3e8ff; /* slightly purple */
+    border-left: 4px solid var(--primary-color);
+}
+body.dark-mode .contraster-audition-item.selected {
+    background-color: #3b2a54; /* dark purple */
+    border-left: 4px solid var(--primary-color);
+}
+
+.contraster-audition-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.contraster-audition-name {
+    font-weight: bold;
+    font-size: 1.05em;
+}
+
+.contraster-audition-meta {
+    font-size: 0.8em;
+    color: var(--gray-600);
+}
+body.dark-mode .contraster-audition-meta {
+    color: var(--gray-400);
+}
+
+.contraster-play-indicator {
+    font-size: 1.2em;
+    color: var(--primary-color);
+    min-width: 20px;
+    text-align: center;
+}
+
+/* VP Auditions Tab */
+.vp-auditions-character-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: bold;
+}
+.vp-auditions-character-item:hover {
+    background-color: var(--gray-100);
+}
+body.dark-mode .vp-auditions-character-item:hover {
+    background-color: var(--gray-800);
+}
+.vp-auditions-character-item.selected {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.vp-auditions-card {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    background-color: var(--gray-50);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+body.dark-mode .vp-auditions-card {
+    background-color: var(--gray-900);
+}
+
+.vp-auditions-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.vp-auditions-stars {
+    display: flex;
+    gap: 5px;
+    cursor: pointer;
+}
+.vp-auditions-star {
+    font-size: 1.5em;
+    color: var(--gray-400);
+    transition: color 0.2s;
+}
+.vp-auditions-star.active,
+.vp-auditions-star:hover,
+.vp-auditions-star:hover ~ .vp-auditions-star {
+    /* The ~ selector trick works nicely if we reverse the DOM order and float right, but since we are manipulating via JS we can just color active */
+}
+.vp-auditions-star.active {
+    color: #ffd700;
+}
+
+.vp-auditions-comments {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-family: inherit;
+    resize: vertical;
+}
+body.dark-mode .vp-auditions-comments {
+    background-color: var(--gray-800);
+    color: var(--gray-100);
+}
+

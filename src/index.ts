@@ -1,4 +1,4 @@
-import { Project, Character, Audition } from './types.js';
+import { Project, Character, Audition, ReceivedAudition } from './types.js';
 import { loadFromLocalStorage, saveToLocalStorage } from './storage.js';
 import { initializeCharacterRenderer } from './character-renderer.js';
 import { initializeCharacterModal, openModal, closeModal } from './character-modal.js';
@@ -20,6 +20,8 @@ import { initializeEffectLibrary } from './effect-library.js';
 import { initializeVoiceProductionFeedback } from './vp-feedback.js';
 import { initializeScriptView, refreshScriptView } from './vp-script.js';
 import { initializeSidesView, refreshSidesView } from './vp-sides.js';
+import { initializeContrasterView } from './vp-contraster.js';
+import { initializeVPAuditionsView } from './vp-auditions.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
@@ -27,6 +29,7 @@ import JSZip from 'jszip';
 let characters: Character[] = [];
 let projects: Project[] = [];
 let auditions: Audition[] = [];
+let receivedAuditions: ReceivedAudition[] = [];
 let warmups: Warmup[] = [];
 let currentSettings: SystemSettings;
 
@@ -73,7 +76,7 @@ function onCharacterDrop(characterId: number, projectId?: number) {
     const charIndex = characters.findIndex(c => c.id === characterId);
     if (charIndex > -1) {
         characters[charIndex].projectId = projectId;
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
         renderApp();
     }
 }
@@ -111,7 +114,7 @@ async function saveCharacter(character: Character, artworkFile?: File, sampleFil
         characters.push(character);
     }
 
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+    saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     renderApp();
     closeModal();
 }
@@ -123,7 +126,7 @@ function duplicateCharacter(characterToDuplicate: Character) {
         name: `${characterToDuplicate.name} (Copy)`
     };
     characters.push(newCharacter);
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+    saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     renderApp();
     closeModal();
 }
@@ -142,7 +145,7 @@ async function deleteCharacter(characterId: number) {
             }
         }
         characters = characters.filter(c => c.id !== characterId);
-        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
         renderApp();
         closeModal();
     }
@@ -154,7 +157,7 @@ function deleteProject(id: number) {
         characters.forEach(c => {
             if (c.projectId === id) c.projectId = undefined;
         });
-        saveToLocalStorage(characters, projects, auditions, currentSettings);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
         renderApp();
         closeProjectModal();
     }
@@ -201,7 +204,7 @@ async function importProject(zipFile: File) {
             }
         }
 
-        saveToLocalStorage(characters, projects, auditions);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
         renderApp();
         alert(`Project "${newProject.name}" and its characters imported successfully!`);
 
@@ -232,7 +235,14 @@ importProjectButton?.addEventListener('click', () => {
 
 
 async function initApp() {
-    const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, settings: loadedSettings, warmups: loadedWarmups } = loadFromLocalStorage();
+    const { characters: loadedCharacters, projects: loadedProjects, auditions: loadedAuditions, receivedAuditions: loadedReceivedAuditions, settings: loadedSettings, warmups: loadedWarmups } = loadFromLocalStorage();
+    
+    characters = loadedCharacters;
+    projects = loadedProjects;
+    auditions = loadedAuditions;
+    receivedAuditions = loadedReceivedAuditions;
+    currentSettings = loadedSettings;
+    warmups = loadedWarmups;
 
     // Migrate legacy artwork and load blob URLs
     for (const char of loadedCharacters) {
@@ -274,14 +284,8 @@ async function initApp() {
             }
         }
     }
-
-    characters = loadedCharacters;
-    projects = loadedProjects;
-    auditions = loadedAuditions;
-    warmups = loadedWarmups;
-    currentSettings = loadedSettings;
     
-    saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+    saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
 
     initializeCharacterRenderer(openModal, openProjectModal, openDictionaryModal);
 
@@ -313,7 +317,7 @@ async function initApp() {
         (id) => deleteProject(id),
         (updatedProjects) => {
             projects = updatedProjects;
-            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+            saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
         }
     );
 
@@ -338,11 +342,24 @@ async function initApp() {
     initializeDungeonMasterView(characters, projects, openModal);
     initializeUtilityView(currentSettings);
     initializeScriptView(projects, characters, openDictionaryModal);
-    initializeSidesView(characters);
+    initializeSidesView(characters, openModal);
     
-    initializeAuditionView(auditions, characters, (updatedAuditions) => {
+    initializeContrasterView(receivedAuditions, (updatedReceived) => {
+        receivedAuditions = updatedReceived;
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
+    });
+
+    initializeVPAuditionsView(receivedAuditions, projects, (updatedReceived) => {
+        receivedAuditions = updatedReceived;
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
+    });
+    
+    initializeAuditionView(auditions, characters, currentSettings, (updatedAuditions) => {
         auditions = updatedAuditions;
-        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
+    }, (updatedSettings) => {
+        currentSettings = updatedSettings;
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     });
 
     initializeDictionaryHighlighter();
@@ -350,12 +367,12 @@ async function initApp() {
 
     initializeWarmupView(warmups, characters, projects, (updatedWarmups) => {
         warmups = updatedWarmups;
-        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     });
 
     initializeEffectLibrary(characters, projects, currentSettings, (updatedSettings) => {
         Object.assign(currentSettings, updatedSettings);
-        saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+        saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     });
 
     initializeSettingsView(
@@ -365,7 +382,7 @@ async function initApp() {
         auditions,
         (newSettings) => {
             Object.assign(currentSettings, newSettings);
-            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+            saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
             applyFeatureVisibility(currentSettings);
         },
         (newChars, newProjs, newAuds, newSets) => {
@@ -373,7 +390,7 @@ async function initApp() {
             projects = newProjs;
             auditions = newAuds;
             Object.assign(currentSettings, newSets);
-            saveToLocalStorage(characters, projects, auditions, currentSettings, warmups);
+            saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
             renderApp();
             location.reload(); 
         }

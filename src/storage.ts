@@ -1,8 +1,9 @@
-import { Character, Project, Audition, SystemSettings, Warmup } from './types.js';
+import { Character, Project, Audition, ReceivedAudition, SystemSettings, Warmup } from './types.js';
 
 const STORAGE_KEY_CHARACTERS = 'vo_app_characters';
 const STORAGE_KEY_PROJECTS = 'vo_app_projects';
 const STORAGE_KEY_AUDITIONS = 'vo_app_auditions';
+const STORAGE_KEY_RECEIVED_AUDITIONS = 'vo_app_received_auditions';
 const STORAGE_KEY_SETTINGS = 'vo_app_settings';
 const STORAGE_KEY_WARMUPS = 'vo_app_warmups';
 
@@ -32,11 +33,12 @@ export const defaultSettings: SystemSettings = {
     }
 };
 
-export function saveToLocalStorage(characters: Character[], projects: Project[], auditions: Audition[], settings: SystemSettings = defaultSettings, warmups?: Warmup[]): void {
+export function saveToLocalStorage(characters: Character[], projects: Project[], auditions: Audition[], receivedAuditions: ReceivedAudition[], settings: SystemSettings = defaultSettings, warmups?: Warmup[]): void {
     try {
         localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(characters));
         localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
         localStorage.setItem(STORAGE_KEY_AUDITIONS, JSON.stringify(auditions));
+        localStorage.setItem(STORAGE_KEY_RECEIVED_AUDITIONS, JSON.stringify(receivedAuditions));
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
         if (warmups) {
             localStorage.setItem(STORAGE_KEY_WARMUPS, JSON.stringify(warmups));
@@ -46,31 +48,33 @@ export function saveToLocalStorage(characters: Character[], projects: Project[],
     }
 }
 
-export function loadFromLocalStorage(): { characters: Character[], projects: Project[], auditions: Audition[], settings: SystemSettings, warmups: Warmup[] } {
+export function loadFromLocalStorage(): { characters: Character[], projects: Project[], auditions: Audition[], receivedAuditions: ReceivedAudition[], settings: SystemSettings, warmups: Warmup[] } {
     try {
-        const charactersJSON = localStorage.getItem(STORAGE_KEY_CHARACTERS);
-        const projectsJSON = localStorage.getItem(STORAGE_KEY_PROJECTS);
-        const auditionsJSON = localStorage.getItem(STORAGE_KEY_AUDITIONS);
-        const settingsJSON = localStorage.getItem(STORAGE_KEY_SETTINGS);
-        const warmupsJSON = localStorage.getItem(STORAGE_KEY_WARMUPS);
+        const charactersData = localStorage.getItem(STORAGE_KEY_CHARACTERS);
+        const projectsData = localStorage.getItem(STORAGE_KEY_PROJECTS);
+        const auditionsData = localStorage.getItem(STORAGE_KEY_AUDITIONS);
+        const receivedAuditionsData = localStorage.getItem(STORAGE_KEY_RECEIVED_AUDITIONS);
+        const settingsData = localStorage.getItem(STORAGE_KEY_SETTINGS);
+        const warmupsData = localStorage.getItem(STORAGE_KEY_WARMUPS);
 
-        const characters = charactersJSON ? JSON.parse(charactersJSON) : [];
-        const projects = projectsJSON ? JSON.parse(projectsJSON) : [];
-        const auditions = auditionsJSON ? JSON.parse(auditionsJSON) : [];
-        const settings = settingsJSON ? { ...defaultSettings, ...JSON.parse(settingsJSON) } : defaultSettings;
+        const characters = charactersData ? JSON.parse(charactersData) : [];
+        const projects = projectsData ? JSON.parse(projectsData) : [];
+        const auditions = auditionsData ? JSON.parse(auditionsData) : [];
+        const receivedAuditions = receivedAuditionsData ? JSON.parse(receivedAuditionsData) : [];
+        const settings = settingsData ? { ...defaultSettings, ...JSON.parse(settingsData) } : defaultSettings;
         
         let warmups: Warmup[] = [];
-        if (warmupsJSON) {
-            warmups = JSON.parse(warmupsJSON);
+        if (warmupsData) {
+            warmups = JSON.parse(warmupsData);
         } else {
             // First time loading, populate with defaults
             warmups = [...DEFAULT_WARMUPS];
             localStorage.setItem(STORAGE_KEY_WARMUPS, JSON.stringify(warmups));
         }
 
-        return { characters, projects, auditions, settings, warmups };
+        return { characters, projects, auditions, receivedAuditions, settings, warmups };
     } catch (e) {
         console.error("Failed to load from local storage", e);
-        return { characters: [], projects: [], auditions: [], settings: defaultSettings, warmups: [...DEFAULT_WARMUPS] };
+        return { characters: [], projects: [], auditions: [], receivedAuditions: [], settings: defaultSettings, warmups: [...DEFAULT_WARMUPS] };
     }
 }

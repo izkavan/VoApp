@@ -23,16 +23,21 @@ let checkedCharacters = new Set<string>();
 // DOM Elements
 let importInput: HTMLInputElement;
 let importBtn: HTMLButtonElement;
+let exportFilenameInput: HTMLInputElement;
 let exportBtn: HTMLButtonElement;
 let includeContextToggle: HTMLInputElement;
 let charactersContainer: HTMLElement;
 let linesContainer: HTMLElement;
 
-export function initializeSidesView(initialCharacters: Character[]) {
+let openModalCallback: ((char: Character) => void) | null = null;
+
+export function initializeSidesView(initialCharacters: Character[], openCharacterModal: (char: Character) => void) {
     characters = initialCharacters;
+    openModalCallback = openCharacterModal;
 
     importInput = document.getElementById('vp-sides-import-input') as HTMLInputElement;
     importBtn = document.getElementById('vp-sides-import-btn') as HTMLButtonElement;
+    exportFilenameInput = document.getElementById('vp-sides-export-filename') as HTMLInputElement;
     exportBtn = document.getElementById('vp-sides-export-btn') as HTMLButtonElement;
     includeContextToggle = document.getElementById('vp-sides-include-context') as HTMLInputElement;
     charactersContainer = document.getElementById('vp-sides-characters') as HTMLElement;
@@ -43,6 +48,7 @@ export function initializeSidesView(initialCharacters: Character[]) {
     importBtn.addEventListener('click', () => importInput.click());
     importInput.addEventListener('change', handleImport);
     exportBtn.addEventListener('click', handleExport);
+    includeContextToggle.addEventListener('change', updateLinesFading);
 }
 
 export function refreshSidesView(newCharacters: Character[]) {
@@ -86,6 +92,10 @@ async function handleImport(e: Event) {
     }
 
     if (scriptData) {
+        exportFilenameInput.style.display = 'block';
+        const safeName = (scriptData.name || 'Script').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        exportFilenameInput.value = `${safeName}_sides`;
+        
         renderCharacters();
         renderLines();
     }
@@ -162,6 +172,32 @@ function renderCharacters() {
         item.addEventListener('mouseenter', () => highlightLines(name, true));
         item.addEventListener('mouseleave', () => highlightLines(name, false));
 
+        // Click on the entire row toggles the checkbox
+        item.addEventListener('click', (e) => {
+            // If they clicked the checkbox directly, don't double-toggle
+            if ((e.target as HTMLElement).tagName !== 'INPUT') {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Click on the avatar opens the character modal
+        img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (openModalCallback) {
+                let charObjToOpen: Character | undefined = undefined;
+                if (id) {
+                    charObjToOpen = characters.find(c => c.id.toString() === id);
+                }
+                if (!charObjToOpen) {
+                    charObjToOpen = characters.find(c => c.name === name);
+                }
+                if (charObjToOpen) {
+                    openModalCallback(charObjToOpen);
+                }
+            }
+        });
+
         charactersContainer.appendChild(item);
     });
     
@@ -223,16 +259,24 @@ function highlightLines(charName: string, highlight: boolean) {
 
 function updateLinesFading() {
     if (!linesContainer) return;
+    const includeContext = includeContextToggle.checked;
+    
     Array.from(linesContainer.children).forEach(child => {
         const el = child as HTMLElement;
         const charName = el.dataset.charName || '';
         const isSceneOrTitle = charName === 'scene' || charName === 'title' || !charName;
         
-        if (!isSceneOrTitle) {
-            if (checkedCharacters.has(charName)) {
-                el.classList.add('faded');
+        if (isSceneOrTitle) {
+            if (includeContext) {
+                el.classList.add('selected');
             } else {
-                el.classList.remove('faded');
+                el.classList.remove('selected');
+            }
+        } else {
+            if (checkedCharacters.has(charName)) {
+                el.classList.add('selected');
+            } else {
+                el.classList.remove('selected');
             }
         }
     });
@@ -308,8 +352,12 @@ async function handleExport() {
     const url = URL.createObjectURL(content);
     const a = document.createElement('a');
     a.href = url;
-    const safeName = (scriptData.name || 'Sides').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    a.download = `${safeName}_sides.zip`;
+    
+    let downloadName = exportFilenameInput.value.trim();
+    if (!downloadName) downloadName = 'sides';
+    if (!downloadName.endsWith('.zip')) downloadName += '.zip';
+    
+    a.download = downloadName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

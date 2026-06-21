@@ -124,7 +124,10 @@
                 <div id="auditions" class="tab-content">
                     <div class="audition-header">
                         <h2>Auditions</h2>
-                        <button id="new-audition-button">New Audition</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="about-me-button" class="secondary">About Me</button>
+                            <button id="new-audition-button">New Audition</button>
+                        </div>
                     </div>
                     <div id="active-audition-list"></div>
                     <div class="collapsible-section">
@@ -248,6 +251,7 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="file" id="vp-sides-import-input" accept=".json,.zip" style="display: none;" />
                                 <button id="vp-sides-import-btn" class="secondary">Upload Script</button>
+                                <input type="text" id="vp-sides-export-filename" placeholder="Export filename..." style="padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); display: none;" />
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <label class="toggle-switch-label" style="display: flex; align-items: center; gap: 5px; font-weight: bold;">
@@ -265,19 +269,62 @@
                             </div>
                             
                             <!-- Right Column: Lines -->
-                            <div id="vp-sides-lines" style="flex: 2; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white); display: flex; flex-direction: column; gap: 5px;">
+                            <div id="vp-sides-lines" style="flex: 3; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white); display: flex; flex-direction: column; gap: 5px;">
                                 <div style="text-align: center; color: var(--gray-500); margin-top: 20px;">Upload a script to view lines</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div id="vp-auditions" class="tab-content">
-                    <h2>Auditions</h2>
-                    <p>A bias free audition system. Strips names from collections of auditions, lets you rank the auditions, and produce a "top 3".</p>
+                    <div class="action-bar" style="justify-content: space-between; display: flex; padding: 10px 0; margin-bottom: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" id="vp-auditions-import-input" accept=".zip,.json" multiple style="display: none;" />
+                            <button id="vp-auditions-import-btn" class="secondary">Upload Audition(s)</button>
+                            <button id="vp-auditions-manual-btn" class="secondary">Manual Audition</button>
+                            <select id="vp-auditions-project-select" class="dropdown-select" style="min-width: 150px;">
+                                <option value="">All Projects</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button id="vp-auditions-reset-btn" class="danger-btn" style="background-color: var(--error-color); color: white;">Reset Auditions</button>
+                        </div>
+                    </div>
+
+                    <div class="vp-auditions-split-container" style="display: flex; gap: 20px; height: calc(100vh - 250px);">
+                        <!-- Left Column: Characters -->
+                        <div id="vp-auditions-characters" style="flex: 1; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white);">
+                            <div style="text-align: center; color: var(--gray-500); margin-top: 20px;">Upload auditions to view characters</div>
+                        </div>
+                        
+                        <!-- Right Column: Audition List -->
+                        <div id="vp-auditions-list" style="flex: 2; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; overflow-y: auto; background-color: var(--white); display: flex; flex-direction: column; gap: 10px;">
+                            <div style="text-align: center; color: var(--gray-500); margin-top: 20px;">Select a character to review auditions</div>
+                        </div>
+                    </div>
+
+                    <div class="vp-auditions-footer" style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        <label style="display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                            Number of final candidates:
+                            <input type="number" id="vp-auditions-finalist-count" value="3" min="1" max="10" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color);" />
+                        </label>
+                        <button id="vp-auditions-finalize-btn" class="primary">Finalize Auditions</button>
+                    </div>
                 </div>
                 <div id="vp-contraster" class="tab-content">
-                    <h2>Contraster</h2>
-                    <p>Can load multiple characters, the auditions associated with each, and do comparisons between them to find a good cast</p>
+                    <div class="action-bar" style="justify-content: space-between; display: flex; padding: 10px 0; margin-bottom: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" id="vp-contraster-import-input" accept=".zip,.json" multiple style="display: none;" />
+                            <button id="vp-contraster-import-btn" class="secondary">Upload Audition(s)</button>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button id="vp-contraster-play-btn" class="primary">▶ Play Cast Sequence</button>
+                            <button id="vp-contraster-export-btn" class="primary">Export Cast</button>
+                        </div>
+                    </div>
+
+                    <div id="vp-contraster-board" class="contraster-board">
+                        <div style="text-align: center; color: var(--gray-500); width: 100%; margin-top: 40px;">Upload auditions to begin casting</div>
+                    </div>
                 </div>
                 <div id="vp-slate-builder" class="tab-content">
                     <h2>Slate Builder</h2>
@@ -587,8 +634,120 @@
     }
     </script>
     <!-- Dictionary Modal -->
-    <div id="dictionary-modal" class="modal hidden">
-        <div id="dictionary-modal-content" class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;"></div>
+    <div id="dictionary-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2>Project Dictionary</h2>
+                <span id="dictionary-modal-close" class="close-button">&times;</span>
+            </div>
+            <div style="padding: 15px; background-color: var(--gray-50); border-bottom: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="dictionary-search" placeholder="Search dictionary..." style="flex: 1; padding: 8px;">
+                <button id="dictionary-add-btn" class="primary">Add New Word</button>
+            </div>
+            <div id="dictionary-list" style="flex: 1; overflow-y: auto; padding: 15px;">
+                <!-- Dictionary entries will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- About Me Modal -->
+    <div id="about-me-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About Me (Actor Profile)</h2>
+                <span id="about-me-modal-close" class="close-button">&times;</span>
+            </div>
+            <p style="font-size: 0.9em; color: var(--gray-600); margin-bottom: 15px;">This information is saved globally and will be used automatically when exporting auditions for casting directors.</p>
+            <label>First Name:</label>
+            <input type="text" id="about-me-first-name" class="modal-input" placeholder="e.g. John">
+            <label>Last Name:</label>
+            <input type="text" id="about-me-last-name" class="modal-input" placeholder="e.g. Doe">
+            <label>Email:</label>
+            <input type="email" id="about-me-email" class="modal-input" placeholder="e.g. john@example.com">
+            <label>Phone Number:</label>
+            <input type="tel" id="about-me-phone" class="modal-input" placeholder="e.g. (555) 123-4567">
+            <label>Address:</label>
+            <input type="text" id="about-me-address" class="modal-input" placeholder="City, State / Full Address">
+            <button id="about-me-save-btn" class="primary" style="margin-top: 15px; width: 100%;">Save Profile</button>
+        </div>
+    </div>
+
+    <!-- Audition Export Modal -->
+    <div id="audition-export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export for Casting</h2>
+                <span id="audition-export-modal-close" class="close-button">&times;</span>
+            </div>
+            <p style="font-size: 0.9em; color: var(--gray-600); margin-bottom: 15px;">Please provide your availability and rate. This will be bundled into the audition ZIP for the casting director.</p>
+            
+            <label>Do you have a predetermined rate for this audition? If so, please provide it:</label>
+            <input type="text" id="audition-export-rate" class="modal-input" placeholder="e.g. $25 an hour, $1 per line, etc">
+            
+            <label>Availability (Start Date & End Date):</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="date" id="audition-export-start-date" class="modal-input" style="flex: 1; margin: 0;">
+                <span style="display: flex; align-items: center;">to</span>
+                <input type="date" id="audition-export-end-date" class="modal-input" style="flex: 1; margin: 0;">
+            </div>
+            
+            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                <input type="checkbox" id="audition-export-open-time">
+                Open to additional time
+            </label>
+            
+            <button id="audition-export-confirm-btn" class="primary" style="width: 100%;">Export Audition ZIP</button>
+        </div>
+    </div>
+
+    <!-- VP Manual Audition Modal -->
+    <div id="vp-manual-audition-modal" class="modal">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2>Manual Audition Upload</h2>
+                <span id="vp-manual-audition-modal-close" class="close-button">&times;</span>
+            </div>
+            
+            <label>Project Name:</label>
+            <input type="text" id="vp-manual-project" class="modal-input" placeholder="e.g. My Animation">
+            
+            <label>Character Name:</label>
+            <input type="text" id="vp-manual-character" class="modal-input" placeholder="e.g. Hero">
+            
+            <hr style="margin: 15px 0;">
+            
+            <label>Actor First Name:</label>
+            <input type="text" id="vp-manual-fname" class="modal-input" placeholder="e.g. Jane">
+            
+            <label>Actor Last Name:</label>
+            <input type="text" id="vp-manual-lname" class="modal-input" placeholder="e.g. Doe">
+            
+            <label>Actor Email:</label>
+            <input type="email" id="vp-manual-email" class="modal-input">
+            
+            <label>Actor Phone:</label>
+            <input type="tel" id="vp-manual-phone" class="modal-input">
+            
+            <label>Actor Rate:</label>
+            <input type="text" id="vp-manual-rate" class="modal-input" placeholder="e.g. $250 / hour">
+            
+            <label>Actor Availability:</label>
+            <input type="text" id="vp-manual-availability" class="modal-input" placeholder="e.g. Jan 1 to Jan 31">
+            
+            <label>Actor Address:</label>
+            <input type="text" id="vp-manual-address" class="modal-input">
+            
+            <hr style="margin: 15px 0;">
+            
+            <label>Audition Audio:</label>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <input type="file" id="vp-manual-audio-upload" accept="audio/*" style="display: none;">
+                <button id="vp-manual-audio-upload-btn" class="secondary" style="margin: 0;">Select File</button>
+                <span id="vp-manual-audio-status" style="font-size: 0.9em; color: var(--gray-600);">No audio loaded</span>
+            </div>
+            
+            <button id="vp-manual-save-btn" class="primary" style="width: 100%;">Save Audition</button>
+        </div>
     </div>
 
     <!-- Comment Modal -->
