@@ -65,6 +65,8 @@
                     <label for="script-file-input" class="custom-file-input">Upload Script</label>
                     <input type="file" id="script-file-input" accept=".txt,.zip,.json">
                     <input type="text" id="script-name-input" placeholder="Script Name..." />
+                    <span style="font-size: 1.2em; font-weight: bold; color: var(--gray-500);">v</span>
+                    <input type="text" id="script-version-input" placeholder="1.0" style="width: 60px; font-size: 1.2em; font-weight: bold; padding: 5px; border: 1px solid transparent; background: transparent; color: inherit; text-align: center;" />
                     <select id="script-project-select"></select>
                     <select id="line-filter-select" style="margin-top: 10px;">
                         <option value="all">No Filter</option>
@@ -75,7 +77,7 @@
                         <button id="read-button">Read</button>
                         <button id="omit-button">Omit</button>
                         <button id="remit-button">Remit</button>
-                        <button id="reset-button">Reset</button>
+                        <button id="reset-button" class="danger-btn">Clear All</button>
                     </div>
                     <div class="read-view-wrapper">
                         <div id="read-container"></div>
@@ -181,7 +183,6 @@
                     <button class="tab-link" data-tab="vp-sides">Sides</button>
                     <button class="tab-link" data-tab="vp-auditions">Auditions</button>
                     <button class="tab-link" data-tab="vp-contraster">Contraster</button>
-                    <button class="tab-link" data-tab="vp-slate-builder">Slate Builder</button>
                     <button class="tab-link" data-tab="vp-table-read">Table Read</button>
                 </div>
                 <div id="vp-feedback" class="tab-content active">
@@ -219,6 +220,8 @@
                 <div id="vp-script" class="tab-content">
                     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
                         <input type="text" id="vp-script-name" placeholder="Script Name..." style="flex-grow: 1; font-size: 1.5em; font-weight: bold; padding: 5px; border: 1px solid transparent; background: transparent; color: inherit;" />
+                        <span style="font-size: 1.2em; font-weight: bold; color: var(--gray-500);">v</span>
+                        <input type="text" id="vp-script-version" placeholder="1.0" style="width: 60px; font-size: 1.2em; font-weight: bold; padding: 5px; border: 1px solid transparent; background: transparent; color: inherit; text-align: center;" />
                         <select id="vp-script-project-select">
                             <option value="none">No Project</option>
                         </select>
@@ -315,6 +318,7 @@
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <input type="file" id="vp-contraster-import-input" accept=".zip,.json" multiple style="display: none;" />
                             <button id="vp-contraster-import-btn" class="secondary">Upload Audition(s)</button>
+                            <button id="vp-contraster-reset-btn" class="danger-btn">Reset</button>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <button id="vp-contraster-play-btn" class="primary">▶ Play Cast Sequence</button>
@@ -326,13 +330,53 @@
                         <div style="text-align: center; color: var(--gray-500); width: 100%; margin-top: 40px;">Upload auditions to begin casting</div>
                     </div>
                 </div>
-                <div id="vp-slate-builder" class="tab-content">
-                    <h2>Slate Builder</h2>
-                    <p>Arrange and export a script for specific characters, building out sides/slates for an actor to read from.</p>
-                </div>
                 <div id="vp-table-read" class="tab-content">
-                    <h2>Table Read</h2>
-                    <p>Import multiple copies of a script and associated reads/takes from various artists, and combine them into one master file. With this, you can select a "golden copy" for each line, and play through the script. We can maybe add a default tone for lines that have no line reads associated.</p>
+                    <div class="action-bar" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <input type="file" id="vp-table-read-import-master-input" accept=".json,.zip" style="display: none;" />
+                        <button id="vp-table-read-import-master-btn" class="primary">Import Master Script</button>
+                        
+                        <input type="file" id="vp-table-read-import-state-input" accept=".zip" style="display: none;" />
+                        <button id="vp-table-read-import-state-btn" class="secondary">Import Table Read</button>
+                        
+                        <input type="file" id="vp-table-read-import-input" accept=".zip" multiple style="display: none;" />
+                        <button id="vp-table-read-import-btn" class="secondary" disabled>Import Line Reads (ZIP)</button>
+                        
+                        <button id="vp-table-read-reset-btn" class="danger-btn">Reset</button>
+                        <div style="flex-grow: 1;"></div>
+                        <button id="vp-table-read-save-btn" class="secondary">💾 Save Table Read</button>
+                        <button id="vp-table-read-play-btn" class="primary">▶ Play Table Read</button>
+                    </div>
+
+                    <div id="vp-table-read-header" style="display: none; padding: 15px; background: var(--gray-100); border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 15px;">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="font-size: 1.2em; font-weight: bold;">
+                                <span id="vp-table-read-project-name">Project Name</span> / 
+                                <span id="vp-table-read-script-name">Script Name</span> 
+                                <span style="color: var(--gray-500); font-size: 0.9em;">v<span id="vp-table-read-script-version">1.0</span></span>
+                            </div>
+                            <div id="vp-table-read-characters" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                                <!-- Character avatars will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 20px; height: calc(100vh - 270px);">
+                        <!-- Lines Sidebar -->
+                        <div style="flex: 1; border-right: 1px solid var(--border-color); padding-right: 10px; overflow-y: auto;">
+                            <h3>Script Lines</h3>
+                            <div id="vp-table-read-lines-container" style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px;">
+                                <div style="color: var(--gray-500); text-align: center; margin-top: 20px;">Import ZIP to load script lines.</div>
+                            </div>
+                        </div>
+
+                        <!-- Takes Main Content -->
+                        <div style="flex: 2; overflow-y: auto;">
+                            <h3 id="vp-table-read-selected-line-header">Selected Line Takes</h3>
+                            <div id="vp-table-read-takes-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <div style="color: var(--gray-500); text-align: center; margin-top: 20px;">Select a line to view available takes.</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -720,25 +764,32 @@
                 <span id="vp-manual-audition-modal-close" class="close-button">&times;</span>
             </div>
             
-            <label>Project Name:</label>
-            <input type="text" id="vp-manual-project" class="modal-input" placeholder="e.g. My Animation">
-            
             <label>Character Name:</label>
-            <input type="text" id="vp-manual-character" class="modal-input" placeholder="e.g. Hero">
+            <select id="vp-manual-character" class="modal-input"></select>
             
             <hr style="margin: 15px 0;">
             
-            <label>Actor First Name:</label>
-            <input type="text" id="vp-manual-fname" class="modal-input" placeholder="e.g. Jane">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>Actor First Name:</label>
+                    <input type="text" id="vp-manual-fname" class="modal-input" placeholder="e.g. Jane">
+                </div>
+                <div style="flex: 1;">
+                    <label>Actor Last Name:</label>
+                    <input type="text" id="vp-manual-lname" class="modal-input" placeholder="e.g. Doe">
+                </div>
+            </div>
             
-            <label>Actor Last Name:</label>
-            <input type="text" id="vp-manual-lname" class="modal-input" placeholder="e.g. Doe">
-            
-            <label>Actor Email:</label>
-            <input type="email" id="vp-manual-email" class="modal-input">
-            
-            <label>Actor Phone:</label>
-            <input type="tel" id="vp-manual-phone" class="modal-input">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="flex: 1;">
+                    <label>Actor Email:</label>
+                    <input type="email" id="vp-manual-email" class="modal-input">
+                </div>
+                <div style="flex: 1;">
+                    <label>Actor Phone:</label>
+                    <input type="tel" id="vp-manual-phone" class="modal-input">
+                </div>
+            </div>
             
             <label>Actor Rate:</label>
             <input type="text" id="vp-manual-rate" class="modal-input" placeholder="e.g. $250 / hour">

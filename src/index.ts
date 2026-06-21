@@ -22,6 +22,7 @@ import { initializeScriptView, refreshScriptView } from './vp-script.js';
 import { initializeSidesView, refreshSidesView } from './vp-sides.js';
 import { initializeContrasterView } from './vp-contraster.js';
 import { initializeVPAuditionsView } from './vp-auditions.js';
+import { initializeTableReadView, setTableReadData } from './vp-table-read.js';
 import { SystemSettings, Warmup } from './types.js';
 import { saveImageBlob, getImageBlob, deleteImageBlob } from './indexeddb.js';
 import JSZip from 'jszip';
@@ -359,7 +360,10 @@ async function initApp() {
         saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     });
 
-    initializeVPAuditionsView(receivedAuditions, projects, (updatedReceived) => {
+    setTableReadData(characters, projects);
+    initializeTableReadView(openModal);
+
+    initializeVPAuditionsView(receivedAuditions, projects, characters, (updatedReceived) => {
         receivedAuditions = updatedReceived;
         saveToLocalStorage(characters, projects, auditions, receivedAuditions, currentSettings, warmups);
     });

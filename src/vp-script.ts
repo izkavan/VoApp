@@ -68,6 +68,7 @@ function setCaretPosition(el: HTMLElement, pos: number) {
 
 // DOM Elements
 let nameInput: HTMLInputElement;
+let versionInput: HTMLInputElement;
 let projectSelect: HTMLSelectElement;
 let dictionaryBtn: HTMLButtonElement;
 let importBtn: HTMLButtonElement;
@@ -90,6 +91,7 @@ export function initializeScriptView(
     openDictionaryCallback = openDictCb;
 
     nameInput = document.getElementById('vp-script-name') as HTMLInputElement;
+    versionInput = document.getElementById('vp-script-version') as HTMLInputElement;
     projectSelect = document.getElementById('vp-script-project-select') as HTMLSelectElement;
     dictionaryBtn = document.getElementById('vp-script-dictionary-btn') as HTMLButtonElement;
     importBtn = document.getElementById('vp-script-import-btn') as HTMLButtonElement;
@@ -293,6 +295,7 @@ function renderLines() {
             header.className = 'script-line-header';
 
             const charSelect = document.createElement('select');
+            charSelect.className = 'script-char-select';
             charSelect.innerHTML = `<option value="scene">Scene Details</option>`;
             availableCharacters.forEach(c => {
                 const opt = document.createElement('option');
@@ -315,6 +318,7 @@ function renderLines() {
 
                 const descInput = document.createElement('input');
                 descInput.type = 'text';
+                descInput.className = 'script-desc-input';
                 descInput.placeholder = 'e.g. whispered';
                 descInput.value = line.descriptor;
                 descInput.addEventListener('input', (e) => {
@@ -466,9 +470,11 @@ async function saveScript() {
 
     const metadata = {
         name: name,
+        version: versionInput.value || '1.0',
         projectId: projectId === 'none' ? null : parseInt(projectId),
         lines: exportLines
     };
+
     zip.file('script.json', JSON.stringify(metadata, null, 2));
 
     let txtContent = '';
@@ -539,9 +545,9 @@ async function handleImport(e: Event) {
             throw new Error('Invalid script data format.');
         }
 
-        nameInput.value = data.name || '';
-        
-        if (data.projectId && projects.some(p => p.id === data.projectId)) {
+        if (data.name) nameInput.value = data.name;
+        if (data.version) versionInput.value = data.version;
+        if (data.projectId) {
             projectSelect.value = data.projectId.toString();
         } else {
             projectSelect.value = 'none';

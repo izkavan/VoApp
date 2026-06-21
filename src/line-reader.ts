@@ -51,6 +51,7 @@ interface SavedScript {
 export function initializeLineReader(characters: Character[], projects: Project[], settings: SystemSettings, openCharacterModal: (character: Character) => void): void {
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
+    const scriptVersionInput = document.getElementById('script-version-input') as HTMLInputElement;
     const projectSelect = document.getElementById('script-project-select') as HTMLSelectElement;
     
     let currentDictionary: DictionaryEntry[] = [];
@@ -66,6 +67,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
         const sessionData = {
             projectId: parseInt(projectSelect.value) || undefined,
             scriptName: scriptNameInput.value || '',
+            scriptVersion: scriptVersionInput.value || '',
             lines: linesToSave,
             lineDetails: Array.from(lineDetails.values())
         };
@@ -78,6 +80,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
         try {
             const sessionData = JSON.parse(dataStr);
             if (sessionData.scriptName) scriptNameInput.value = sessionData.scriptName;
+            if (sessionData.scriptVersion) scriptVersionInput.value = sessionData.scriptVersion;
             if (sessionData.projectId && projectSelect) projectSelect.value = String(sessionData.projectId);
             
             const lineContainer = document.getElementById('line-container');
@@ -183,8 +186,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
             currentDictionary = [];
         }
 
-        if (selectedReadLine && selectedReadLine.textContent) {
-            renderDetails(selectedReadLine.textContent);
+        if (selectedReadLine) {
+            renderDetails(selectedReadLine.getAttribute('data-line-text') || selectedReadLine.textContent || '');
         }
         updateLineContainerUI();
     });
@@ -223,12 +226,12 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 if (lineDiv.classList.contains('read') && charId !== undefined && !isNaN(charId)) {
                     const char = characters.find(c => c.id === charId);
                     if (char && char.artwork) {
-                        lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
+                        lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
                     } else {
-                        lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
+                        lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                     }
                 } else {
-                    lineDiv.innerHTML = `<span class="line-entry-text">${stateDot}${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
+                    lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                 }
             });
         });
@@ -377,7 +380,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
             if (container) container.classList.remove('selected');
             setter(lineDiv);
             lineDiv.classList.add('selected');
-            if(isReadLine) renderDetails(lineDiv.textContent || '');
+            if(isReadLine) renderDetails(lineDiv.getAttribute('data-line-text') || lineDiv.textContent || '');
         }
     };
 
@@ -439,6 +442,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
         [lineContainer, readContainer, readDetailsContainer].forEach(c => c && (c.innerHTML = ''));
         if (scriptNameInput) scriptNameInput.value = '';
+        if (scriptVersionInput) scriptVersionInput.value = '';
         if (projectSelect) projectSelect.value = '';
         selectedLine = null;
         selectedReadLine = null;
@@ -539,7 +543,10 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
         if (data.name) {
                 scriptNameInput.value = data.name;
-            }
+        }
+        if (data.version) {
+                scriptVersionInput.value = data.version;
+        }
 
             if (data.projectId && projects.some(p => p.id === data.projectId)) {
                 projectSelect.value = data.projectId.toString();
@@ -741,6 +748,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
         });
 
         const saveData: any = {
+            name: scriptNameInput.value || 'Script',
+            version: scriptVersionInput.value || '1.0',
             projectId: parseInt(projectSelect.value) || undefined,
             lines: linesToSave,
             lineDetails: jsonLineDetails

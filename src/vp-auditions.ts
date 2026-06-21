@@ -1,8 +1,9 @@
-import { Project, ReceivedAudition } from './types.js';
+import { Project, ReceivedAudition, Character } from './types.js';
 import JSZip from 'jszip';
 
 let receivedAuditions: ReceivedAudition[] = [];
 let projects: Project[] = [];
+let characters: Character[] = [];
 let saveCallback: (auditions: ReceivedAudition[]) => void;
 
 let activeProjectId = '';
@@ -23,10 +24,12 @@ let listContainer: HTMLElement;
 export function initializeVPAuditionsView(
     initialAuditions: ReceivedAudition[],
     initialProjects: Project[],
+    initialCharacters: Character[],
     onSave: (auditions: ReceivedAudition[]) => void
 ) {
     receivedAuditions = initialAuditions;
     projects = initialProjects;
+    characters = initialCharacters;
     saveCallback = onSave;
 
     projectSelect = document.getElementById('vp-auditions-project-select') as HTMLSelectElement;
@@ -77,7 +80,7 @@ function populateProjectDropdown() {
     // Maintain current selection if possible
     const currentVal = projectSelect.value;
     
-    projectSelect.innerHTML = '<option value="">All Projects</option>';
+    projectSelect.innerHTML = '';
     
     // Find unique project names from loaded auditions and local projects
     const auditionProjects = receivedAuditions.map(a => a.project);
@@ -94,8 +97,11 @@ function populateProjectDropdown() {
 
     if (uniqueProjects.includes(currentVal)) {
         projectSelect.value = currentVal;
+        activeProjectId = currentVal;
+    } else if (uniqueProjects.length > 0) {
+        projectSelect.value = uniqueProjects[0];
+        activeProjectId = uniqueProjects[0];
     } else {
-        projectSelect.value = '';
         activeProjectId = '';
     }
 }
@@ -434,9 +440,24 @@ function openManualAuditionModal() {
     const modal = document.getElementById('vp-manual-audition-modal');
     if (!modal) return;
 
-    // Clear previous values
-    (document.getElementById('vp-manual-project') as HTMLInputElement).value = activeProjectId || '';
-    (document.getElementById('vp-manual-character') as HTMLInputElement).value = activeCharacter || '';
+    // Populate character dropdown
+    const charSelect = document.getElementById('vp-manual-character') as HTMLSelectElement;
+    charSelect.innerHTML = '<option value="">Select a Character</option>';
+    
+    // Only show characters for the active project, if any
+    const activeProject = projects.find(p => p.name === activeProjectId);
+    const relevantCharacters = activeProject 
+        ? characters.filter(c => c.projectId === activeProject.id)
+        : characters;
+        
+    relevantCharacters.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = c.name;
+        charSelect.appendChild(opt);
+    });
+
+    charSelect.value = activeCharacter || '';
     (document.getElementById('vp-manual-fname') as HTMLInputElement).value = '';
     (document.getElementById('vp-manual-lname') as HTMLInputElement).value = '';
     (document.getElementById('vp-manual-email') as HTMLInputElement).value = '';
@@ -474,8 +495,8 @@ function openManualAuditionModal() {
 
     const saveBtn = document.getElementById('vp-manual-save-btn');
     saveBtn!.onclick = () => {
-        const project = (document.getElementById('vp-manual-project') as HTMLInputElement).value.trim();
-        const character = (document.getElementById('vp-manual-character') as HTMLInputElement).value.trim();
+        const project = activeProjectId; // Use the currently active project
+        const character = (document.getElementById('vp-manual-character') as HTMLSelectElement).value;
         const fName = (document.getElementById('vp-manual-fname') as HTMLInputElement).value.trim();
         const lName = (document.getElementById('vp-manual-lname') as HTMLInputElement).value.trim();
         

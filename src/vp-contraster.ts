@@ -16,6 +16,7 @@ let importInput: HTMLInputElement;
 let importBtn: HTMLButtonElement;
 let playSeqBtn: HTMLButtonElement;
 let exportBtn: HTMLButtonElement;
+let resetBtn: HTMLButtonElement;
 
 export function initializeContrasterView(
     initialAuditions: ReceivedAudition[],
@@ -29,6 +30,7 @@ export function initializeContrasterView(
     importBtn = document.getElementById('vp-contraster-import-btn') as HTMLButtonElement;
     playSeqBtn = document.getElementById('vp-contraster-play-btn') as HTMLButtonElement;
     exportBtn = document.getElementById('vp-contraster-export-btn') as HTMLButtonElement;
+    resetBtn = document.getElementById('vp-contraster-reset-btn') as HTMLButtonElement;
 
     if (!importBtn) return;
 
@@ -36,6 +38,16 @@ export function initializeContrasterView(
     importInput.addEventListener('change', handleImport);
     playSeqBtn.addEventListener('click', playSequence);
     exportBtn.addEventListener('click', handleExport);
+    
+    resetBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to clear all loaded auditions from the Contraster? This action cannot be undone.")) {
+            stopAudio();
+            receivedAuditions = [];
+            selectedAuditions.clear();
+            saveCallback(receivedAuditions);
+            renderBoard();
+        }
+    });
 
     renderBoard();
 }
