@@ -231,6 +231,16 @@ importProjectButton?.addEventListener('click', () => {
         }
     };
     input.click();
+    input.click();
+});
+
+window.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('modal')) {
+        if (target.id === 'modal') closeModal();
+        else if (target.id === 'project-modal') closeProjectModal();
+        else target.style.display = 'none';
+    }
 });
 
 

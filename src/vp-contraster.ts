@@ -7,6 +7,7 @@ let saveCallback: (auditions: ReceivedAudition[]) => void;
 // Selection State: characterName -> audition id
 let selectedAuditions: Map<string, number> = new Map();
 let currentAudio: HTMLAudioElement | null = null;
+let currentAudioId: number | null = null;
 let currentlyPlayingId: number | null = null;
 
 // DOM Elements
@@ -209,17 +210,26 @@ function renderBoard() {
             item.appendChild(indicator);
 
             item.addEventListener('click', () => {
-                // If it's already selected, clicking it again toggles play/pause
                 if (selectedAuditions.get(character) === aud.id) {
+                    // Already selected. Toggle play/pause
                     if (currentlyPlayingId === aud.id) {
-                        stopAudio();
+                        // It is playing -> Pause it
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentlyPlayingId = null; // Mark as paused
+                            renderBoard();
+                        }
                     } else {
+                        // It is paused -> Resume it
                         playAudio(aud);
                     }
                 } else {
-                    // Select it and play
+                    // Select a new audition and play from start
+                    if (currentAudio) {
+                        currentAudio.pause();
+                        currentAudio = null;
+                    }
                     selectedAuditions.set(character, aud.id);
-                    renderBoard(); // re-render to update selected class
                     playAudio(aud);
                 }
             });
@@ -233,10 +243,19 @@ function renderBoard() {
 }
 
 function playAudio(aud: ReceivedAudition) {
-    stopAudio();
     if (!aud.audioData) return;
 
+    if (currentAudioId === aud.id && currentAudio) {
+        // Resume
+        currentlyPlayingId = aud.id;
+        currentAudio.play().catch(e => console.error("Resume failed", e));
+        renderBoard();
+        return;
+    }
+
+    stopAudio();
     currentlyPlayingId = aud.id;
+    currentAudioId = aud.id;
     currentAudio = new Audio(aud.audioData);
     currentAudio.onended = () => {
         currentlyPlayingId = null;
@@ -252,7 +271,8 @@ function playAudio(aud: ReceivedAudition) {
 function stopAudio() {
     if (currentAudio) {
         currentAudio.pause();
-        currentAudio = null;
+        // We do NOT set currentAudio to null here, so we can resume if needed.
+        // But if we stop to play another, playAudio will overwrite it.
     }
     currentlyPlayingId = null;
     renderBoard();
@@ -302,6 +322,7 @@ async function playSequence() {
         }
 
         currentlyPlayingId = aud.id;
+        currentAudioId = aud.id;
         renderBoard();
 
         currentAudio = new Audio(aud.audioData);
@@ -379,7 +400,9 @@ async function handleExport() {
     const url = URL.createObjectURL(content);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Contraster_Cast_Export.zip`;
+    const projName = castList[0]?.project ? castList[0].project.replace(/\s+/g, '_') : 'Project';
+    const dateStr = new Date().toISOString().split('.')[0].replace(/[-:]/g, '').replace('T', '_');
+    a.download = `${projName}_Cast_${dateStr}.zip`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

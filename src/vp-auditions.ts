@@ -79,8 +79,11 @@ function populateProjectDropdown() {
     
     projectSelect.innerHTML = '<option value="">All Projects</option>';
     
-    // Find unique project names from loaded auditions
-    const uniqueProjects = Array.from(new Set(receivedAuditions.map(a => a.project).filter(Boolean)));
+    // Find unique project names from loaded auditions and local projects
+    const auditionProjects = receivedAuditions.map(a => a.project);
+    const localProjects = projects.map(p => p.name);
+    
+    const uniqueProjects = Array.from(new Set([...auditionProjects, ...localProjects].filter(Boolean)));
     
     uniqueProjects.forEach(projName => {
         const opt = document.createElement('option');
@@ -417,7 +420,10 @@ async function handleFinalize() {
     const url = URL.createObjectURL(content);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Finalized_Auditions.zip`;
+    const downloadName = activeProjectId 
+        ? `Finalized_Auditions_${activeProjectId.replace(/\s+/g, '_')}.zip` 
+        : `Finalized_Auditions.zip`;
+    a.download = downloadName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

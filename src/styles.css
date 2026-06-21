@@ -285,6 +285,23 @@ textarea, input, select {
     cursor: pointer;
 }
 
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-button {
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+
 .modal-footer {
     margin-top: 20px;
     padding-top: 20px;
@@ -1478,6 +1495,14 @@ body.dark-mode .vp-auditions-character-item:hover {
 .vp-auditions-character-item.selected {
     background-color: var(--primary-color);
     color: white;
+}
+
+#vp-auditions-characters, #vp-auditions-list {
+    background-color: var(--white) !important;
+}
+body.dark-mode #vp-auditions-characters, 
+body.dark-mode #vp-auditions-list {
+    background-color: var(--gray-800) !important;
 }
 
 .vp-auditions-card {

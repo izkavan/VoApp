@@ -87,6 +87,17 @@ function renderAuditionList() {
             }
         });
     });
+
+    document.querySelectorAll('.export-audition-btn').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent opening the audition modal if it's nested
+            const auditionId = Number((e.currentTarget as HTMLElement).dataset.id);
+            const audition = auditions.find(a => a.id === auditionId);
+            if (audition) {
+                openExportModal(audition);
+            }
+        });
+    });
 }
 
 function openAuditionModal(audition?: Audition) {
@@ -419,48 +430,53 @@ function openExportModal(aud: Audition) {
 }
 
 async function exportAuditionZip(aud: Audition) {
-    const profile = systemSettings.actorProfile!;
-    const charName = aud.linkedCharacterIds.length > 0 
-        ? characters.find(c => c.id === aud.linkedCharacterIds[0])?.name || 'Unknown_Character' 
-        : 'Unknown_Character';
-    
-    const zip = new JSZip();
-    const folderName = `${profile.firstName} ${profile.lastName}`.trim();
-    const folder = zip.folder(folderName);
-    
-    if (!folder) return;
+    try {
+        const profile = systemSettings.actorProfile!;
+        const charName = aud.linkedCharacterIds.length > 0 
+            ? characters.find(c => c.id === aud.linkedCharacterIds[0])?.name || 'Unknown_Character' 
+            : 'Unknown_Character';
+        
+        const zip = new JSZip();
+        const folderName = `${profile.firstName} ${profile.lastName}`.trim() || 'Voice_Actor';
+        const folder = zip.folder(folderName);
+        
+        if (!folder) return;
 
-    const auditionData = {
-        actorFirstName: profile.firstName,
-        actorLastName: profile.lastName,
-        actorEmail: profile.email,
-        actorRate: aud.actorRate || '',
-        actorPhone: profile.phone,
-        actorAddress: profile.address,
-        actorAvailability: aud.actorAvailability || '',
-        character: charName,
-        project: aud.projectName || '',
-        dateSubmitted: new Date().toISOString().split('T')[0],
-        fileName: aud.audioFileName || 'audition.wav',
-        audioData: aud.audioData || ''
-    };
+        const auditionData = {
+            actorFirstName: profile.firstName,
+            actorLastName: profile.lastName,
+            actorEmail: profile.email,
+            actorRate: aud.actorRate || '',
+            actorPhone: profile.phone,
+            actorAddress: profile.address,
+            actorAvailability: aud.actorAvailability || '',
+            character: charName,
+            project: aud.projectName || '',
+            dateSubmitted: new Date().toISOString().split('T')[0],
+            fileName: aud.audioFileName || 'audition.wav',
+            audioData: aud.audioData || ''
+        };
 
-    folder.file("Audition.json", JSON.stringify(auditionData, null, 2));
+        folder.file("Audition.json", JSON.stringify(auditionData, null, 2));
 
-    if (aud.audioData) {
-        const base64Data = aud.audioData.split(',')[1];
-        if (base64Data) {
-            folder.file(auditionData.fileName, base64Data, { base64: true });
+        if (aud.audioData) {
+            const base64Data = aud.audioData.split(',')[1];
+            if (base64Data) {
+                folder.file(auditionData.fileName, base64Data, { base64: true });
+            }
         }
-    }
 
-    const content = await zip.generateAsync({ type: 'blob' });
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${folderName}_Audition_${charName}.zip`.replace(/\s+/g, '_');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+        const content = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${folderName}_Audition_${charName}.zip`.replace(/\s+/g, '_');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error("Export failed:", e);
+        alert("Export failed: " + e);
+    }
 }
