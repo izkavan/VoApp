@@ -187,12 +187,14 @@ If you feel like this project is fun enough to kick a few bucks to, check me out
 # Technical callouts
 Dependencies:
 * Typescript
+* Rust (for Tauri)
 * npm install --save-dev @types/jszip
 * npm install --save-dev @types/node
 * npm install -D vitest jsdom
 * npm install -D @vitest/coverage-v8
 * npm install -D make-coverage-badge
 * npm install -D fake-indexeddb
+* npm install -D @tauri-apps/cli
 
 Also features:
 * npx make-coverage-badge
@@ -203,6 +205,7 @@ install/run via npm
 * `npm run build && npx serve src` to make and serve the project locally
 * `npm run build && npm run test:coverage` to make and run the test, while updating coverage
 * `npx make-coverage-badge` for coverage badge updates by itself
+* `npx tauri build` for the tauri system to build the application into a standalone.
 
 ## Test Coverage Metrics:
 ### General Health

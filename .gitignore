@@ -8,6 +8,7 @@ yarn-error.log*
 /out-tsc
 /dist
 /build
+/src/*.js
 
 # Dependencies
 /node_modules
@@ -30,3 +31,10 @@ voAppToke
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Custom Ignore Additions
+/.idea
+/.agents
+/voApp
+/*.js.map
+/index.js.map
