@@ -38,6 +38,7 @@ export interface Character {
     pace?: number;
     placement?: number;
     timbre?: number;
+    characterOddities?: string;
 }
 
 export interface AuditionFile {

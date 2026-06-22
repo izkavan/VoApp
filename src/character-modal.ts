@@ -75,7 +75,10 @@ export function openModal(character?: Character, isEditMode = false) {
                         </div>
                         <span id="file-name" class="file-name">${artworkFilename}</span>
                     </div>
-                    <textarea id="edit-description" placeholder="Character Description">${character.description}</textarea>
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <textarea id="edit-description" placeholder="Character Description">${character.description}</textarea>
+                        <textarea id="edit-oddities" placeholder="Defining artistic features; Vocal Tics, catchphrase, etc.">${character.characterOddities || ''}</textarea>
+                    </div>
                 </div>
                 <p><strong>Voice Description:</strong></p>
                 <textarea id="edit-voice">${character.voice_description}</textarea>
@@ -204,7 +207,10 @@ export function openModal(character?: Character, isEditMode = false) {
                     <div id="artwork-preview-container"></div>
                     <span id="file-name" class="file-name"></span>
                 </div>
-                <textarea id="edit-description" placeholder="Character Description"></textarea>
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                    <textarea id="edit-description" placeholder="Character Description"></textarea>
+                    <textarea id="edit-oddities" placeholder="Defining artistic features; Vocal Tics, catchphrase, etc."></textarea>
+                </div>
             </div>
             <p><strong>Voice Description:</strong></p>
             <textarea id="edit-voice" placeholder="Voice Description"></textarea>
@@ -465,6 +471,7 @@ function renderMoodboardEditGrid() {
 async function saveCharacterHandler(characterId: number | null) {
     const name = (document.getElementById('edit-name') as HTMLInputElement).value;
     const description = (document.getElementById('edit-description') as HTMLTextAreaElement).value;
+    const characterOddities = (document.getElementById('edit-oddities') as HTMLTextAreaElement).value;
     const voice_description = (document.getElementById('edit-voice') as HTMLTextAreaElement).value;
     
     const artworkFile = (document.getElementById('edit-artwork') as HTMLInputElement).files?.[0];
@@ -483,6 +490,7 @@ async function saveCharacterHandler(characterId: number | null) {
         id: idToSave,
         name: name,
         description: description,
+        characterOddities: characterOddities,
         voice_description: voice_description,
         tags: tags,
         projectId: projectId || undefined,

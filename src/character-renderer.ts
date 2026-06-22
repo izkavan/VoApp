@@ -66,7 +66,28 @@ export function createCharacterCard(character: Character): HTMLElement {
     if (character.artwork) {
         artwork = `<img src="${character.artwork}" class="character-card-artwork">`;
     }
-    card.innerHTML = `${artwork}<h3>${character.name}</h3>`;
+    
+    let odditiesHtml = '';
+    if (character.characterOddities) {
+        odditiesHtml = `<p class="character-oddities" style="font-size: 0.85em; font-style: italic; margin-top: 5px;"><strong>Oddities:</strong> ${character.characterOddities}</p>`;
+    }
+
+    let audioButtonHtml = '';
+    if (character.voice_sample) {
+        audioButtonHtml = `<button class="play-reference-btn" style="margin-top: 10px; padding: 4px 8px; font-size: 0.9em;">Play Reference</button>`;
+    }
+
+    card.innerHTML = `${artwork}<h3>${character.name}</h3>${odditiesHtml}${audioButtonHtml}`;
+    
+    const playBtn = card.querySelector('.play-reference-btn');
+    if (playBtn) {
+        playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const audio = new Audio(character.voice_sample!);
+            audio.play().catch(err => console.error("Could not play audio reference:", err));
+        });
+    }
+
     card.addEventListener('click', () => openCharacterModalCallback(character));
     return card;
 }

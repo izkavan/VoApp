@@ -1316,6 +1316,19 @@ body.dark-mode .dict-highlight {
     border: 1px solid #ffe082;
 }
 
+.character-card h3 {
+    margin: 10px 0 0 0;
+    font-size: 1.2em;
+}
+
+.character-card .play-reference-btn {
+    display: none;
+}
+
+#dungeon-master-view .character-card .play-reference-btn {
+    display: inline-block;
+}
+
 .warmup-card-title {
     margin: 0;
     font-size: 1.2rem;
