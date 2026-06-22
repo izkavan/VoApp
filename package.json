@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "tauri": "tauri",
     "build": "rm -rf dist && tsc && cp src/index.html dist/ && cp src/styles.css dist/ && cp -r src/images dist/",
     "test": "vitest run",
     "test:watch": "vitest",
