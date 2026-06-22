@@ -186,10 +186,32 @@ If you feel like this project is fun enough to kick a few bucks to, check me out
 
 # Technical callouts
 Dependencies:
-Typescript
-npm install --save-dev @types/jszip
-npm install --save-dev @types/node
+* Typescript
+* npm install --save-dev @types/jszip
+* npm install --save-dev @types/node
+* npm install -D vitest jsdom
+* npm install -D @vitest/coverage-v8
+* npm install -D make-coverage-badge
+* npm install -D fake-indexeddb
+
+Also features:
+* npx make-coverage-badge
+* npx vitest run --coverage
 
 install/run via npm
 
-`npm run build && npx serve src`
+* `npm run build && npx serve src` to make and serve the project locally
+* `npm run build && npm run test:coverage` to make and run the test, while updating coverage
+* `npx make-coverage-badge` for coverage badge updates by itself
+
+## Test Coverage Metrics:
+### General Health
+![Coverage Badge](./coverage/badge.svg)
+### Folder Specific
+#### Utils: 98.68%
+#### Services: 95.05%
+#### Managers: 76.14%
+#### Components: 58.13%
+#### Views: 50.10%
+
+*For a detailed breakdown of covered lines and branches, see [TEST_COVERAGE.md](./TEST_COVERAGE.md).*

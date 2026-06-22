@@ -257,10 +257,15 @@ textarea, input, select {
 
 .dictionary-grid {
     display: grid;
-    grid-template-columns: 2fr 2fr 3fr 100px 40px;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 3fr) 180px 40px;
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
+}
+.dictionary-grid input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 .dictionary-header {
     font-weight: bold;
@@ -369,8 +374,10 @@ input[type="checkbox"] {
     padding: 5px 10px;
     border-radius: 15px;
     font-size: 14px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .tag-close {
@@ -936,16 +943,32 @@ body.dark-mode .theme-toggle svg { color: var(--gray-100); }
     background-color: var(--danger-color);
     color: white;
     border: none;
-    padding: 10px 15px;
     border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-    line-height: 1;
-    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
 }
+.record-button:hover { background-color: #c9302c; }
 .record-button.recording { background-color: var(--success-color); }
+
+.text-record-button {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.text-record-button.recording { background-color: var(--success-color); }
 .takes-list { list-style: none; padding: 0; }
 .take-item {
     display: flex;
