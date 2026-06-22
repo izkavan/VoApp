@@ -1,11 +1,15 @@
 # Vo-App: Your Personal Vocal Character Library
 
-Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor.
+## Welcome
+Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you keep track of all the unique vocal characters you use for storytelling, role-playing, or any other creative endeavor. I'm open to new and better ideas for a name for this application. Placeholders have a bad habit of sticking around.
 
 As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on. I sort of want this to be the "connective tissue" of the industry, for teams that feel that it's a good fit!
 
-I have no interest in selling this idea to a corporation. 
-I have no interest in making a "Premium" tier and gating features behind it-- The exception being if there's a central networked system at play for the community "pipedream" features. I'm not going to shell out money for web hosting out of the kindness of my heart. 
+### Please Note: 
+* I have no interest in selling this application to a corporation.
+* I have no interest in making a "Premium" tier and gating features behind it
+  * The exception being if there's a central networked system at play for the community "pipedream" features. 
+  * I'm not going to shell out money for web hosting out of the kindness of my heart-- not yet, at any rate.
 
 I'm in it for a love of the game. If you want to kick a few dollars my way, my Ko-Fi link is at the bottom of this readme!
 
@@ -64,10 +68,10 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 Vo-App acts as your personal vocal library! It helps you manage the dozens or even hundreds of different voices and character archetypes you might use across various games, audiobooks, podcasts, and animations.
 
 **Typical Workflow:**
-1. **Create your Projects and Characters**: Start by defining the show or game you are working on. Create characters for that project and give them a "Vocal Recipe" (pitch, pace, placement, timbre) so you remember *exactly* how they sound six months later. Add character art and record a quick reference anchor phrase!
+1. **Create your Projects and Characters**: Start by defining the show or game you are working on. Create characters for that project and give them a "Vocal Recipe" (pitch, pace, placement, timbre) so you remember *exactly* how they sound six months later. Add character art and record a quick reference anchor phrase! You can also import a project library that is given to you, which really helps for ensuring you have the same data as the other actors!
 2. **Setup your Dictionary**: If your project has complex fantasy names or scientific jargon, define them in the Pronunciation Dictionary so you can record the correct pronunciation.
 3. **Read your Scripts**: Use the Line Reader or Teleprompter to upload your script. If your project has dictionary words in the script, they will automatically highlight! You can hover over them to read the phonetics or play your audio reference. Record multiple takes of your lines and star the ones you like best.
-4. **Manage Auditions**: Track what characters you submitted for which casting directors using the Audition Tracker, so you never lose track of what voice you used for that callback.
+4. **Manage Auditions**: Track what characters you submitted for which casting directors using the Audition Tracker, so you never lose track of what voice you used for that callback. Need to put together an audition? Select the Characters and Voices you are using, and you can export a zip file of the data that is needed!
 5. **Warmups and Efforts**: Head to the Vocal Warmups tab to run through your daily tongue twisters, and build a reusable catalog of fight grunts and dying breaths in the Effect Library.
 
 ## I'm a dungeon master. What is this and how do I use it?
@@ -90,7 +94,19 @@ Yes! While Vo-App is highly tailored for actors, it serves as an excellent refer
 2. **Define the Sound**: Instead of just writing "He sounds gruff," use the Vocal Recipe sliders to build the exact sonic profile you want. You can record your own temporary voice samples as scratch audio to demonstrate the intended vibe.
 3. **Standardize Pronunciations**: Fill out the Pronunciation Dictionary with the canon pronunciations of your sci-fi or fantasy terms. When actors import your project and load their scripts into the Line Reader, the app will automatically highlight those terms and play your canon audio so they don't have to guess.
 4. **Share with Talent**: Use the **Export Project** feature to package the entire project (including character profiles, artwork, and your scratch audio) into a single ZIP file. Send this to your voice actors so they can import it into their own Vo-App and know exactly what you're looking for.
-5. **Assemble a Table Read**: After your actors have recorded their lines using the Line Reader, you can import their exported audio zips directly over your master script. Mark your 'Preferred' takes, and run a Table Read sequence to hear how the full cast sounds together!
+5. **Listen to Auditions**: Blind samples of auditions let you isolate the actor for their talent, and rate what takes you like the best. 
+6. **Compare the Cast**: Use the Contraster to ensure vocal contrast between your top picks! This helps ensure that the ensemble you hire is the right one for the job, or that any new hires fit the bill.
+7. **Assemble a Table Read**: After your actors have recorded their lines using the Line Reader, you can import their exported audio zips directly over your master script. Mark your 'Preferred' takes, and run a Table Read sequence to hear how the full project sends before sending it out to final editing!
+
+## I'm a writer or editor, is this useful for me?
+
+Yes! Vo-App serves as an incredible central hub for world-building, script development, and rough audio assembly. It helps bridge the gap between text on a page and a fully voiced production.
+
+**Typical Workflow:**
+1. **World Building:** Create a Project and establish a Pronunciation Dictionary for your fictional names, spells, or locations, ensuring consistency for the cast and narrators.
+2. **Character Conception:** Build up your Character Library. Define vocal recipes, upload reference artwork, and compile mood boards to establish distinct personalities for your cast before a single line is recorded.
+3. **Drafting:** Use the integrated Script Writer tool to construct scenes. You can quickly assign lines directly to your characters, and the app will automatically reference your dictionary as you write.
+4. **Table Read Simulation:** As you receive exported Line Read sessions back from your voice actors, import them into the Table Read Simulator. You can quickly sequence their takes together, test different variations, and export a perfectly timed rough cut of the full script straight to your final audio editor.
 
 ## What's Coming Next?
 
@@ -105,9 +121,6 @@ Here are some of the features that I thought up for the app that could be coming
 * Can we link a pinterest board and have that in a view for the moodboard?
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 * Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
-
-
-
 
 ### Changes to the Character and Project Management
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
