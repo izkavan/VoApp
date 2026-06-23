@@ -21,6 +21,8 @@ export const defaultSettings: SystemSettings = {
     recordingGear: '',
     effectGroups: ['Laugh', 'Grunt', 'Pain', 'Breath', 'Scream', 'Cry'],
     systemFont: 'default',
+    timerWarningTime: 300,
+    timerStopTime: 600,
     featureVisibility: {
         viewVoiceActor: true,
         viewDungeonMaster: true,

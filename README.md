@@ -202,7 +202,7 @@ Also features:
 
 install/run via npm
 
-* `npm run build && npx serve src` to make and serve the project locally
+* `npm run build && npx serve dist` to make and serve the project locally
 * `npm run build && npm run test:coverage` to make and run the test, while updating coverage
 * `npx make-coverage-badge` for coverage badge updates by itself
 * `npx tauri build` for the tauri system to build the application into a standalone.

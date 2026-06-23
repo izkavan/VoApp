@@ -35,6 +35,24 @@
     --shadow-gray: rgba(128, 128, 128, 0.2);
 }
 
+
+::-webkit-scrollbar {
+    width: 1rem;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-950);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
 html { box-sizing: border-box; }
 *, *:before, *:after { box-sizing: inherit; }
 
@@ -1787,4 +1805,9 @@ body.dark-mode .table-read-take-card {
 }
 body.dark-mode .table-read-take-card.golden {
     background-color: #332b00;
+}
+
+@keyframes timer-flash-red {
+    0%, 100% { color: #f00; }
+    50% { color: transparent; }
 }

@@ -26,7 +26,7 @@ export function initializeTeleprompter(projects: Project[]) {
     const displayDiv = document.getElementById('teleprompt-display') as HTMLDivElement;
     
     // Controls
-    const speedInput = document.getElementById('teleprompt-speed') as HTMLInputElement;
+    const speedInput = document.getElementById('teleprompt-speed') as HTMLSelectElement;
     const fontMinus = document.getElementById('teleprompt-font-minus') as HTMLButtonElement;
     const fontPlus = document.getElementById('teleprompt-font-plus') as HTMLButtonElement;
     const fontLabel = document.getElementById('teleprompt-font-label') as HTMLSpanElement;

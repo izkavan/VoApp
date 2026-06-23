@@ -133,8 +133,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
     const readContainer = document.getElementById('read-container');
     const readDetailsContainer = document.getElementById('read-details');
     const readButton = document.getElementById('read-button');
-    const omitButton = document.getElementById('omit-button');
-    const remitButton = document.getElementById('remit-button');
+    const ignoreButton = document.getElementById('ignore-button');
     const resetButton = document.getElementById('reset-button');
     const saveButton = document.getElementById('save-button');
 
@@ -560,8 +559,12 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
             const lineContainer = document.getElementById('line-container');
             const readContainer = document.getElementById('read-container');
+            const readDetailsContainer = document.getElementById('read-details');
             if (lineContainer) lineContainer.innerHTML = '';
             if (readContainer) readContainer.innerHTML = '';
+            if (readDetailsContainer) readDetailsContainer.innerHTML = '';
+            selectedLine = null;
+            selectedReadLine = null;
             lineDetails.clear();
 
             if (data.lines && Array.isArray(data.lines)) {
@@ -820,8 +823,17 @@ export function initializeLineReader(characters: Character[], projects: Project[
         URL.revokeObjectURL(url);
     });
 
-    omitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read'); selectedLine.classList.add('omitted'); updateLineContainerUI(); } });
-    remitButton?.addEventListener('click', () => { if (selectedLine) { selectedLine.classList.remove('read', 'omitted'); updateLineContainerUI(); } });
+    ignoreButton?.addEventListener('click', () => {
+        if (selectedLine) {
+            if (selectedLine.classList.contains('omitted')) {
+                selectedLine.classList.remove('omitted');
+            } else {
+                selectedLine.classList.remove('read');
+                selectedLine.classList.add('omitted');
+            }
+            updateLineContainerUI();
+        }
+    });
 
     resetButton?.addEventListener('click', () => {
         const confirmed = confirm("Are you sure you want to reset? All line statuses, notes, and recorded audio takes for this script will be lost.");

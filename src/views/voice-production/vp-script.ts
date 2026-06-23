@@ -541,6 +541,26 @@ async function handleImport(e: Event) {
     if (!file) return;
 
     try {
+        if (file.name.endsWith('.txt')) {
+            const textContent = await file.text();
+            const linesArray = textContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            
+            nameInput.value = file.name.replace('.txt', '');
+            versionInput.value = '1.0';
+            projectSelect.value = 'none';
+            handleProjectChange();
+
+            scriptLines = linesArray.map((text, idx) => ({
+                id: Date.now().toString() + '-' + idx,
+                type: 'line',
+                characterId: 'none',
+                descriptor: '',
+                text: text
+            }));
+            renderLines();
+            return;
+        }
+
         let jsonStr = '';
 
         if (file.name.endsWith('.zip')) {
@@ -561,7 +581,7 @@ async function handleImport(e: Event) {
         } else if (file.name.endsWith('.json')) {
             jsonStr = await file.text();
         } else {
-            throw new Error('Unsupported file format. Please upload a .json or .zip file.');
+            throw new Error('Unsupported file format. Please upload a .txt, .json or .zip file.');
         }
 
         const data = JSON.parse(jsonStr);

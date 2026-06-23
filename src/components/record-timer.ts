@@ -5,28 +5,41 @@ let accumulatedTime = 0; // in milliseconds
 let timerInterval: number | null = null;
 let lastTickTime = 0;
 let lastSaveTime = 0;
+let currentWarningTime = 300;
+let currentStopTime = 600;
 
 const STORAGE_KEY = 'VoApp_RecordTimer';
 
-export function initializeRecordTimer(settings: SystemSettings) {
+function updateDisplay() {
     const container = document.getElementById('record-timer-container');
     const display = document.getElementById('record-timer-display');
+    if (!display || !container) return;
+    const totalSecs = Math.floor(accumulatedTime / 1000);
+    const ms = Math.floor(accumulatedTime % 1000);
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    display.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+    
+    if (totalSecs >= currentStopTime) {
+        container.style.color = '#f00'; // red
+        container.style.animation = 'timer-flash-red 1s infinite';
+    } else if (totalSecs >= currentWarningTime) {
+        container.style.color = '#ff0'; // yellow
+        container.style.animation = 'none';
+    } else {
+        container.style.color = '#0f0'; // green
+        container.style.animation = 'none';
+    }
+}
+
+export function initializeRecordTimer(settings: SystemSettings) {
     const resetBtn = document.getElementById('record-timer-reset');
 
     const savedTime = localStorage.getItem(STORAGE_KEY);
     if (savedTime) {
         accumulatedTime = parseInt(savedTime, 10);
     }
-
-    const updateDisplay = () => {
-        if (!display) return;
-        const totalSecs = Math.floor(accumulatedTime / 1000);
-        const ms = Math.floor(accumulatedTime % 1000);
-        const hrs = Math.floor(totalSecs / 3600);
-        const mins = Math.floor((totalSecs % 3600) / 60);
-        const secs = totalSecs % 60;
-        display.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
-    };
 
     updateDisplay();
 
@@ -93,4 +106,7 @@ export function updateRecordTimerVisibility(settings: SystemSettings) {
     if (container) {
         container.style.display = settings.featureVisibility?.showRecordTimer ? 'flex' : 'none';
     }
+    currentWarningTime = settings.timerWarningTime ?? 300;
+    currentStopTime = settings.timerStopTime ?? 600;
+    updateDisplay();
 }

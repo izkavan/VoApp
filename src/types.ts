@@ -148,4 +148,6 @@ export interface SystemSettings {
     featureVisibility?: FeatureVisibility;
     actorProfile?: ActorProfile;
     systemFont?: string;
+    timerWarningTime?: number;
+    timerStopTime?: number;
 }

@@ -24,6 +24,8 @@ export function initializeSettingsView(
     const visViewDungeonMaster = document.getElementById('visibility-view-dungeon-master') as HTMLInputElement;
     const visViewUtility = document.getElementById('visibility-view-utility') as HTMLInputElement;
     const visShowRecordTimer = document.getElementById('visibility-show-record-timer') as HTMLInputElement;
+    const timerWarningInput = document.getElementById('setting-timer-warning') as HTMLInputElement;
+    const timerStopInput = document.getElementById('setting-timer-stop') as HTMLInputElement;
     const visTabLineReader = document.getElementById('visibility-tab-line-reader') as HTMLInputElement;
     const visTabTeleprompter = document.getElementById('visibility-tab-teleprompter') as HTMLInputElement;
     const visTabAuditions = document.getElementById('visibility-tab-auditions') as HTMLInputElement;
@@ -44,6 +46,8 @@ export function initializeSettingsView(
     if (groupingSelect) groupingSelect.value = settings.scriptExportGrouping;
     if (gearInput) gearInput.value = settings.recordingGear;
     if (fontSelect) fontSelect.value = settings.systemFont || 'default';
+    if (timerWarningInput) timerWarningInput.value = (settings.timerWarningTime || 300).toString();
+    if (timerStopInput) timerStopInput.value = (settings.timerStopTime || 600).toString();
     
     const checkFontWarning = () => {
         if (fontSelect && fontWarning) {
@@ -101,7 +105,9 @@ export function initializeSettingsView(
                 tabWarmups: visTabWarmups?.checked ?? true,
                 tabVoiceMemos: visTabVoiceMemos?.checked ?? true
             },
-            systemFont: fontSelect?.value || 'default'
+            systemFont: fontSelect?.value || 'default',
+            timerWarningTime: parseInt(timerWarningInput?.value || '300', 10),
+            timerStopTime: parseInt(timerStopInput?.value || '600', 10)
         };
         
         if (newSettings.systemFont && newSettings.systemFont !== 'default') {
@@ -125,6 +131,8 @@ export function initializeSettingsView(
     visViewDungeonMaster?.addEventListener('change', triggerSave);
     visViewUtility?.addEventListener('change', triggerSave);
     visShowRecordTimer?.addEventListener('change', triggerSave);
+    timerWarningInput?.addEventListener('input', triggerSave);
+    timerStopInput?.addEventListener('input', triggerSave);
     visTabLineReader?.addEventListener('change', triggerSave);
     visTabTeleprompter?.addEventListener('change', triggerSave);
     visTabAuditions?.addEventListener('change', triggerSave);
