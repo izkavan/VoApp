@@ -1,4 +1,4 @@
-import { Character, Project, Audition, ReceivedAudition, SystemSettings, Warmup } from '../types.js';
+import { Character, Project, Audition, ReceivedAudition, SystemSettings, Warmup, UserProfile } from '../types.js';
 import { loadFromLocalStorage, saveToLocalStorage, defaultSettings } from './storage.js';
 import { EventBus } from './EventBus.js';
 
@@ -9,6 +9,7 @@ class AppDataStore {
     private receivedAuditions: ReceivedAudition[] = [];
     private settings: SystemSettings = defaultSettings;
     private warmups: Warmup[] = [];
+    private userProfile: UserProfile | null = null;
 
     /**
      * Load initial state from storage and broadcast it to the application.
@@ -21,6 +22,7 @@ class AppDataStore {
         this.receivedAuditions = data.receivedAuditions;
         this.settings = data.settings;
         this.warmups = data.warmups;
+        this.userProfile = data.userProfile;
         
         EventBus.emit('storeInitialized', this.getState());
     }
@@ -35,7 +37,8 @@ class AppDataStore {
             this.auditions,
             this.receivedAuditions,
             this.settings,
-            this.warmups
+            this.warmups,
+            this.userProfile
         );
         EventBus.emit('storeUpdated', this.getState());
     }
@@ -50,7 +53,8 @@ class AppDataStore {
             auditions: [...this.auditions],
             receivedAuditions: [...this.receivedAuditions],
             settings: { ...this.settings },
-            warmups: [...this.warmups]
+            warmups: [...this.warmups],
+            userProfile: this.userProfile ? { ...this.userProfile } : null
         };
     }
 
@@ -60,6 +64,21 @@ class AppDataStore {
         this.characters.push(char);
         this.save();
     }
+    updateWarmup(id: number, warmup: Partial<Warmup>) {
+        const index = this.warmups.findIndex(w => w.id === id);
+        if (index > -1) {
+            this.warmups[index] = { ...this.warmups[index], ...warmup };
+            this.save();
+        }
+    }
+
+    // --- User Profile ---
+    getUserProfile(): UserProfile | null { return this.userProfile; }
+    setUserProfile(profile: UserProfile) {
+        this.userProfile = profile;
+        this.save();
+    }
+
     updateCharacter(char: Character) {
         const index = this.characters.findIndex(c => c.id === char.id);
         if (index > -1) {

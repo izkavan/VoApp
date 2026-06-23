@@ -168,6 +168,7 @@ function addOrUpdateAudition(data: any) {
         existing.audioData = data.audioData || existing.audioData;
         existing.rating = data.rating !== undefined ? data.rating : existing.rating;
         existing.comments = data.comments !== undefined ? data.comments : existing.comments;
+        existing.actorProfile = data.actorProfile || existing.actorProfile;
     } else {
         const newAudition: ReceivedAudition = {
             id: data.id || Date.now() + Math.floor(Math.random() * 1000),
@@ -184,7 +185,8 @@ function addOrUpdateAudition(data: any) {
             fileName: data.fileName || '',
             audioData: data.audioData || '',
             rating: data.rating || 0,
-            comments: data.comments || ''
+            comments: data.comments || '',
+            actorProfile: data.actorProfile
         };
         receivedAuditions.push(newAudition);
     }

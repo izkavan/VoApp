@@ -57,6 +57,28 @@ export interface CastingDirector {
 
 export type AuditionStatus = 'Submitted' | 'Callback' | 'Booked' | 'Rejected' | 'Ghosted';
 
+export interface UserProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address: string;
+    yearsOfExperience: string;
+    preferredJobTypes: string[];
+    headshotId?: string; // IndexedDB ID
+    demoReelId?: string; // IndexedDB ID
+    demoReelFilename?: string; // For downloading
+    socialLinks: {
+        twitter: string;
+        mastodon: string;
+        bluesky: string;
+        linkedin: string;
+        personalSite: string;
+        custom: { name: string; url: string }[];
+    };
+    roleHistory: number[]; // Array of Character IDs
+}
+
 export interface Audition {
     id: number;
     projectName: string;
@@ -88,6 +110,7 @@ export interface ReceivedAudition {
     audioData: string; // Base64 data URL
     rating?: number;
     comments?: string;
+    actorProfile?: Omit<UserProfile, 'roleHistory'>;
 }
 
 export interface VoiceMemo {

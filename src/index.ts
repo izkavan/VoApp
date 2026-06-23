@@ -11,6 +11,7 @@ import { initializeProjectModal, openProjectModal, closeProjectModal, saveProjec
 import { initializeFilterSearch, filterCharacters, updateFilterData } from './components/filter-search.js';
 import { initializeTheme } from './core/theme.js';
 import { initializeNavigation, applyFeatureVisibility } from './core/navigation.js';
+import { initializeMeView, loadMeViewData } from './views/me-view.js';
 import { initializeVoiceActorView } from './views/voice-actor-view.js';
 import { initializeLineReader } from './views/line-reader.js';
 import { initializeUtilityView } from './views/utility-view.js';
@@ -30,6 +31,7 @@ import { initializeVPAuditionsView } from './views/voice-production/vp-auditions
 import { initializeTableReadView, setTableReadData } from './views/voice-production/vp-table-read.js';
 import { initializeAudioOverlay } from './views/utilities/audio-overlay.js';
 import { initializeRecordTimer } from './components/record-timer.js';
+import { initializeCraftDemoReel } from './views/craft-demo-reel.js';
 
 // --- Main Page Elements ---
 const characterListElement = document.getElementById('character-list');
@@ -71,6 +73,7 @@ export function renderApp() {
     refreshDungeonMasterView();
     refreshScriptView(projects, characters);
     refreshSidesView(characters);
+    loadMeViewData();
 }
 
 // Subscribe to store updates to keep the UI fresh
@@ -176,8 +179,14 @@ async function initApp() {
 
     initializeTheme();
     initializeNavigation();
-    initializeAudioOverlay();
+    initializeMeView();
     applyFeatureVisibility(currentSettings);
+    initializeTableReadView(openModal);
+    initializeAudioOverlay();
+    initializeRecordTimer(currentSettings);
+    initializeCraftDemoReel();
+
+    // Data Load
     initializeVoiceActorView();
     initializeVoiceProductionFeedback();
     initializeLineReader(characters, projects, currentSettings, openModal);

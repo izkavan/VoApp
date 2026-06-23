@@ -1,5 +1,6 @@
 import { Audition, Character, AuditionStatus, AuditionFile, SystemSettings } from '../types.js';
 import JSZip from 'jszip';
+import { DataStore } from '../services/DataStore.js';
 
 let auditions: Audition[] = [];
 let characters: Character[] = [];
@@ -24,7 +25,6 @@ export function initializeAuditionView(
     saveSettingsCallback = onSettingsSave;
 
     document.getElementById('new-audition-button')?.addEventListener('click', () => openAuditionModal());
-    document.getElementById('about-me-button')?.addEventListener('click', openAboutMeModal);
 
     const collapsible = document.querySelector('.collapsible-header');
     collapsible?.addEventListener('click', () => {
@@ -352,47 +352,12 @@ function openAuditionModal(audition?: Audition) {
     modal.classList.remove('hidden');
 }
 
-function openAboutMeModal() {
-    const modal = document.getElementById('about-me-modal');
-    if (!modal) return;
 
-    const fName = document.getElementById('about-me-first-name') as HTMLInputElement;
-    const lName = document.getElementById('about-me-last-name') as HTMLInputElement;
-    const email = document.getElementById('about-me-email') as HTMLInputElement;
-    const phone = document.getElementById('about-me-phone') as HTMLInputElement;
-    const address = document.getElementById('about-me-address') as HTMLInputElement;
-
-    if (systemSettings.actorProfile) {
-        fName.value = systemSettings.actorProfile.firstName;
-        lName.value = systemSettings.actorProfile.lastName;
-        email.value = systemSettings.actorProfile.email;
-        phone.value = systemSettings.actorProfile.phone;
-        address.value = systemSettings.actorProfile.address;
-    }
-
-    const closeBtn = document.getElementById('about-me-modal-close');
-    const saveBtn = document.getElementById('about-me-save-btn');
-
-    closeBtn!.onclick = () => modal.style.display = 'none';
-    
-    saveBtn!.onclick = () => {
-        systemSettings.actorProfile = {
-            firstName: fName.value,
-            lastName: lName.value,
-            email: email.value,
-            phone: phone.value,
-            address: address.value
-        };
-        saveSettingsCallback(systemSettings);
-        modal.style.display = 'none';
-    };
-
-    modal.style.display = 'flex';
-}
 
 function openExportModal(aud: Audition) {
-    if (!systemSettings.actorProfile || !systemSettings.actorProfile.firstName) {
-        alert("Please fill out your 'About Me' profile first so casting directors know who you are!");
+    const userProfile = DataStore.getUserProfile();
+    if (!userProfile || !userProfile.firstName) {
+        alert("Please fill out your 'Me' profile first so casting directors know who you are!");
         return;
     }
     if (!aud.audioData) {
@@ -438,30 +403,34 @@ function openExportModal(aud: Audition) {
 
 async function exportAuditionZip(aud: Audition) {
     try {
-        const profile = systemSettings.actorProfile!;
+        const fullProfile = DataStore.getUserProfile()!;
+        // Omit roleHistory
+        const { roleHistory, ...actorProfile } = fullProfile;
+        
         const charName = aud.linkedCharacterIds.length > 0 
             ? characters.find(c => c.id === aud.linkedCharacterIds[0])?.name || 'Unknown_Character' 
             : 'Unknown_Character';
         
         const zip = new JSZip();
-        const folderName = `${profile.firstName} ${profile.lastName}`.trim() || 'Voice_Actor';
+        const folderName = `${actorProfile.firstName} ${actorProfile.lastName}`.trim() || 'Voice_Actor';
         const folder = zip.folder(folderName);
         
         if (!folder) return;
 
         const auditionData = {
-            actorFirstName: profile.firstName,
-            actorLastName: profile.lastName,
-            actorEmail: profile.email,
+            actorFirstName: actorProfile.firstName,
+            actorLastName: actorProfile.lastName,
+            actorEmail: actorProfile.email,
             actorRate: aud.actorRate || '',
-            actorPhone: profile.phone,
-            actorAddress: profile.address,
+            actorPhone: actorProfile.phone,
+            actorAddress: actorProfile.address,
             actorAvailability: aud.actorAvailability || '',
             character: charName,
             project: aud.projectName || '',
             dateSubmitted: new Date().toISOString().split('T')[0],
             fileName: aud.audioFileName || 'audition.wav',
-            audioData: aud.audioData || ''
+            audioData: aud.audioData || '',
+            actorProfile: actorProfile // Attach full actor profile data for VP side
         };
 
         folder.file("Audition.json", JSON.stringify(auditionData, null, 2));

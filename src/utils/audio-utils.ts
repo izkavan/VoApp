@@ -16,7 +16,7 @@ export async function convertWebMToWav(webmBlobOrBase64: Blob | string): Promise
     return audioBufferToWav(audioBuffer);
 }
 
-function audioBufferToWav(buffer: AudioBuffer): Blob {
+export function audioBufferToWav(buffer: AudioBuffer): Blob {
     const numOfChan = buffer.numberOfChannels,
         length = buffer.length * numOfChan * 2 + 44,
         bufferArr = new ArrayBuffer(length),

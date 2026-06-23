@@ -41,8 +41,12 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 ### Audition Tracker
 * **Log Submissions**: Keep track of audition details including project name, casting director, due date, script sides, and status (e.g., Submitted, Callback, Booked, Rejected). 
 * **Character Linking**: Link characters from your library to the auditions you used them for.
-* **Profile & Live Recording**: Save your global "About Me" profile so your contact info is always ready. Record your audition directly in the app using your microphone, or upload an existing file.
 * **Export for Casting**: Easily export your audition as a standardized ZIP file containing your audio and a metadata JSON (including your rates and availability) that drops perfectly into the Voice Production Blind Review system.
+
+### Voice Actor Profile ("Me" Section) & Demo Reel Studio
+* **Comprehensive Profile**: Build a master profile containing your contact info, preferred job types, role history, headshot, and custom social links. This profile natively integrates with your Audition exports so Casting Directors automatically receive your details alongside your audio.
+* **Craft Demo Reel Studio**: A built-in lightweight audio workstation to assemble your professional demo reel. Upload multiple audio clips, rearrange them via drag-and-drop, and visually trim each clip using interactive waveform handles. Set custom silence gaps between clips and render a single polished `.wav` or `.webm` file directly in the browser!
+* **Live Recording Integration**: Record your audition takes directly in the app using your microphone, or upload existing files.
 
 ### Dungeon Master (Live Session) View
 * **Game Day Dashboard**: A simplified view tailored for running a game. Select a project to instantly access its assigned characters, voice samples, and notes without searching the full library.
@@ -141,7 +145,6 @@ Here are some of the features that I thought up for the app that could be coming
 * Could look into lightweight VSTs, like radio/telephone, some compression, for exports.
 * An overlay widget that shows pitch? Could be good for characters who sing, or who thematically need to sit in a specific range of tone. Could also be useful for replication purposes if you say "sits at a C5".
 * IPA Keyboard overlay/underlay with the dictionary-- I know this is over in VA section rather than the Character/project system, but I've met very few people who know of, understand, or care about the IPA symbols that aren't knee deep in linguistics of D'ni, or voice actors. Tishmah shorah!
-* The "timer" in the bottom left corner of the screen should change color at a user defined number-- 3 hours of recording yellow, 5 hours red, etc. so they don't strain themself.
 
 ### Changes for Story Tellers
 * **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 

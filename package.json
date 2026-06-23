@@ -8,7 +8,9 @@
     "build": "rm -rf dist && tsc && cp src/index.html dist/ && cp src/styles.css dist/ && cp -r src/images dist/",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage && make-coverage-badge"
+    "test:coverage": "vitest run --coverage && make-coverage-badge",
+    "tauri:build:mac-universal": "tauri build --target universal-apple-darwin",
+    "tauri:build:mac-intel": "tauri build --target x86_64-apple-darwin"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.11.1",
