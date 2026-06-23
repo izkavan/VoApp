@@ -5,6 +5,7 @@ import { convertWebMToWav } from '../../utils/audio-utils.js';
 import { AudioService } from '../../services/AudioService.js';
 import { ZipService } from '../../services/ZipService.js';
 import { html, HtmlSanitizer } from '../../services/HtmlSanitizer.js';
+import { openEditAudioModal } from '../edit-audio-modal.js';
 
 export function initializeVoiceMemos() {
     const newMemoBtn = document.getElementById('new-voice-memo-button');
@@ -309,6 +310,12 @@ export function initializeVoiceMemos() {
             audio.src = audioUrl;
             audio.style.flex = '1';
             
+            const editBtn = document.createElement('span');
+            editBtn.textContent = '✏️';
+            editBtn.title = 'Edit Audio';
+            editBtn.style.cursor = 'pointer';
+            editBtn.style.fontSize = '1.2rem';
+            
             const downloadBtn = document.createElement('span');
             downloadBtn.textContent = '💾';
             downloadBtn.title = 'Download Memo';
@@ -316,17 +323,26 @@ export function initializeVoiceMemos() {
             downloadBtn.style.fontSize = '1.2rem';
             
             audioContainer.appendChild(audio);
+            audioContainer.appendChild(editBtn);
             audioContainer.appendChild(downloadBtn);
 
             // Click interactions
             div.addEventListener('click', (e) => {
-                if (e.target !== checkbox && e.target !== audio) {
+                if (e.target !== checkbox && e.target !== audio && e.target !== downloadBtn && e.target !== editBtn) {
                     checkbox.checked = !checkbox.checked;
                 }
             });
 
             audioContainer.addEventListener('click', (e) => {
                 e.stopPropagation(); 
+            });
+
+            editBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                openEditAudioModal(memo.blob, async (newBlob: Blob) => {
+                    await updateVoiceMemo({ ...memo, blob: newBlob });
+                    renderList();
+                });
             });
 
             downloadBtn.addEventListener('click', async (e) => {

@@ -1,9 +1,10 @@
 import JSZip from 'jszip';
 import { convertWebMToWav } from '../utils/audio-utils.js';
-import { Project, DictionaryEntry, SystemSettings } from '../types.js';
+import { Project, DictionaryEntry } from '../types.js';
 import { getDictionaryEntries, saveAudioBlob, getAudioBlob, deleteAudioBlob } from '../services/indexeddb.js';
 import { highlightDictionaryWords } from './dictionary-highlighter.js';
 import { loadFromLocalStorage } from '../services/storage.js';
+import { openEditAudioModal } from '../views/edit-audio-modal.js';
 
 interface TakeDetail {
     audioId: string;
@@ -65,6 +66,7 @@ export function initializeTeleprompter(projects: Project[]) {
     let sessionFiles: TeleprompterFile[] = [];
     let activeFileId: string | null = null;
     let currentDictionary: DictionaryEntry[] = [];
+    let audioUrls = new Map<string, string>();
 
     // --- TOC Logic ---
     tocToggle.addEventListener('click', () => {
@@ -245,45 +247,69 @@ export function initializeTeleprompter(projects: Project[]) {
             return;
         }
 
-        const takesHtml = await Promise.all(activeFile.takes.map(async (take, index) => {
-            let audioUrl = '';
-            if (take.audioId) {
+        await Promise.all(activeFile.takes.map(async (take) => {
+            if (take.audioId && !audioUrls.has(take.audioId)) {
                 const blob = await getAudioBlob(take.audioId);
-                if (blob) {
-                    audioUrl = URL.createObjectURL(blob);
-                }
+                if (blob) audioUrls.set(take.audioId, URL.createObjectURL(blob));
             }
-            return `
-                <li class="take-item" data-index="${index}">
-                    <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
-                    <div class="take-audio-controls">
-                        <audio controls src="${audioUrl}"></audio>
-                        <span class="delete-take">🗑️</span>
-                    </div>
-                    <div class="take-metadata">
-                        <div class="star-rating">
-                            ${[1, 2, 3, 4, 5].map(star => `<span class="star ${star <= take.rating ? 'active' : ''}" data-value="${star}">★</span>`).join('')}
-                        </div>
-                        <input type="text" class="take-note-input" placeholder="Take notes..." value="${take.notes.replace(/"/g, '&quot;')}" />
-                    </div>
-                </li>
-            `;
         }));
 
-        takesList.innerHTML = takesHtml.join('');
+        takesList.innerHTML = activeFile.takes.map((take, index) => `
+            <li class="take-item tp-take-item" data-index="${index}">
+                <input type="text" class="take-title-input tp-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
+                <div class="tp-take-controls">
+                    <audio controls controlsList="nodownload" src="${audioUrls.get(take.audioId) || ''}"></audio>
+                    <span class="tp-edit-take" title="Edit Take Audio" style="cursor: pointer; font-size: 1.2rem;">✏️</span>
+                    <span class="tp-download-take" title="Download Take" style="cursor: pointer; font-size: 1.2rem;">💾</span>
+                    <span class="tp-delete-take" title="Delete Take" style="cursor: pointer; font-size: 1.2rem;">🗑️</span>
+                </div>
+                <div class="take-metadata">
+                    <div class="star-rating">
+                        ${[1, 2, 3, 4, 5].map(star => `<span class="star ${star <= take.rating ? 'active' : ''}" data-value="${star}">★</span>`).join('')}
+                    </div>
+                    <input type="text" class="take-note-input" placeholder="Take notes..." value="${take.notes.replace(/"/g, '&quot;')}" />
+                </div>
+            </li>
+        `).join('');
 
-        document.querySelectorAll('#teleprompt-takes-list .delete-take').forEach(btn => btn.addEventListener('click', async (e) => {
-            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+        takesList.querySelectorAll('.tp-delete-take').forEach(btn => btn.addEventListener('click', async (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.tp-take-item')?.getAttribute('data-index'));
             const take = activeFile.takes[index];
             if (take.audioId) await deleteAudioBlob(take.audioId);
             activeFile.takes.splice(index, 1);
             renderTakes();
         }));
-        document.querySelectorAll('#teleprompt-takes-list .take-title-input').forEach(input => input.addEventListener('input', (e) => {
+
+        takesList.querySelectorAll('.tp-edit-take').forEach(btn => btn.addEventListener('click', async (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.tp-take-item')?.getAttribute('data-index'));
+            const take = activeFile!.takes[index];
+            if (!take.audioId) return;
+
+            const blob = await getAudioBlob(take.audioId);
+            if (!blob) return;
+
+            openEditAudioModal(blob, async (newBlob: Blob) => {
+                const oldAudioId = take.audioId;
+                const newAudioId = await saveAudioBlob(newBlob);
+                take.audioId = newAudioId;
+                if (oldAudioId) {
+                    await deleteAudioBlob(oldAudioId).catch(err => console.warn(err));
+                }
+                
+                const audioPlayer = (e.currentTarget as HTMLElement).parentElement?.querySelector('audio');
+                if (audioPlayer) {
+                    const newUrl = URL.createObjectURL(newBlob);
+                    audioUrls.set(newAudioId, newUrl);
+                    audioPlayer.src = newUrl;
+                }
+            });
+        }));
+
+        takesList.querySelectorAll('.tp-title-input').forEach(input => input.addEventListener('input', (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             activeFile.takes[index].title = (e.target as HTMLInputElement).value;
         }));
-        document.querySelectorAll('#teleprompt-takes-list .take-note-input').forEach(input => input.addEventListener('input', (e) => {
+        takesList.querySelectorAll('.take-note-input').forEach(input => input.addEventListener('input', (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             activeFile.takes[index].notes = (e.target as HTMLInputElement).value;
         }));

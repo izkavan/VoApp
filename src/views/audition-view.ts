@@ -1,6 +1,7 @@
 import { Audition, Character, AuditionStatus, AuditionFile, SystemSettings } from '../types.js';
 import JSZip from 'jszip';
 import { DataStore } from '../services/DataStore.js';
+import { openEditAudioModal } from './edit-audio-modal.js';
 
 let auditions: Audition[] = [];
 let characters: Character[] = [];
@@ -148,6 +149,7 @@ function openAuditionModal(audition?: Audition) {
                 <button id="audition-audio-record-btn" class="record-button" style="margin: 0; padding: 5px 10px; font-size: 1.2em; flex-shrink: 0;">●</button>
                 <span id="audition-audio-status" style="font-size: 0.9em; color: var(--gray-600); flex-shrink: 0;">${aud.audioFileName || 'No audio loaded'}</span>
                 <audio id="audition-audio-player" controls style="display: ${aud.audioData ? 'block' : 'none'}; height: 30px; flex-shrink: 0;" src="${aud.audioData || ''}"></audio>
+                <button id="audition-audio-edit-btn" class="secondary" style="display: ${aud.audioData ? 'block' : 'none'}; margin: 0; flex-shrink: 0;">✏️</button>
                 <button id="audition-audio-download-btn" class="secondary" style="display: ${aud.audioData ? 'block' : 'none'}; margin: 0; flex-shrink: 0;">💾</button>
                 <button id="audition-audio-remove-btn" class="danger-btn" style="display: ${aud.audioData ? 'block' : 'none'}; margin: 0; flex-shrink: 0;">Remove</button>
             </div>
@@ -164,6 +166,28 @@ function openAuditionModal(audition?: Audition) {
             <button id="save-audition-button">Save</button>
         </div>
     `;
+
+    function updateAudioUI() {
+        const hasAudio = !!aud.audioData;
+        const player = document.getElementById('audition-audio-player') as HTMLAudioElement;
+        const uploadBtn = document.getElementById('audition-audio-upload-btn') as HTMLButtonElement;
+        const recordBtn = document.getElementById('audition-audio-record-btn') as HTMLButtonElement;
+        const status = document.getElementById('audition-audio-status') as HTMLSpanElement;
+        const downloadBtn = document.getElementById('audition-audio-download-btn') as HTMLButtonElement;
+        const editBtn = document.getElementById('audition-audio-edit-btn') as HTMLButtonElement;
+        const removeBtn = document.getElementById('audition-audio-remove-btn') as HTMLButtonElement;
+
+        if (player) {
+            player.style.display = hasAudio ? 'block' : 'none';
+            player.src = aud.audioData || '';
+        }
+        if (downloadBtn) downloadBtn.style.display = hasAudio ? 'block' : 'none';
+        if (editBtn) editBtn.style.display = hasAudio ? 'block' : 'none';
+        if (removeBtn) removeBtn.style.display = hasAudio ? 'block' : 'none';
+        
+        // Don't hide upload/record, let them replace
+        if (status) status.textContent = aud.audioFileName || 'No audio loaded';
+    }
 
     const charSelect = content.querySelector('#aud-character-select') as HTMLSelectElement;
     charSelect.addEventListener('change', () => {
@@ -187,8 +211,6 @@ function openAuditionModal(audition?: Audition) {
 
     // --- Event Listeners ---
     document.getElementById('audition-modal-close')?.addEventListener('click', () => modal.classList.add('hidden'));
-
-
 
     content.addEventListener('click', (e) => {
         const target = e.target as HTMLButtonElement;
@@ -254,13 +276,10 @@ function openAuditionModal(audition?: Audition) {
     const audioUploadBtn = content.querySelector('#audition-audio-upload-btn') as HTMLButtonElement;
     const audioRecordBtn = content.querySelector('#audition-audio-record-btn') as HTMLButtonElement;
     const audioStatus = content.querySelector('#audition-audio-status') as HTMLSpanElement;
-    const audioPlayer = content.querySelector('#audition-audio-player') as HTMLAudioElement;
-    const audioRemoveBtn = content.querySelector('#audition-audio-remove-btn') as HTMLButtonElement;
-    const audioDownloadBtn = content.querySelector('#audition-audio-download-btn') as HTMLButtonElement;
 
     if (audioRecordBtn) audioRecordBtn.disabled = !charSelect.value;
 
-    audioDownloadBtn?.addEventListener('click', () => {
+    document.getElementById('audition-audio-download-btn')?.addEventListener('click', () => {
         if (!aud.audioData || !aud.audioFileName) return;
         const a = document.createElement('a');
         a.href = aud.audioData;
@@ -277,25 +296,33 @@ function openAuditionModal(audition?: Audition) {
             reader.onload = (e) => {
                 aud.audioData = e.target?.result as string;
                 aud.audioFileName = file.name;
-                audioStatus.textContent = aud.audioFileName;
-                audioPlayer.src = aud.audioData;
-                audioPlayer.style.display = 'block';
-                audioRemoveBtn.style.display = 'block';
-                audioDownloadBtn.style.display = 'block';
+                updateAudioUI();
             };
             reader.readAsDataURL(file);
         }
     });
 
-    audioRemoveBtn?.addEventListener('click', () => {
+    document.getElementById('audition-audio-remove-btn')?.addEventListener('click', () => {
         aud.audioData = undefined;
         aud.audioFileName = undefined;
-        audioStatus.textContent = 'No audio loaded';
-        audioPlayer.src = '';
-        audioPlayer.style.display = 'none';
-        audioRemoveBtn.style.display = 'none';
-        audioDownloadBtn.style.display = 'none';
-        audioUpload.value = '';
+        updateAudioUI();
+    });
+
+    document.getElementById('audition-audio-edit-btn')?.addEventListener('click', async () => {
+        if (!aud.audioData) return;
+        
+        // Convert data URL to Blob
+        const res = await fetch(aud.audioData);
+        const blob = await res.blob();
+        
+        openEditAudioModal(blob, (newBlob: Blob) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                aud.audioData = e.target?.result as string;
+                updateAudioUI();
+            };
+            reader.readAsDataURL(newBlob);
+        });
     });
 
     // Basic MediaRecorder logic
@@ -327,11 +354,7 @@ function openAuditionModal(audition?: Audition) {
                         
                         aud.audioData = e.target?.result as string;
                         aud.audioFileName = `${audTitle}_${actorName}_${dateStr}_${timeStr}.webm`.replace(/[^a-zA-Z0-9_.\-]/g, '_');
-                        audioStatus.textContent = aud.audioFileName;
-                        audioPlayer.src = aud.audioData;
-                        audioPlayer.style.display = 'block';
-                        audioRemoveBtn.style.display = 'block';
-                        audioDownloadBtn.style.display = 'block';
+                        updateAudioUI();
                     };
                     reader.readAsDataURL(blob);
                     

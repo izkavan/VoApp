@@ -2,6 +2,7 @@ import { Effect, Character, Project, SystemSettings } from '../types.js';
 import { getEffects, saveEffect, updateEffect, deleteEffect } from '../services/indexeddb.js';
 import JSZip from 'jszip';
 import { convertWebMToWav } from '../utils/audio-utils.js';
+import { openEditAudioModal } from './edit-audio-modal.js';
 
 let currentEffects: Effect[] = [];
 let currentCharacters: Character[] = [];
@@ -250,6 +251,7 @@ function setupModalEvents() {
     const addProjBtn = document.getElementById('effect-modal-add-project');
     const groupSelect = document.getElementById('effect-modal-group-select') as HTMLSelectElement;
     const newGroupInput = document.getElementById('effect-modal-new-group-input') as HTMLInputElement;
+    const editAudioBtn = document.getElementById('effect-audio-edit-btn');
 
     closeBtn?.addEventListener('click', closeEffectModal);
     
@@ -263,6 +265,18 @@ function setupModalEvents() {
     deleteBtn?.addEventListener('click', deleteCurrentEffect);
     addCharBtn?.addEventListener('click', attachCharacterToEffect);
     addProjBtn?.addEventListener('click', attachProjectToEffect);
+
+    editAudioBtn?.addEventListener('click', () => {
+        if (currentRecordingBlob) {
+            openEditAudioModal(currentRecordingBlob, (newBlob) => {
+                currentRecordingBlob = newBlob;
+                const previewDiv = document.getElementById('effect-audio-preview');
+                if (previewDiv) {
+                    previewDiv.innerHTML = `<audio controls src="${URL.createObjectURL(newBlob)}" style="width: 100%;"></audio>`;
+                }
+            });
+        }
+    });
 
     groupSelect.addEventListener('change', () => {
         if (groupSelect.value === '_add_new_') {
@@ -329,6 +343,7 @@ function openEffectModal(effect: Effect | null) {
     const groupSelect = document.getElementById('effect-modal-group-select') as HTMLSelectElement;
     const newGroupInput = document.getElementById('effect-modal-new-group-input') as HTMLInputElement;
     const previewDiv = document.getElementById('effect-audio-preview') as HTMLElement;
+    const editBtn = document.getElementById('effect-audio-edit-btn') as HTMLButtonElement;
 
     newGroupInput.classList.add('hidden');
     newGroupInput.value = '';
@@ -352,8 +367,10 @@ function openEffectModal(effect: Effect | null) {
         if (effect.blob) {
             const url = URL.createObjectURL(effect.blob);
             previewDiv.innerHTML = `<audio controls src="${url}" style="width: 100%;"></audio>`;
+            editBtn.style.display = 'block';
         } else {
             previewDiv.innerHTML = '';
+            editBtn.style.display = 'none';
         }
 
         renderAttachedLists(effect.characterIds, effect.projectIds);
@@ -370,6 +387,7 @@ function openEffectModal(effect: Effect | null) {
             newGroupInput.classList.remove('hidden');
         }
         previewDiv.innerHTML = '';
+        editBtn.style.display = 'none';
         renderAttachedLists([], []);
     }
 }
@@ -654,11 +672,8 @@ function setupAudioRecorder() {
                     const blob = new Blob(audioChunks, { type: 'audio/webm' });
                     currentRecordingBlob = blob;
 
-                    const modalAudio = document.getElementById('effect-modal-audio') as HTMLAudioElement;
-                    if (modalAudio) {
-                        modalAudio.src = URL.createObjectURL(blob);
-                        modalAudio.style.display = 'block';
-                    }
+                    const editBtn = document.getElementById('effect-audio-edit-btn');
+                    if (editBtn) editBtn.style.display = 'block';
                     
                     const previewDiv = document.getElementById('effect-audio-preview');
                     if (previewDiv) {

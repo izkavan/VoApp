@@ -2,6 +2,8 @@ import { AudioClip, exportDemoReel } from '../utils/audio-processor.js';
 import { TrimmableWaveform } from '../components/trimmable-waveform.js';
 import { DataStore } from '../services/DataStore.js';
 import { loadMeViewData } from './me-view.js';
+import { openEditAudioModal } from './edit-audio-modal.js';
+import { audioBufferToWav } from '../utils/audio-utils.js';
 
 interface UIAudioClip extends AudioClip {
     name: string;
@@ -90,6 +92,7 @@ function renderClipList() {
         <div class="craft-clip-item ${clip.id === selectedClipId ? 'selected' : ''}" data-id="${clip.id}" draggable="true" style="padding: 10px; border: 1px solid var(--border-color); margin-bottom: 5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: ${clip.id === selectedClipId ? 'var(--primary-color)' : 'var(--surface-color)'}; color: ${clip.id === selectedClipId ? 'white' : 'inherit'}; border-radius: 4px;">
             <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${clip.name}</span>
             <div style="display: flex; gap: 5px;">
+                <button class="craft-clip-edit secondary-btn" data-id="${clip.id}" style="padding: 2px 6px;">✏️</button>
                 <button class="craft-clip-up secondary-btn" data-index="${i}" ${i === 0 ? 'disabled' : ''} style="padding: 2px 6px;">↑</button>
                 <button class="craft-clip-down secondary-btn" data-index="${i}" ${i === clips.length - 1 ? 'disabled' : ''} style="padding: 2px 6px;">↓</button>
                 <button class="craft-clip-delete danger-btn" data-id="${clip.id}" style="padding: 2px 6px;">X</button>
@@ -160,6 +163,32 @@ function renderClipList() {
                 }
             }
             renderClipList();
+        });
+    });
+
+    container.querySelectorAll('.craft-clip-edit').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = (e.currentTarget as HTMLElement).dataset.id!;
+            const clip = clips.find(c => c.id === id);
+            if (!clip) return;
+            
+            // Convert audio buffer to blob
+            const wavData = audioBufferToWav(clip.buffer);
+            const blob = new Blob([wavData], { type: 'audio/wav' });
+            
+            openEditAudioModal(blob, async (newBlob: Blob) => {
+                const arrayBuffer = await newBlob.arrayBuffer();
+                const newAudioContext = new window.AudioContext();
+                const newBuffer = await newAudioContext.decodeAudioData(arrayBuffer);
+                clip.buffer = newBuffer;
+                clip.startTime = 0;
+                clip.endTime = newBuffer.duration;
+                if (selectedClipId === id && waveform) {
+                    waveform.setBuffer(clip.buffer, clip.startTime, clip.endTime);
+                }
+                renderClipList();
+            });
         });
     });
 }

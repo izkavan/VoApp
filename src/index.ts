@@ -32,6 +32,7 @@ import { initializeTableReadView, setTableReadData } from './views/voice-product
 import { initializeAudioOverlay } from './views/utilities/audio-overlay.js';
 import { initializeRecordTimer } from './components/record-timer.js';
 import { initializeCraftDemoReel } from './views/craft-demo-reel.js';
+import { initializeEditAudioModal } from './views/edit-audio-modal.js';
 
 // --- Main Page Elements ---
 const characterListElement = document.getElementById('character-list');
@@ -185,6 +186,7 @@ async function initApp() {
     initializeAudioOverlay();
     initializeRecordTimer(currentSettings);
     initializeCraftDemoReel();
+    initializeEditAudioModal();
 
     // Data Load
     initializeVoiceActorView();

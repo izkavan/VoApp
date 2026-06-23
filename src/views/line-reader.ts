@@ -3,6 +3,7 @@ import { convertWebMToWav } from '../utils/audio-utils.js';
 import { saveAudioBlob, getAudioBlob, deleteAudioBlob, initDB, getDictionaryEntries } from '../services/indexeddb.js';
 import JSZip from 'jszip';
 import { highlightDictionaryWords } from '../components/dictionary-highlighter.js';
+import { openEditAudioModal } from './edit-audio-modal.js';
 
 // In-memory representation
 interface TakeDetail {
@@ -291,6 +292,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
                     <input type="text" class="take-title-input" placeholder="Take title..." value="${(take.title || '').replace(/"/g, '&quot;')}" />
                     <div class="take-audio-controls">
                         <audio controls controlsList="nodownload" src="${audioUrls.get(take.audioId) || ''}"></audio>
+                        <span class="edit-take" title="Edit Take Audio" style="cursor: pointer; font-size: 1.2rem;">✏️</span>
                         <span class="download-take" title="Download Take" style="cursor: pointer; font-size: 1.2rem;">💾</span>
                         <span class="delete-take" style="cursor: pointer; font-size: 1.2rem;">🗑️</span>
                     </div>
@@ -329,6 +331,32 @@ export function initializeLineReader(characters: Character[], projects: Project[
             details.takes.splice(index, 1);
             saveActiveSession();
             renderDetails(lineText);
+        }));
+        document.querySelectorAll('.edit-take').forEach(btn => btn.addEventListener('click', async (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
+            const take = details.takes[index];
+            if (!take.audioId) return;
+
+            const blob = await getAudioBlob(take.audioId);
+            if (!blob) return;
+
+            openEditAudioModal(blob, async (newBlob: Blob) => {
+                // Save new blob, update audioId, delete old blob
+                const oldAudioId = take.audioId;
+                const newAudioId = await saveAudioBlob(newBlob);
+                take.audioId = newAudioId;
+                if (oldAudioId) {
+                    await deleteAudioBlob(oldAudioId).catch(err => console.warn(err));
+                }
+                
+                // Update UI for this specific take
+                const audioPlayer = (e.currentTarget as HTMLElement).parentElement?.querySelector('audio');
+                if (audioPlayer) {
+                    const newUrl = URL.createObjectURL(newBlob);
+                    audioUrls.set(newAudioId, newUrl);
+                    audioPlayer.src = newUrl;
+                }
+            });
         }));
         document.querySelectorAll('.download-take').forEach(btn => btn.addEventListener('click', async (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
