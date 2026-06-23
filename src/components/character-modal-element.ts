@@ -4,6 +4,7 @@ import { AudioService } from '../services/AudioService.js';
 import { saveImageBlob } from '../services/indexeddb.js';
 import { DataStore } from '../services/DataStore.js';
 import { convertWebMToWav } from '../utils/audio-utils.js';
+import { openEditAudioModal } from '../views/edit-audio-modal.js';
 
 /**
  * Massive Web Component acting as the central Character edit and view modal.
@@ -156,8 +157,9 @@ export class CharacterModalElement extends HTMLElement {
             <p><strong>Voice Sample:</strong></p>
             <div id="wc-recording-status"></div>
             <button id="wc-record-button" class="text-record-button">● Record</button>
-            <div id="wc-character-audio-preview" style="display: none; margin-top: 10px; align-items: center; gap: 5px;">
-                <audio id="wc-character-audio-player" controls controlsList="nodownload" style="flex: 1; height: 30px;"></audio>
+            <div id="wc-character-audio-preview" style="display: ${char.voice_sample ? 'flex' : 'none'}; margin-top: 10px; align-items: center; gap: 5px;">
+                <audio id="wc-character-audio-player" controls controlsList="nodownload" style="flex: 1; height: 30px;" src="${char.voice_sample || ''}"></audio>
+                <span id="wc-character-edit-sample" style="cursor: pointer; font-size: 1.2rem;" title="Edit Sample">✏️</span>
                 <span id="wc-character-download-sample" style="cursor: pointer; font-size: 1.2rem;" title="Download Sample">💾</span>
             </div>
 
@@ -311,6 +313,61 @@ export class CharacterModalElement extends HTMLElement {
         });
 
         this.querySelector('#wc-record-button')?.addEventListener('click', () => this.recordAudio());
+        
+        const downloadBtn = this.querySelector('#wc-character-download-sample');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                const src = (this.querySelector('#wc-character-audio-player') as HTMLAudioElement)?.src;
+                if (!src) return;
+                try {
+                    const res = await fetch(src);
+                    const blob = await res.blob();
+                    const settings = DataStore.getSettings();
+                    const ext = settings.exportFormat || 'webm';
+                    let exportBlob = blob;
+                    if (ext === 'wav' && blob.type !== 'audio/wav') {
+                        exportBlob = await convertWebMToWav(blob);
+                    }
+                    const url = URL.createObjectURL(exportBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const nameInput = this.querySelector('#wc-edit-name') as HTMLInputElement;
+                    const charName = nameInput ? nameInput.value : 'character';
+                    a.download = `${charName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_sample.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (e) {
+                    console.error('Failed to download', e);
+                }
+            });
+        }
+
+        const editBtn = this.querySelector('#wc-character-edit-sample');
+        if (editBtn) {
+            editBtn.addEventListener('click', async () => {
+                const src = (this.querySelector('#wc-character-audio-player') as HTMLAudioElement)?.src;
+                if (!src) return;
+                try {
+                    const res = await fetch(src);
+                    const blob = await res.blob();
+                    openEditAudioModal(blob, (newBlob: Blob) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            this.recordedSample = reader.result as string;
+                            const player = this.querySelector('#wc-character-audio-player') as HTMLAudioElement;
+                            if (player) {
+                                player.src = this.recordedSample;
+                            }
+                        };
+                        reader.readAsDataURL(newBlob);
+                    });
+                } catch (e) {
+                    console.error('Failed to edit', e);
+                }
+            });
+        }
         
         this.renderTagsForEdit();
         this.renderMoodboardEditGrid();
@@ -470,28 +527,9 @@ export class CharacterModalElement extends HTMLElement {
             this.mediaRecorder.addEventListener("dataavailable", e => this.audioChunks.push(e.data));
             this.mediaRecorder.addEventListener("stop", () => {
                 const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                if (previewContainer && player && downloadBtn) {
+                if (previewContainer && player) {
                     previewContainer.style.display = 'flex';
                     player.src = URL.createObjectURL(blob);
-                    
-                    downloadBtn.addEventListener('click', async () => {
-                        const settings = DataStore.getSettings();
-                        const ext = settings.exportFormat || 'webm';
-                        let exportBlob = blob;
-                        if (ext === 'wav') {
-                            exportBlob = await convertWebMToWav(blob);
-                        }
-                        const url = URL.createObjectURL(exportBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        const nameInput = this.querySelector('#wc-edit-name') as HTMLInputElement;
-                        const charName = nameInput ? nameInput.value : 'character';
-                        a.download = `${charName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_sample.${ext}`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    });
                 }
                 const reader = new FileReader();
                 reader.onload = () => {
