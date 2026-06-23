@@ -470,8 +470,9 @@
         <div id="utility-view" class="view hidden">
             <div class="tab-container">
                 <div class="tab-nav">
-                    <button class="tab-link active" data-tab="warm-ups">Vocal Warm Ups</button>
+                    <button class="tab-link active" data-tab="warm-ups">Warmups</button>
                     <button class="tab-link" data-tab="voice-memos">Voice Memos</button>
+                    <button class="tab-link" data-tab="audio-overlay">Audio Overlay</button>
                 </div>
                 <div id="warm-ups" class="tab-content active">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -538,6 +539,55 @@
                     </div>
                     <div id="voice-memo-list" class="voice-memo-list">
                         <!-- Voice memos will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div id="audio-overlay" class="tab-content">
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+                        <div style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #00ffff;">Sound 1 (Cyan)</h3>
+                            <label for="ao-file1" class="custom-file-input" style="display: block; margin-bottom: 10px; text-align: center;">Upload File</label>
+                            <input type="file" id="ao-file1" accept="audio/*">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <label>Vol:</label>
+                                <input type="range" id="ao-vol1" min="0" max="1" step="0.01" value="1">
+                                <label><input type="checkbox" id="ao-mute1"> Mute</label>
+                            </div>
+                        </div>
+                        <div style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #ff00ff;">Sound 2 (Magenta)</h3>
+                            <label for="ao-file2" class="custom-file-input" style="display: block; margin-bottom: 10px; text-align: center;">Upload File</label>
+                            <input type="file" id="ao-file2" accept="audio/*">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <label>Vol:</label>
+                                <input type="range" id="ao-vol2" min="0" max="1" step="0.01" value="1">
+                                <label><input type="checkbox" id="ao-mute2"> Mute</label>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button id="ao-play-btn" style="background: var(--success-color); color: white; padding: 10px 20px; font-size: 1.2em;">Play</button>
+                            <button id="ao-clear-btn" class="secondary">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div style="position: relative; width: 100%; height: 150px; background: var(--gray-900); border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+                        <canvas id="ao-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                        <div id="ao-playhead" style="position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: white; z-index: 10; display: none;"></div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="width: 120px; color: #00ffff; font-weight: bold;">Tracking 1:</label>
+                            <input type="range" id="ao-track1" min="-10" max="10" step="0.01" value="0" style="flex: 1;">
+                            <input type="number" id="ao-track1-val" value="0.00" step="0.01" style="width: 80px; text-align: right; margin: 0; padding: 5px;">
+                            <span style="font-weight: bold; color: var(--gray-500);">s</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="width: 120px; color: #ff00ff; font-weight: bold;">Tracking 2:</label>
+                            <input type="range" id="ao-track2" min="-10" max="10" step="0.01" value="0" style="flex: 1;">
+                            <input type="number" id="ao-track2-val" value="0.00" step="0.01" style="width: 80px; text-align: right; margin: 0; padding: 5px;">
+                            <span style="font-weight: bold; color: var(--gray-500);">s</span>
+                        </div>
                     </div>
                 </div>
             </div>

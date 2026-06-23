@@ -28,6 +28,7 @@ import { initializeSidesView, refreshSidesView } from './views/voice-production/
 import { initializeContrasterView } from './views/voice-production/vp-contraster.js';
 import { initializeVPAuditionsView } from './views/voice-production/vp-auditions.js';
 import { initializeTableReadView, setTableReadData } from './views/voice-production/vp-table-read.js';
+import { initializeAudioOverlay } from './views/utilities/audio-overlay.js';
 import { initializeRecordTimer } from './components/record-timer.js';
 
 // --- Main Page Elements ---
@@ -175,6 +176,7 @@ async function initApp() {
 
     initializeTheme();
     initializeNavigation();
+    initializeAudioOverlay();
     applyFeatureVisibility(currentSettings);
     initializeVoiceActorView();
     initializeVoiceProductionFeedback();
