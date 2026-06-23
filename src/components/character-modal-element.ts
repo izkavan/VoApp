@@ -24,6 +24,8 @@ export class CharacterModalElement extends HTMLElement {
     private character: Character | null = null;
     private isEditMode = false;
     private currentMoodboardMedia: any[] = [];
+    private currentMoodboardType: 'custom' | 'pinterest' = 'custom';
+    private currentPinterestUrl: string = '';
     private recordedSample: string | undefined;
     private mediaRecorder: MediaRecorder | null = null;
     private audioChunks: Blob[] = [];
@@ -39,6 +41,8 @@ export class CharacterModalElement extends HTMLElement {
         this.character = character;
         this.isEditMode = isEditMode || !character;
         this.currentMoodboardMedia = character?.moodboardMedia ? [...character.moodboardMedia] : [];
+        this.currentMoodboardType = character?.moodboardType || 'custom';
+        this.currentPinterestUrl = character?.pinterestBoardUrl || '';
         this.currentTags = character?.tags ? [...character.tags] : [];
         this.recordedSample = undefined;
         this.render();
@@ -86,6 +90,13 @@ export class CharacterModalElement extends HTMLElement {
             this.bindEditEvents();
         } else {
             this.bindViewEvents();
+            if (this.currentMoodboardType === 'pinterest') {
+                setTimeout(() => {
+                    if ((window as any).PinUtils) {
+                        (window as any).PinUtils.build();
+                    }
+                }, 100);
+            }
         }
         this.bindCollapsibles();
     }
@@ -157,13 +168,27 @@ export class CharacterModalElement extends HTMLElement {
             <div class="collapsible-section" style="margin-top: 20px;">
                 <h3 class="collapsible-header">Mood Board (Edit)</h3>
                 <div class="collapsible-content" style="display: none;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <label for="wc-moodboard-upload" class="custom-file-input" style="cursor: pointer; padding: 5px 10px; background: var(--primary-color); color: white; border-radius: 4px;">Upload Images</label>
-                        <input type="file" id="wc-moodboard-upload" multiple accept="image/*" style="display: none;">
-                        <input type="text" id="wc-moodboard-link-input" placeholder="Paste YouTube link here..." style="flex: 1; padding: 5px;">
-                        <button id="wc-moodboard-link-btn" style="padding: 5px 10px;">Add Link</button>
+                    <div style="margin-bottom: 10px;">
+                        <label><strong>Moodboard Type:</strong></label>
+                        <select id="wc-moodboard-type-select" style="margin-left: 10px; padding: 5px;">
+                            <option value="custom" ${this.currentMoodboardType === 'custom' ? 'selected' : ''}>Custom Grid (Images/Videos)</option>
+                            <option value="pinterest" ${this.currentMoodboardType === 'pinterest' ? 'selected' : ''}>Pinterest Board</option>
+                        </select>
                     </div>
-                    <div id="wc-moodboard-edit-grid" class="moodboard-masonry"></div>
+
+                    <div id="wc-moodboard-custom-ui" style="display: ${this.currentMoodboardType === 'custom' ? 'block' : 'none'};">
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <label for="wc-moodboard-upload" class="custom-file-input" style="cursor: pointer; padding: 5px 10px; background: var(--primary-color); color: white; border-radius: 4px;">Upload Images</label>
+                            <input type="file" id="wc-moodboard-upload" multiple accept="image/*" style="display: none;">
+                            <input type="text" id="wc-moodboard-link-input" placeholder="Paste YouTube link here..." style="flex: 1; padding: 5px;">
+                            <button id="wc-moodboard-link-btn" style="padding: 5px 10px;">Add Link</button>
+                        </div>
+                        <div id="wc-moodboard-edit-grid" class="moodboard-masonry"></div>
+                    </div>
+
+                    <div id="wc-moodboard-pinterest-ui" style="display: ${this.currentMoodboardType === 'pinterest' ? 'block' : 'none'};">
+                        <input type="text" id="wc-pinterest-url-input" placeholder="Paste Pinterest Board URL here..." value="${HtmlSanitizer.escape(this.currentPinterestUrl)}" style="width: 100%; padding: 5px; margin-bottom: 10px;">
+                    </div>
                 </div>
             </div>
 
@@ -197,7 +222,16 @@ export class CharacterModalElement extends HTMLElement {
         }
 
         let moodboardDisplay = '';
-        if (char.moodboardMedia && char.moodboardMedia.length > 0) {
+        if (char.moodboardType === 'pinterest' && char.pinterestBoardUrl) {
+            moodboardDisplay = `
+                <div class="collapsible-section" style="margin-top: 20px;">
+                    <h3 class="collapsible-header">Mood Board (Pinterest)</h3>
+                    <div class="collapsible-content" style="display: none; overflow-y: auto; max-height: 600px;">
+                        <a data-pin-do="embedBoard" data-pin-board-width="400" data-pin-scale-height="240" data-pin-scale-width="80" href="${HtmlSanitizer.escape(char.pinterestBoardUrl)}"></a>
+                    </div>
+                </div>
+            `;
+        } else if (char.moodboardMedia && char.moodboardMedia.length > 0) {
             const items = char.moodboardMedia.map(media => {
                 if (media.type === 'video_link') {
                     return html`<div class="moodboard-item"><iframe src="${media.urlOrId}" frameborder="0" allowfullscreen></iframe></div>`;
@@ -280,6 +314,19 @@ export class CharacterModalElement extends HTMLElement {
         
         this.renderTagsForEdit();
         this.renderMoodboardEditGrid();
+
+        this.querySelector('#wc-moodboard-type-select')?.addEventListener('change', (e: Event) => {
+            const val = (e.target as HTMLSelectElement).value as 'custom' | 'pinterest';
+            this.currentMoodboardType = val;
+            const customUi = this.querySelector('#wc-moodboard-custom-ui') as HTMLElement;
+            const pinterestUi = this.querySelector('#wc-moodboard-pinterest-ui') as HTMLElement;
+            if (customUi) customUi.style.display = val === 'custom' ? 'block' : 'none';
+            if (pinterestUi) pinterestUi.style.display = val === 'pinterest' ? 'block' : 'none';
+        });
+
+        this.querySelector('#wc-pinterest-url-input')?.addEventListener('input', (e: Event) => {
+            this.currentPinterestUrl = (e.target as HTMLInputElement).value;
+        });
 
         this.querySelector('#wc-moodboard-upload')?.addEventListener('change', async (e: Event) => {
             const files = (e.target as HTMLInputElement).files;
@@ -491,13 +538,16 @@ export class CharacterModalElement extends HTMLElement {
             tags: this.currentTags,
             projectId,
             artwork: this.character?.artwork,
+            artworkId: this.character?.artworkId,
             artworkFilename: this.character?.artworkFilename,
-            voice_sample: this.character?.voice_sample,
+            moodboardType: this.currentMoodboardType,
+            pinterestBoardUrl: this.currentPinterestUrl,
+            moodboardMedia: this.currentMoodboardType === 'custom' ? this.currentMoodboardMedia : this.character?.moodboardMedia,
+            voice_sample: this.recordedSample || this.character?.voice_sample,
             pitch,
             pace,
             placement,
-            timbre,
-            moodboardMedia: this.currentMoodboardMedia
+            timbre
         };
 
         this.dispatchEvent(new CustomEvent('saveCharacter', {

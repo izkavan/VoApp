@@ -116,11 +116,9 @@ Here are some of the features that I thought up for the app that could be coming
 
 ### Changes to the core System
 * Get a Docker Image put together that can pull this repo and get it running.
-* rebundle with pkg, NodeJS, NPM to make an EXE version that can just be executed
 * **Multi-Device Support**: Sync your character library across all your devices. This is going to require some sort of cloud subscription solution though, so I don't know how I'm going to handle all that. Until then, take a look at the character packager, coupled with the import/export of projects!
 * **Voice Memos** Would pair really well with that sync, so you could voice memo a project while on your phone at a coffee shop, and then get home and flesh it out more.
 * Tie ins to common note taking apps (Obsidian, Notion, World Anvil?)
-* Can we link a pinterest board and have that in a view for the moodboard?
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 * Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
 

@@ -26,6 +26,8 @@ export interface Character {
     artwork?: string; // Memory object URL or legacy base64
     artworkId?: string; // IndexedDB ID
     artworkFilename?: string;
+    moodboardType?: 'custom' | 'pinterest';
+    pinterestBoardUrl?: string;
     moodboardMedia?: {
         id: string;
         type: 'image' | 'video_link';
