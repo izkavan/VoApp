@@ -360,8 +360,18 @@ function stopPlayback() {
 
 async function playTableReadSequence() {
     if (tableLines.length === 0) return;
+
+    const playBtn = document.getElementById('vp-table-read-play-btn');
+
+    if (isPlayingSequence) {
+        stopPlayback();
+        if (playBtn) playBtn.textContent = 'Play Sequence';
+        return;
+    }
+
     stopPlayback();
     isPlayingSequence = true;
+    if (playBtn) playBtn.textContent = 'Stop Sequence';
 
     if (!audioContext) {
         audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -370,11 +380,12 @@ async function playTableReadSequence() {
         await audioContext.resume();
     }
 
-    let i = 0;
+    let i = selectedLineIndex !== null ? selectedLineIndex : 0;
     
     const playNext = () => {
         if (!isPlayingSequence || i >= tableLines.length) {
             isPlayingSequence = false;
+            if (playBtn) playBtn.textContent = 'Play Sequence';
             return;
         }
 
