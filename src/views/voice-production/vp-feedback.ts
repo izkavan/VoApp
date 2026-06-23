@@ -14,10 +14,11 @@ export interface VPComment {
 let player: FeedbackAudioPlayer;
 let waveform: FeedbackWaveform;
 
-let currentAudioBlob: Blob | null = null;
-let currentAudioFilename: string = '';
-let isHoveringLine: boolean = false;
+let audioBlobs: Map<string, Blob> = new Map();
+let fileComments: Map<string, VPComment[]> = new Map();
+let currentSelectedFile: string = '';
 let comments: VPComment[] = [];
+let isHoveringLine: boolean = false;
 
 // DOM Elements
 let fileInput: HTMLInputElement;
@@ -30,6 +31,10 @@ let timeDisplay: HTMLElement;
 let commentList: HTMLElement;
 let titleInput: HTMLInputElement;
 let btnExport: HTMLButtonElement;
+let fileListEl: HTMLElement;
+let contentEl: HTMLElement;
+let currentAudioTitleEl: HTMLElement;
+let btnClear: HTMLButtonElement;
 
 let commentModal: HTMLElement;
 let timestampInput: HTMLInputElement;
@@ -58,7 +63,13 @@ export function initializeVoiceProductionFeedback() {
     cancelBtn = document.getElementById('comment-cancel-btn') as HTMLButtonElement;
     saveBtn = document.getElementById('comment-save-btn') as HTMLButtonElement;
 
+    fileListEl = document.getElementById('vp-feedback-file-list') as HTMLElement;
+    contentEl = document.getElementById('vp-feedback-content') as HTMLElement;
+    currentAudioTitleEl = document.getElementById('vp-current-audio-title') as HTMLElement;
+    btnClear = document.getElementById('vp-btn-clear') as HTMLButtonElement;
+
     fileInput.addEventListener('change', handleFileUpload);
+    btnClear.addEventListener('click', clearFeedback);
     
     const container = waveform.getContainer();
     container.addEventListener('click', handleWaveformClick);
@@ -104,42 +115,126 @@ export function initializeVoiceProductionFeedback() {
 }
 
 async function handleFileUpload(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
+    const files = (e.target as HTMLInputElement).files;
+    if (!files || files.length === 0) return;
 
-    const ctx = AudioService.getAudioContext();
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.name.endsWith('.zip')) {
+            const zip = await ZipService.loadZip(file);
+            
+            const data = await ZipService.readJsonFile<any>(zip, 'feedback.json', {});
+            if (!titleInput.value) {
+                titleInput.value = data.title || file.name.replace(/\.zip$/i, '');
+            }
+            
+            if (data.files) {
+                Object.keys(data.files).forEach(k => {
+                    fileComments.set(k, data.files[k]);
+                });
+            }
 
-    if (file.name.endsWith('.zip')) {
-        const zip = await ZipService.loadZip(file);
-        
-        const data = await ZipService.readJsonFile<any>(zip, 'comments.json', {});
-        titleInput.value = data.title || '';
-        comments = data.comments || [];
-
-        const audioFiles = Object.keys(zip.files).filter(k => k.startsWith('audio.'));
-        if (audioFiles.length > 0) {
-            const audioZipFile = zip.file(audioFiles[0]);
-            if (audioZipFile) {
-                const arrayBuffer = await audioZipFile.async('arraybuffer');
-                currentAudioBlob = new Blob([arrayBuffer]);
-                currentAudioFilename = file.name.replace(/\.zip$/, '');
-                player.setBuffer(await ctx.decodeAudioData(arrayBuffer));
+            const audioExts = ['.webm', '.wav', '.mp3', '.ogg', '.flac', '.m4a'];
+            for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+                if (zipEntry.dir) continue;
+                const isAudio = audioExts.some(ext => relativePath.toLowerCase().endsWith(ext));
+                if (isAudio) {
+                    const arrayBuffer = await zipEntry.async('arraybuffer');
+                    const type = relativePath.toLowerCase().endsWith('.webm') ? 'audio/webm' : 'audio/wav';
+                    audioBlobs.set(relativePath, new Blob([arrayBuffer], { type }));
+                    
+                    if (!fileComments.has(relativePath)) {
+                        fileComments.set(relativePath, []);
+                    }
+                }
+            }
+        } else {
+            const arrayBuffer = await file.arrayBuffer();
+            const filename = file.name;
+            audioBlobs.set(filename, new Blob([arrayBuffer], { type: file.type }));
+            if (!fileComments.has(filename)) {
+                fileComments.set(filename, []);
+            }
+            if (!titleInput.value) {
+                titleInput.value = filename.replace(/\.[^/.]+$/, '');
             }
         }
-    } else {
-        const arrayBuffer = await file.arrayBuffer();
-        currentAudioBlob = new Blob([arrayBuffer], { type: file.type });
-        currentAudioFilename = file.name.replace(/\.[^/.]+$/, '');
-        titleInput.value = currentAudioFilename;
-        player.setBuffer(await ctx.decodeAudioData(arrayBuffer));
-        comments = [];
     }
+    
+    (e.target as HTMLInputElement).value = '';
+    renderTOC();
+}
+
+function clearFeedback() {
+    audioBlobs.clear();
+    fileComments.clear();
+    currentSelectedFile = '';
+    comments = [];
+    titleInput.value = '';
+    contentEl.style.display = 'none';
+    if (player) {
+        player.setPauseTime(0);
+        player.setBuffer(null);
+    }
+    updateTimeDisplay(0);
+    renderTOC();
+}
+
+function renderTOC() {
+    fileListEl.innerHTML = '';
+    let firstFile = '';
+    for (const filename of audioBlobs.keys()) {
+        if (!firstFile) firstFile = filename;
+        const li = document.createElement('li');
+        li.textContent = filename;
+        li.style.padding = '8px';
+        li.style.cursor = 'pointer';
+        li.style.borderRadius = '4px';
+        li.style.wordBreak = 'break-all';
+        li.dataset.filename = filename;
+        
+        if (filename === currentSelectedFile) {
+            li.style.background = 'var(--primary-color)';
+            li.style.color = 'white';
+        } else {
+            li.style.background = 'var(--bg-color)';
+            li.addEventListener('mouseenter', () => { if(currentSelectedFile !== filename) li.style.background = 'var(--hover-color)'});
+            li.addEventListener('mouseleave', () => { if(currentSelectedFile !== filename) li.style.background = 'var(--bg-color)'});
+        }
+        
+        li.addEventListener('click', () => selectAudioFile(filename));
+        fileListEl.appendChild(li);
+    }
+
+    if (!currentSelectedFile && firstFile) {
+        selectAudioFile(firstFile);
+    }
+}
+
+async function selectAudioFile(filename: string) {
+    if (!audioBlobs.has(filename)) return;
+    
+    currentSelectedFile = filename;
+    currentAudioTitleEl.textContent = filename;
+    contentEl.style.display = 'flex';
+    
+    // Switch active comment array
+    comments = fileComments.get(filename) || [];
+
+    // Lazy load the buffer
+    const blob = audioBlobs.get(filename)!;
+    const arrayBuffer = await blob.arrayBuffer();
+    const ctx = AudioService.getAudioContext();
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    
+    player.setBuffer(audioBuffer);
     
     renderComments();
     const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim() || '#007bff';
-    waveform.draw(player.getBuffer(), primaryColor);
-    waveform.renderMarkers(comments, player.getBuffer()?.duration || 0);
+    waveform.draw(audioBuffer, primaryColor);
+    waveform.renderMarkers(comments, audioBuffer.duration);
     updateTimeDisplay(0);
+    renderTOC(); // Re-render to update highlighting
 }
 
 function formatTime(seconds: number): string {
@@ -379,24 +474,28 @@ function highlightComment(timeSeconds: number, type: 'active' | 'hover') {
 }
 
 async function exportFeedback() {
-    if (!currentAudioBlob) {
-        alert("No audio file loaded.");
+    if (audioBlobs.size === 0) {
+        alert("No audio files loaded.");
         return;
     }
 
     const zip = await ZipService.createZip();
-    const title = titleInput.value || currentAudioFilename || "Feedback";
+    const title = titleInput.value || "Feedback";
     
-    zip.file("comments.json", JSON.stringify({
+    // Convert maps to plain objects for JSON serialization
+    const filesObj: Record<string, VPComment[]> = {};
+    for (const [filename, fileCommentsList] of fileComments.entries()) {
+        filesObj[filename] = fileCommentsList;
+    }
+
+    zip.file("feedback.json", JSON.stringify({
         title: titleInput.value,
-        comments: comments
+        files: filesObj
     }, null, 2));
 
-    let ext = "webm";
-    if (currentAudioBlob.type.includes("wav") || currentAudioFilename.endsWith(".wav")) {
-        ext = "wav";
+    for (const [filename, blob] of audioBlobs.entries()) {
+        zip.file(filename, blob);
     }
-    zip.file(`audio.${ext}`, currentAudioBlob);
 
     await ZipService.downloadZip(zip, `${title}.zip`);
 }

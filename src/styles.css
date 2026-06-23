@@ -192,7 +192,7 @@ main {
 }
 
 .character-card {
-    background: var(--gray-50);
+    background: var(--gray-150);
     border: 1px solid var(--gray-300);
     border-radius: 4px;
     padding: 15px;
@@ -479,7 +479,7 @@ input:checked + .slider:before {
 /* --- Dark Mode --- */
 body.dark-mode { background-color: var(--gray-1000); color: var(--gray-100); }
 body.dark-mode #app, body.dark-mode #settings-container { background: var(--gray-950); }
-body.dark-mode .character-card { background: var(--gray-900); border-color: var(--gray-800); }
+body.dark-mode .character-card { background: var(--gray-875); border-color: var(--gray-800); }
 body.dark-mode textarea, body.dark-mode input, body.dark-mode select { background-color: var(--gray-975); color: var(--gray-100); border-color: var(--gray-800); }
 body.dark-mode .modal-content { background: var(--gray-950); }
 body.dark-mode .modal-footer { border-top-color: var(--gray-850); }
@@ -608,8 +608,13 @@ body.dark-mode .dungeon-master-session-log p {
     color: var(--gray-300);
 }
 
-body.dark-mode #vp-script-toc {
+body.dark-mode #vp-script-toc,
+body.dark-mode #vp-feedback-toc {
     background: var(--gray-800) !important;
+}
+
+#vp-feedback-toc {
+    background: var(--gray-100) !important;
 }
 
 .script-text-input:empty:before {

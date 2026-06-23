@@ -59,7 +59,7 @@ Vo-App is designed to be your go-to place for voice-work related items. Here is 
 * **Sides Converter**: Upload a script and easily export customized "Sides" (condensed scripts) for individual characters. Select the characters you want, and the app generates a ZIP containing a master script of just their lines, plus individualized folders and scripts for each character.
 * **Blind Audition Review**: Remove bias from the casting process! Casting directors can upload a ZIP of auditions (or import them manually), and the app will display them randomly without actor names. Directors can listen to the audio, leave 5-star ratings and comments, and then export the finalized "Top Choices" to send to producers.
 * **Chemistry Contraster**: A visual grid where a Casting Director can place their top picks for multiple characters side-by-side. Play the samples back-to-back to ensure the leads have distinct vocal timbres, ensuring a well-balanced sonic cast before making final offers.
-* **Time-stamped waveform notes**: When a director opens a project, they can select a take to load, and then annotate that take. You can display the waveform and the director can click a point on the waveform to leave a comment at that point, and then export their notes.
+* **Audio Feedback Sessions**: Provide detailed, multi-file feedback on talent recordings. Upload a ZIP of an actor's audio takes, and the app will organize them into a clean sidebar. You can select individual tracks, view their waveforms, and leave timestamp-specific comments on exactly where you need a pacing change or different inflection. Export the feedback session as a neat package to send back to the actor for revisions.
 * **A basic Script Writer**: Can assign lines to characters, reference project dictionaries, annotate scenes, place headers, and export the script in a number of formats. 
 * **Table Read Simulator**: Import a master script along with exported Line Read zip sessions from multiple voice actors. See all of their takes lined up sequentially! You can preview their audio and mark a "Preferred" take for each line. When you hit play, the app seamlessly sequences the preferred audio files together to simulate a full cast table read. You can even export the entire table read state (including a neatly packaged sequential audio folder) to send straight to your editor!
 
@@ -75,7 +75,7 @@ Vo-App acts as your personal vocal library! It helps you manage the dozens or ev
 4. **Manage Auditions**: Track what characters you submitted for which casting directors using the Audition Tracker, so you never lose track of what voice you used for that callback. Need to put together an audition? Select the Characters and Voices you are using, and you can export a zip file of the data that is needed!
 5. **Warmups and Efforts**: Head to the Vocal Warmups tab to run through your daily tongue twisters, and build a reusable catalog of fight grunts and dying breaths in the Effect Library.
 
-## I'm a dungeon master. What is this and how do I use it?
+## I'm a Game Master/Storyteller. What is this and how do I use it?
 
 Running a tabletop RPG campaign requires juggling dozens of NPCs, and keeping their voices consistent across months of gameplay can be tough. Vo-App helps you organize your world's cast of characters and gives you the tools to recall exactly how they sound at a moment's notice. You won't have to say, "Oh shoot, how did the mayor talk again?" again!
 
@@ -98,6 +98,7 @@ Yes! While Vo-App is highly tailored for actors, it serves as an excellent refer
 5. **Listen to Auditions**: Blind samples of auditions let you isolate the actor for their talent, and rate what takes you like the best. 
 6. **Compare the Cast**: Use the Contraster to ensure vocal contrast between your top picks! This helps ensure that the ensemble you hire is the right one for the job, or that any new hires fit the bill.
 7. **Assemble a Table Read**: After your actors have recorded their lines using the Line Reader, you can import their exported audio zips directly over your master script. Mark your 'Preferred' takes, and run a Table Read sequence to hear how the full project sends before sending it out to final editing!
+8. **Provide Audio Feedback**: When actors send in their session recordings, load their ZIP file into the Feedback tool. You can scrub through their waveforms track-by-track and leave precise, timestamped comments (e.g., "Hit this word harder," or "Pause here") before exporting the notes back to them!
 
 ## I'm a writer or editor, is this useful for me?
 
@@ -153,10 +154,9 @@ Here are some of the features that I thought up for the app that could be coming
 ### Changes for Directors/Writers/producers
 
 * **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
-* Time-stamped waveform feedback should also allows multiple audio files to be selected from a list on the left, waveform on the right, and then comments for that waveform below. This should allow, for example, feedback on an entire Teleprompter session. 
 * It might be a good idea to also allow a script to bundle with it a project/character library, so that if you are sending it to someone you don't need to remember to do that as well. This gets into more and more complex data formats, so it's in the backlog for now. I'm thinking it would be something like "Prepare Production Package", and the resulting zip file would be able to see who has been selected for a project, and make a sub-folder-zip for each person that they can import and have all of their character descriptions, project, project library, scripts, etc. in one spot.
 * **Franken-bite**: Often, a director loves the first half of Take 1, and the second half of Take 3. Instead of just starring both and confusing the editor, the director could highlight specific words in the script text attached to each take. This generates an "Edit Decision List" (EDL) so the editor knows exactly which pieces to stitch together.
-* **DAW Drag and drop**: tie ins to DAW projects could give the ability to literally click a starred take in the Vo-App browser/UI and drag it directly onto a timeline in Pro Tools, Reaper, or Audacity as a clean .wav file, bringing the character name metadata with it.
+* **DAW Drag and drop**: tie ins to DAW projects could give the ability to literally click a starred take in the Vo-App browser/UI and drag it directly onto a timeline in Pro Tools, Reaper, or Audacity as a clean .wav file, bringing the character name metadata with it. The problem is, modern web and security standards prevent this since the web application is typically scoped away from editing the user's filesystem. For good reason! We'll keep this on the backlog, but it wouldn't be a doable thing unless we switch the application from TS to something more native. We may be able to look into "export for editing" as an option, but the existing exports already build out folders of audio files.
 
 ### Utilities to add
 * Have a viewer for active memory management. Should allow a single view of all the data the application stores in local memory, with options to delete that data if the user wants.

@@ -231,34 +231,45 @@
                 </div>
                 <div id="vp-feedback" class="tab-content active">
 
-                    <p>Upload a .webm or .wav file to view the waveform and leave timestamped comments.</p>
-                    
-                    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        <input type="file" id="vp-audio-upload" accept=".webm,.wav,.zip" class="custom-file-input" style="display: none;" />
-                        <label for="vp-audio-upload" class="custom-file-input">Upload Audio or Zip</label>
-                        <button id="vp-btn-export" title="Export Feedback" class="icon-btn" style="margin-left: auto;">Export Feedback</button>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                        <input type="text" id="vp-feedback-title" placeholder="Feedback Title..." style="flex-grow: 1; font-size: 1.5em; font-weight: bold; padding: 5px;" />
+                        <input type="file" id="vp-audio-upload" accept=".webm,.wav,.zip" class="hidden" multiple />
+                        <button class="secondary-btn" onclick="document.getElementById('vp-audio-upload').click()">Import File(s)</button>
+                        <button id="vp-btn-clear" class="danger-btn">Clear</button>
+                        <button id="vp-btn-export" title="Export Feedback" class="primary-btn">Export Feedback</button>
                     </div>
 
-                    <div style="margin-bottom: 10px;">
-                        <input type="text" id="vp-feedback-title" placeholder="Feedback Title..." style="width: 100%; font-size: 1.2em; font-weight: bold; padding: 5px;" />
-                    </div>
+                    <div style="display: flex; gap: 20px; align-items: flex-start; height: 100%;">
+                        <div id="vp-feedback-toc" style="width: 250px; background: var(--bg-color-lighter); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 6px var(--shadow-color); display: flex; flex-direction: column; align-self: flex-start; flex-shrink: 0; min-height: 400px; color: var(--text-color);">
+                            <div style="padding: 10px; background: var(--bg-color); border-bottom: 1px solid var(--border-color); border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                                <h3 style="margin: 0; font-size: 1.1em;">Audio Files</h3>
+                            </div>
+                            <ul id="vp-feedback-file-list" style="list-style-type: none; padding: 10px; margin: 0; display: flex; flex-direction: column; gap: 8px; max-height: 550px; overflow-y: auto;">
+                                <!-- Files populated dynamically -->
+                            </ul>
+                        </div>
+                        
+                        <div id="vp-feedback-content" style="flex-grow: 1; display: none; flex-direction: column;">
+                            <h3 id="vp-current-audio-title" style="margin-top: 0; margin-bottom: 15px; font-weight: normal; color: var(--primary-color); word-break: break-all;"></h3>
+                            
+                            <div class="vp-waveform-container" style="position: relative; width: 100%; height: 150px; background: var(--gray-900); border-radius: var(--border-radius); overflow: hidden; margin-bottom: 10px; cursor: pointer;">
+                                <canvas id="vp-waveform-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                                <div id="vp-progress-bar" style="position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: yellow; pointer-events: none; display: none;"></div>
+                            </div>
 
-                    <div class="vp-waveform-container" style="position: relative; width: 100%; height: 150px; background: var(--gray-900); border-radius: var(--border-radius); overflow: hidden; margin-bottom: 10px; cursor: pointer;">
-                        <canvas id="vp-waveform-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
-                        <div id="vp-progress-bar" style="position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: yellow; pointer-events: none; display: none;"></div>
-                    </div>
+                            <div class="vp-controls" style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                                <button id="vp-btn-start" title="Start from beginning" class="icon-btn">|&lt;&lt;</button>
+                                <button id="vp-btn-prev-comment" title="Start from last comment" class="icon-btn">|&lt;</button>
+                                <button id="vp-btn-play-pause" title="Play/Pause" class="icon-btn">▶</button>
+                                <button id="vp-btn-insert-comment" title="Insert Comment" class="icon-btn">💬 Insert Comment</button>
+                                <span id="vp-time-display" style="margin-left: auto; font-family: monospace;">00:00:00.000</span>
+                            </div>
 
-                    <div class="vp-controls" style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
-                        <button id="vp-btn-start" title="Start from beginning" class="icon-btn">|&lt;&lt;</button>
-                        <button id="vp-btn-prev-comment" title="Start from last comment" class="icon-btn">|&lt;</button>
-                        <button id="vp-btn-play-pause" title="Play/Pause" class="icon-btn">▶</button>
-                        <button id="vp-btn-insert-comment" title="Insert Comment" class="icon-btn">💬 Insert Comment</button>
-                        <span id="vp-time-display" style="margin-left: auto; font-family: monospace;">00:00:00.000</span>
-                    </div>
-
-                    <h3>Comments</h3>
-                    <div id="vp-comment-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
-                        <p style="color: var(--gray-600); font-style: italic;">No comments yet.</p>
+                            <h3 style="margin-top: 0;">Comments</h3>
+                            <div id="vp-comment-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                                <p style="color: var(--gray-600); font-style: italic;">No comments yet.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="vp-script" class="tab-content">
