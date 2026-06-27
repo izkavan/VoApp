@@ -136,8 +136,6 @@ async function initApp() {
         document.documentElement.style.setProperty('--system-font', "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif");
     }
 
-    initializeRecordTimer(currentSettings);
-
     const migrated = await migrateLegacyArtwork(characters);
     if (migrated) {
         DataStore.restoreAll(characters, projects, auditions, currentSettings);
@@ -192,7 +190,6 @@ async function initApp() {
     initializeNavigation();
     initializeMeView();
     applyFeatureVisibility(currentSettings);
-    initializeTableReadView(openModal);
     initializeAudioOverlay();
     initializeRecordTimer(currentSettings);
     initializeCraftDemoReel();

@@ -240,7 +240,7 @@ function renderLines() {
             item.style.textAlign = 'center';
             meta.style.textAlign = 'center';
         } else if (line.characterId === 'scene' || line.characterName === 'scene') {
-            meta.textContent = 'SCENE DETAILS';
+            meta.textContent = 'Scene Descriptor';
         } else {
             meta.textContent = line.characterName || 'Unknown Character';
             if (line.descriptor) meta.textContent += ` (${line.descriptor})`;

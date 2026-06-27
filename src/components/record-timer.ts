@@ -2,6 +2,7 @@ import { SystemSettings } from '../types.js';
 
 let activeRecorders = 0;
 let accumulatedTime = 0; // in milliseconds
+let isInitialized = false;
 let timerInterval: number | null = null;
 let lastTickTime = 0;
 let lastSaveTime = 0;
@@ -34,6 +35,10 @@ function updateDisplay() {
 }
 
 export function initializeRecordTimer(settings: SystemSettings) {
+    updateRecordTimerVisibility(settings);
+    if (isInitialized) return;
+    isInitialized = true;
+
     const resetBtn = document.getElementById('record-timer-reset');
 
     const savedTime = localStorage.getItem(STORAGE_KEY);
@@ -97,8 +102,6 @@ export function initializeRecordTimer(settings: SystemSettings) {
         };
         (window as any).__mediaRecorderPatched = true;
     }
-
-    updateRecordTimerVisibility(settings);
 }
 
 export function updateRecordTimerVisibility(settings: SystemSettings) {

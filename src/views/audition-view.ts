@@ -2,6 +2,7 @@ import { Audition, Character, AuditionStatus, AuditionFile, SystemSettings } fro
 import JSZip from 'jszip';
 import { DataStore } from '../services/DataStore.js';
 import { openEditAudioModal } from './edit-audio-modal.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 
 let auditions: Audition[] = [];
 let characters: Character[] = [];
@@ -17,7 +18,7 @@ export function refreshAuditionView(newCharacters: Character[]) {
     const charSelect = document.getElementById('aud-character-select') as HTMLSelectElement;
     if (charSelect) {
         const currentVal = charSelect.value;
-        charSelect.innerHTML = `<option value="">--Select Character--</option>${characters.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}`;
+        charSelect.innerHTML = `<option value="">--Select Character--</option>` + generateCharacterOptionsHTML(characters);
         charSelect.value = currentVal;
     }
 }
@@ -148,7 +149,7 @@ function openAuditionModal(audition?: Audition) {
                 <label for="aud-character-select">Linked Character (Required for Recording)</label>
                 <select id="aud-character-select">
                     <option value="">--Select Character--</option>
-                    ${characters.map(c => `<option value="${c.id}" ${aud.linkedCharacterIds[0] === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
+                    ${generateCharacterOptionsHTML(characters, undefined, aud.linkedCharacterIds[0])}
                 </select>
             </div>
 

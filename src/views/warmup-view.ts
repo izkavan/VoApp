@@ -1,4 +1,5 @@
 import { Character, Project, Warmup, SystemSettings } from '../types.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 import { loadFromLocalStorage } from '../services/storage.js';
 import { convertWebMToWav } from '../utils/audio-utils.js';
 
@@ -31,26 +32,15 @@ export function refreshWarmupView(projects: Project[], characters: Character[]) 
     const characterSelect = document.getElementById('warmup-character-select') as HTMLSelectElement;
     if (characterSelect) {
         const currentVal = characterSelect.value;
-        characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>`;
-        currentCharacters.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id.toString();
-            opt.textContent = c.name;
-            characterSelect.appendChild(opt);
-        });
+        const selectedProj = projectSelect && projectSelect.value !== 'none' ? parseInt(projectSelect.value) : undefined;
+        characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>` + generateCharacterOptionsHTML(currentCharacters, selectedProj);
         characterSelect.value = currentVal;
     }
 
     const modalCharSelect = document.getElementById('warmup-modal-character-select') as HTMLSelectElement;
     if (modalCharSelect) {
         const currentVal = modalCharSelect.value;
-        modalCharSelect.innerHTML = '<option value="none">-- Select Character --</option>';
-        currentCharacters.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id.toString();
-            opt.textContent = c.name;
-            modalCharSelect.appendChild(opt);
-        });
+        modalCharSelect.innerHTML = '<option value="none">-- Select Character --</option>' + generateCharacterOptionsHTML(currentCharacters);
         modalCharSelect.value = currentVal;
     }
 }
@@ -106,20 +96,8 @@ function setupFilters() {
 
 function populateCharacterSelect(projectIdStr: string) {
     const characterSelect = document.getElementById('warmup-character-select') as HTMLSelectElement;
-    characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>`;
-    
-    let chars = currentCharacters;
-    if (projectIdStr !== 'none') {
-        const pId = parseInt(projectIdStr);
-        chars = chars.filter(c => c.projectId === pId);
-    }
-
-    chars.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id.toString();
-        opt.textContent = c.name;
-        characterSelect.appendChild(opt);
-    });
+    const pId = projectIdStr !== 'none' ? parseInt(projectIdStr) : undefined;
+    characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>` + generateCharacterOptionsHTML(currentCharacters, pId);
 }
 
 function renderWarmupGrid() {
@@ -422,13 +400,7 @@ function renderTags(tags: string[]) {
 
 function populateModalCharacterSelect() {
     const sel = document.getElementById('warmup-modal-character-select') as HTMLSelectElement;
-    sel.innerHTML = '<option value="none">-- Select Character to Add --</option>';
-    currentCharacters.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id.toString();
-        opt.textContent = c.name;
-        sel.appendChild(opt);
-    });
+    sel.innerHTML = '<option value="none">-- Select Character to Add --</option>' + generateCharacterOptionsHTML(currentCharacters);
 }
 
 function renderAttachedCharacters(charIds: number[]) {

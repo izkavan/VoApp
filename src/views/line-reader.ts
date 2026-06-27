@@ -4,6 +4,7 @@ import { saveAudioBlob, getAudioBlob, deleteAudioBlob, initDB, getDictionaryEntr
 import JSZip from 'jszip';
 import { highlightDictionaryWords } from '../components/dictionary-highlighter.js';
 import { openEditAudioModal } from './edit-audio-modal.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 
 // In-memory representation
 interface TakeDetail {
@@ -177,10 +178,10 @@ export function initializeLineReader(characters: Character[], projects: Project[
     };
 
     const updateCharacterDropdowns = () => {
-        const availableCharacters = getAvailableCharacters();
         if (filterSelect) {
             const currentFilter = filterSelect.value;
-            filterSelect.innerHTML = `<option value="all">No Filter</option><option value="unassigned">Unassigned</option>${availableCharacters.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}`;
+            const selectedProjectId = projectSelect?.value && projectSelect.value !== '' ? Number(projectSelect.value) : undefined;
+            filterSelect.innerHTML = `<option value="all">No Filter</option><option value="unassigned">Unassigned</option>` + generateCharacterOptionsHTML(currentLineReaderCharacters, selectedProjectId);
             if (Array.from(filterSelect.options).some(o => o.value === currentFilter)) {
                 filterSelect.value = currentFilter;
             } else {
@@ -304,7 +305,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
             <div class="character-selector">
                 <select id="line-character-select">
                     <option value="">--Select Character--</option>
-                    ${getAvailableCharacters().map(c => `<option value="${c.id}" ${c.id === details.characterId ? 'selected' : ''}>${c.name}</option>`).join('')}
+                    ${generateCharacterOptionsHTML(currentLineReaderCharacters, projectSelect?.value ? Number(projectSelect.value) : undefined, details.characterId)}
                 </select>
                 ${artworkImage}
             </div>

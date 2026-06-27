@@ -1,4 +1,5 @@
 import { Project, Character } from '../types.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 
 interface AssignedLine {
     id: string;
@@ -149,17 +150,9 @@ function handleKeyDown(e: KeyboardEvent) {
 
 function handleProjectChange() {
     const projectId = projectSelect.value;
-    characterSelect.innerHTML = '<option value="none">Select Character...</option>';
-    
-    if (projectId !== 'none') {
-        const filteredChars = charactersData.filter(c => c.projectId === parseInt(projectId));
-        filteredChars.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id.toString();
-            opt.textContent = c.name;
-            characterSelect.appendChild(opt);
-        });
-    }
+    const pId = projectId !== 'none' ? parseInt(projectId) : undefined;
+    characterSelect.innerHTML = '<option value="none">Select Character...</option>' + generateCharacterOptionsHTML(charactersData, pId);
+    updateButtonStates();
 }
 
 function isSegmentAssigned(lineIdx: number, charIdxStart: number, charIdxEnd: number) {

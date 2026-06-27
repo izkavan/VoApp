@@ -1,6 +1,7 @@
 import { Project, ReceivedAudition, Character } from '../../types.js';
 import JSZip from 'jszip';
 import '../../components/audition-card.js';
+import { generateCharacterOptionsHTML } from '../../utils/dom-utils.js';
 
 let receivedAuditions: ReceivedAudition[] = [];
 let projects: Project[] = [];
@@ -356,17 +357,7 @@ function openManualAuditionModal() {
 
     // Populate character dropdown
     const charSelect = document.getElementById('vp-manual-character') as HTMLSelectElement;
-    charSelect.innerHTML = '<option value="">Select a Character</option>';
-    
-    // Show all characters since project filter is removed
-    const relevantCharacters = characters;
-        
-    relevantCharacters.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.name;
-        opt.textContent = c.name;
-        charSelect.appendChild(opt);
-    });
+    charSelect.innerHTML = '<option value="">Select a Character</option>' + generateCharacterOptionsHTML(characters);
 
     charSelect.value = activeCharacter || '';
     (document.getElementById('vp-manual-fname') as HTMLInputElement).value = '';
@@ -407,7 +398,8 @@ function openManualAuditionModal() {
     const saveBtn = document.getElementById('vp-manual-save-btn');
     saveBtn!.onclick = () => {
         const project = ''; // Project filter removed
-        const character = (document.getElementById('vp-manual-character') as HTMLSelectElement).value;
+        const characterId = (document.getElementById('vp-manual-character') as HTMLSelectElement).value;
+        const character = characters.find(c => c.id.toString() === characterId)?.name || characterId;
         const fName = (document.getElementById('vp-manual-fname') as HTMLInputElement).value.trim();
         const lName = (document.getElementById('vp-manual-lname') as HTMLInputElement).value.trim();
         

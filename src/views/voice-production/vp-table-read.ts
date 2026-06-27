@@ -44,7 +44,11 @@ export function setTableReadData(chars: any[], projs: any[]) {
 
 let openCharacterModalCb: ((character: any) => void) | null = null;
 
+let isInitialized = false;
+
 export function initializeTableReadView(openModalCb: (character: any) => void) {
+    if (isInitialized) return;
+    isInitialized = true;
     openCharacterModalCb = openModalCb;
     const importMasterBtn = document.getElementById('vp-table-read-import-master-btn') as HTMLButtonElement;
     const importMasterInput = document.getElementById('vp-table-read-import-master-input') as HTMLInputElement;

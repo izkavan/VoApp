@@ -3,6 +3,7 @@ import { getEffects, saveEffect, updateEffect, deleteEffect } from '../services/
 import JSZip from 'jszip';
 import { convertWebMToWav } from '../utils/audio-utils.js';
 import { openEditAudioModal } from './edit-audio-modal.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 
 let currentEffects: Effect[] = [];
 let currentCharacters: Character[] = [];
@@ -38,13 +39,9 @@ export function refreshEffectLibraryView(projects: Project[], characters: Charac
     const characterSelect = document.getElementById('effect-character-select') as HTMLSelectElement;
     if (characterSelect) {
         const currentVal = characterSelect.value;
-        characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>`;
-        currentCharacters.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id.toString();
-            opt.textContent = c.name;
-            characterSelect.appendChild(opt);
-        });
+        const projectSelect = document.getElementById('effect-project-select') as HTMLSelectElement;
+        const selectedProj = projectSelect && projectSelect.value !== 'none' ? parseInt(projectSelect.value) : undefined;
+        characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>` + generateCharacterOptionsHTML(currentCharacters, selectedProj);
         characterSelect.value = currentVal;
     }
     
@@ -65,13 +62,7 @@ export function refreshEffectLibraryView(projects: Project[], characters: Charac
     const modalCharSelect = document.getElementById('effect-modal-character-select') as HTMLSelectElement;
     if (modalCharSelect) {
         const currentVal = modalCharSelect.value;
-        modalCharSelect.innerHTML = '<option value="none">-- Select Character --</option>';
-        currentCharacters.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id.toString();
-            opt.textContent = c.name;
-            modalCharSelect.appendChild(opt);
-        });
+        modalCharSelect.innerHTML = '<option value="none">-- Select Character --</option>' + generateCharacterOptionsHTML(currentCharacters);
         modalCharSelect.value = currentVal;
     }
 }
@@ -184,13 +175,8 @@ function populateFilterSelects() {
     });
 
     // Characters
-    characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>`;
-    currentCharacters.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id.toString();
-        opt.textContent = c.name;
-        characterSelect.appendChild(opt);
-    });
+    const selectedProj = projectSelect && projectSelect.value !== 'none' ? parseInt(projectSelect.value) : undefined;
+    characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>` + generateCharacterOptionsHTML(currentCharacters, selectedProj);
 }
 
 function renderEffectGrid() {
@@ -588,13 +574,7 @@ function populateModalSelects() {
 
     // Characters
     const charSelect = document.getElementById('effect-modal-character-select') as HTMLSelectElement;
-    charSelect.innerHTML = '<option value="none">-- Select Character --</option>';
-    currentCharacters.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id.toString();
-        opt.textContent = c.name;
-        charSelect.appendChild(opt);
-    });
+    charSelect.innerHTML = '<option value="none">-- Select Character --</option>' + generateCharacterOptionsHTML(currentCharacters);
 
     // Projects
     const projSelect = document.getElementById('effect-modal-project-select') as HTMLSelectElement;

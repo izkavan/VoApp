@@ -173,6 +173,8 @@ function getScriptPayload() {
             if (line.characterId !== 'scene') {
                 const char = characters.find(c => c.id.toString() === line.characterId);
                 charName = char ? char.name : 'Unknown';
+            } else {
+                charName = 'Scene Descriptor';
             }
             return {
                 id: line.id,
@@ -344,7 +346,7 @@ function renderLines() {
 
             const charSelect = document.createElement('select');
             charSelect.className = 'script-char-select';
-            charSelect.innerHTML = `<option value="scene">Scene Details</option>`;
+            charSelect.innerHTML = `<option value="scene">Scene Descriptor</option>`;
             availableCharacters.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.id.toString();
@@ -531,7 +533,7 @@ async function handleExport() {
     
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${name}.zip`;
+    a.download = `${nameInput.value.trim() || 'script'}_${versionInput.value.trim() || '1.0'}.zip`;
     a.click();
     
     URL.revokeObjectURL(url);

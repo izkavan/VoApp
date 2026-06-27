@@ -1,6 +1,7 @@
 import { Character, Project } from '../types.js';
 import { createCharacterCard } from '../components/character-renderer.js';
 import { generateRandomCharacter } from '../data/generator-data.js';
+import { generateCharacterOptionsHTML } from '../utils/dom-utils.js';
 
 let characters: Character[] = [];
 let projects: Project[] = [];
@@ -66,18 +67,9 @@ export function initializeDungeonMasterView(
     });
 
     const updateCharacterSelect = () => {
-        characterSelect.innerHTML = '';
         const selectedProject = projectSelect.value;
-        const filtered = selectedProject === 'none' 
-            ? characters 
-            : characters.filter(c => c.projectId === parseInt(selectedProject));
-
-        filtered.forEach(c => {
-            const option = document.createElement('option');
-            option.value = c.id.toString();
-            option.textContent = c.name;
-            characterSelect.appendChild(option);
-        });
+        const pId = selectedProject !== 'none' ? parseInt(selectedProject) : undefined;
+        characterSelect.innerHTML = generateCharacterOptionsHTML(characters, pId);
     };
     updateCharacterSelectCallback = updateCharacterSelect;
 
