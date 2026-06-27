@@ -13,26 +13,28 @@ import { initializeTheme } from './core/theme.js';
 import { initializeNavigation, applyFeatureVisibility } from './core/navigation.js';
 import { initializeMeView, loadMeViewData } from './views/me-view.js';
 import { initializeVoiceActorView } from './views/voice-actor-view.js';
-import { initializeLineReader } from './views/line-reader.js';
+import { initializeLineReader, refreshLineReaderView } from './views/line-reader.js';
 import { initializeUtilityView } from './views/utility-view.js';
-import { initializeAuditionView } from './views/audition-view.js';
-import { initializeTeleprompter } from './components/teleprompt.js';
+import { initializeAuditionView, refreshAuditionView } from './views/audition-view.js';
+import { initializeTeleprompter, refreshTeleprompterProjects } from './components/teleprompt.js';
 import { initializeDungeonMasterView, refreshDungeonMasterView } from './views/dungeon-master-view.js';
 import { initializeSettingsView } from './views/settings-view.js';
 import { initializeDictionaryModal, openDictionaryModal } from './components/dictionary-modal.js';
 import { initializeDictionaryHighlighter } from './components/dictionary-highlighter.js';
-import { initializeWarmupView } from './views/warmup-view.js';
-import { initializeEffectLibrary } from './views/effect-library.js';
+import { initializeWarmupView, refreshWarmupView } from './views/warmup-view.js';
+import { initializeEffectLibrary, refreshEffectLibraryView } from './views/effect-library.js';
 import { initializeVoiceProductionFeedback } from './views/voice-production/vp-feedback.js';
 import { initializeScriptView, refreshScriptView } from './views/voice-production/vp-script.js';
 import { initializeSidesView, refreshSidesView } from './views/voice-production/vp-sides.js';
 import { initializeContrasterView } from './views/voice-production/vp-contraster.js';
-import { initializeVPAuditionsView } from './views/voice-production/vp-auditions.js';
+import { initializeVPAuditionsView, refreshVPAuditionsView } from './views/voice-production/vp-auditions.js';
 import { initializeTableReadView, setTableReadData } from './views/voice-production/vp-table-read.js';
 import { initializeAudioOverlay } from './views/utilities/audio-overlay.js';
+import { initializeVoiceMemos, refreshVoiceMemosProjects } from './views/utility/voice-memos.js';
 import { initializeRecordTimer } from './components/record-timer.js';
 import { initializeCraftDemoReel } from './views/craft-demo-reel.js';
 import { initializeEditAudioModal } from './views/edit-audio-modal.js';
+import { initializeScriptImportModal } from './components/script-import-modal.js';
 
 // --- Main Page Elements ---
 const characterListElement = document.getElementById('character-list');
@@ -71,10 +73,18 @@ export function renderApp() {
     
     updateFilterData(characters, projects);
     filterCharacters();
-    refreshDungeonMasterView();
+    refreshDungeonMasterView(projects, characters);
     refreshScriptView(projects, characters);
     refreshSidesView(characters);
     loadMeViewData();
+    
+    refreshLineReaderView(projects, characters);
+    refreshTeleprompterProjects(projects);
+    refreshEffectLibraryView(projects, characters);
+    refreshWarmupView(projects, characters);
+    refreshAuditionView(characters);
+    refreshVoiceMemosProjects(projects);
+    refreshVPAuditionsView(projects, characters);
 }
 
 // Subscribe to store updates to keep the UI fresh
@@ -187,6 +197,7 @@ async function initApp() {
     initializeRecordTimer(currentSettings);
     initializeCraftDemoReel();
     initializeEditAudioModal();
+    initializeScriptImportModal();
 
     // Data Load
     initializeVoiceActorView();

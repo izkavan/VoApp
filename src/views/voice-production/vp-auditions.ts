@@ -20,6 +20,12 @@ let finalistCountInput: HTMLInputElement;
 let charactersContainer: HTMLElement;
 let listContainer: HTMLElement;
 
+export function refreshVPAuditionsView(newProjects: Project[], newCharacters: Character[]) {
+    projects = newProjects;
+    characters = newCharacters;
+    renderCharacters(); // Might as well re-render the sidebar to keep character tabs accurate!
+}
+
 export function initializeVPAuditionsView(
     initialAuditions: ReceivedAudition[],
     initialProjects: Project[],

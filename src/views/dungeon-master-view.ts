@@ -7,7 +7,36 @@ let projects: Project[] = [];
 let activeSessionIds: number[] = [];
 let updateCharacterSelectCallback: () => void = () => {};
 
-export function refreshDungeonMasterView() {
+export function refreshDungeonMasterView(newProjects?: Project[], newCharacters?: Character[]) {
+    if (newProjects) projects = newProjects;
+    if (newCharacters) characters = newCharacters;
+
+    const projectSelect = document.getElementById('dm-session-project') as HTMLSelectElement;
+    if (projectSelect) {
+        const currentVal = projectSelect.value;
+        projectSelect.innerHTML = '<option value="none">-- All Projects --</option>';
+        projects.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id.toString();
+            option.textContent = p.name;
+            projectSelect.appendChild(option);
+        });
+        projectSelect.value = currentVal;
+    }
+
+    const generatorProjectSelect = document.getElementById('dm-generator-project') as HTMLSelectElement;
+    if (generatorProjectSelect) {
+        const currentVal = generatorProjectSelect.value;
+        generatorProjectSelect.innerHTML = '<option value="none">Any Project</option>';
+        projects.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id.toString();
+            option.textContent = p.name;
+            generatorProjectSelect.appendChild(option);
+        });
+        generatorProjectSelect.value = currentVal;
+    }
+
     updateCharacterSelectCallback();
 }
 

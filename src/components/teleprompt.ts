@@ -21,6 +21,18 @@ interface TeleprompterFile {
     takes: TakeDetail[];
 }
 
+let projectsData: Project[] = [];
+
+export function refreshTeleprompterProjects(projects: Project[]) {
+    projectsData = projects;
+    const projectSelect = document.getElementById('teleprompt-project-select') as HTMLSelectElement;
+    if (projectSelect) {
+        const currentVal = projectSelect.value;
+        projectSelect.innerHTML = `<option value="">--Select Project--</option>${projectsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
+        projectSelect.value = currentVal;
+    }
+}
+
 export function initializeTeleprompter(projects: Project[]) {
     const fileInput = document.getElementById('teleprompt-file-input') as HTMLInputElement;
     const projectSelect = document.getElementById('teleprompt-project-select') as HTMLSelectElement;
@@ -164,8 +176,9 @@ export function initializeTeleprompter(projects: Project[]) {
     };
 
     // --- Project Selection ---
+    projectsData = projects;
     if (projectSelect) {
-        projectSelect.innerHTML = `<option value="">--Select Project--</option>${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
+        projectSelect.innerHTML = `<option value="">--Select Project--</option>${projectsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
         projectSelect.addEventListener('change', async () => {
             const projectId = parseInt(projectSelect.value);
             if (!isNaN(projectId)) {

@@ -12,6 +12,16 @@ let saveSettingsCallback: (settings: SystemSettings) => void;
 const STATUS_OPTIONS: AuditionStatus[] = ['Submitted', 'Callback', 'Booked', 'Rejected', 'Ghosted'];
 const INACTIVE_STATUSES: AuditionStatus[] = ['Rejected', 'Ghosted'];
 
+export function refreshAuditionView(newCharacters: Character[]) {
+    characters = newCharacters;
+    const charSelect = document.getElementById('aud-character-select') as HTMLSelectElement;
+    if (charSelect) {
+        const currentVal = charSelect.value;
+        charSelect.innerHTML = `<option value="">--Select Character--</option>${characters.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}`;
+        charSelect.value = currentVal;
+    }
+}
+
 export function initializeAuditionView(
     initialAuditions: Audition[],
     initialCharacters: Character[],

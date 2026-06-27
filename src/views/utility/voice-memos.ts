@@ -6,6 +6,22 @@ import { AudioService } from '../../services/AudioService.js';
 import { ZipService } from '../../services/ZipService.js';
 import { html, HtmlSanitizer } from '../../services/HtmlSanitizer.js';
 import { openEditAudioModal } from '../edit-audio-modal.js';
+import { Project } from '../../types.js';
+
+export function refreshVoiceMemosProjects(projects: Project[]) {
+    const projectSelect = document.getElementById('voice-memo-project-select') as HTMLSelectElement;
+    if (projectSelect) {
+        const currentVal = projectSelect.value;
+        projectSelect.innerHTML = `<option value="none">-- Project (Optional) --</option>`;
+        projects.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id.toString();
+            opt.textContent = p.name;
+            projectSelect.appendChild(opt);
+        });
+        projectSelect.value = currentVal;
+    }
+}
 
 export function initializeVoiceMemos() {
     const newMemoBtn = document.getElementById('new-voice-memo-button');

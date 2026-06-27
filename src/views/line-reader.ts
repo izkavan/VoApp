@@ -51,7 +51,25 @@ interface SavedScript {
 
 export let loadScriptIntoLineReader: ((data: any) => void) | null = null;
 
+let currentLineReaderProjects: Project[] = [];
+let currentLineReaderCharacters: Character[] = [];
+
+export function refreshLineReaderView(newProjects: Project[], newCharacters: Character[]) {
+    currentLineReaderProjects = newProjects;
+    currentLineReaderCharacters = newCharacters;
+    const projectSelect = document.getElementById('script-project-select') as HTMLSelectElement;
+    if (projectSelect) {
+        const currentVal = projectSelect.value;
+        projectSelect.innerHTML = `<option value="">--Select Project--</option>${currentLineReaderProjects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}`;
+        projectSelect.value = currentVal;
+        // Trigger a change event so filters update
+        projectSelect.dispatchEvent(new Event('change'));
+    }
+}
+
 export function initializeLineReader(characters: Character[], projects: Project[], settings: SystemSettings, openCharacterModal: (character: Character) => void): void {
+    currentLineReaderCharacters = characters;
+    currentLineReaderProjects = projects;
     const fileInput = document.getElementById('script-file-input') as HTMLInputElement;
     const scriptNameInput = document.getElementById('script-name-input') as HTMLInputElement;
     const scriptVersionInput = document.getElementById('script-version-input') as HTMLInputElement;
@@ -114,6 +132,8 @@ export function initializeLineReader(characters: Character[], projects: Project[
                 lineDetails.set(detail.text, detail);
             });
 
+            updateLineContainerUI();
+
             if (projectSelect) projectSelect.dispatchEvent(new Event('change'));
             
             const pId = parseInt(projectSelect.value);
@@ -151,9 +171,9 @@ export function initializeLineReader(characters: Character[], projects: Project[
     const getAvailableCharacters = () => {
         const selectedProjectId = projectSelect?.value ? Number(projectSelect.value) : undefined;
         if (selectedProjectId !== undefined && !isNaN(selectedProjectId)) {
-            return characters.filter(c => c.projectId === selectedProjectId);
+            return currentLineReaderCharacters.filter(c => c.projectId === selectedProjectId);
         }
-        return characters;
+        return currentLineReaderCharacters;
     };
 
     const updateCharacterDropdowns = () => {
@@ -221,15 +241,18 @@ export function initializeLineReader(characters: Character[], projects: Project[
 
                 let stateDot = '';
                 if (lineDiv.classList.contains('read')) {
-                    if (detail?.state === 'Done') stateDot = '🟢 ';
-                    else if (detail?.state === 'In Progress') stateDot = '🟡 ';
-                    else stateDot = '🔴 ';
-                }
+                    const state = detail?.state;
+                    if (state === 'Done') stateDot = '<span class="status-dot dot-done"></span>';
+                    else if (state === 'In Progress') stateDot = '<span class="status-dot dot-in-progress"></span>';
+                    else stateDot = '<span class="status-dot dot-not-started"></span>';
 
-                if (lineDiv.classList.contains('read') && charId !== undefined && !isNaN(charId)) {
-                    const char = characters.find(c => c.id === charId);
-                    if (char && char.artwork) {
-                        lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
+                    if (detail && detail.characterId) {
+                        const char = currentLineReaderCharacters.find(c => c.id === detail.characterId);
+                        if (char && char.artwork) {
+                            lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span><img class="line-character-icon" src="${char.artwork}">`;
+                        } else {
+                            lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
+                        }
                     } else {
                         lineDiv.innerHTML = `<span class="line-status-icon">${stateDot}</span><span class="line-entry-text">${highlightDictionaryWords(lineText, currentDictionary)}</span>`;
                     }
@@ -254,7 +277,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
         const details = lineDetails.get(lineText);
         if (!details) return;
 
-        const associatedCharacter = characters.find(c => c.id === details.characterId);
+        const associatedCharacter = currentLineReaderCharacters.find(c => c.id === details.characterId);
         const artworkImage = associatedCharacter?.artwork
             ? `<img id="line-character-art" class="character-art-preview" src="${associatedCharacter.artwork}" />`
             : `<div id="line-character-art" class="character-art-preview"></div>`;
@@ -307,6 +330,23 @@ export function initializeLineReader(characters: Character[], projects: Project[
             </ul>
             <textarea id="line-notes" class="notes-area" placeholder="Notes...">${details.notes}</textarea>
         `;
+
+        const char = details.characterId ? currentLineReaderCharacters.find(c => c.id === details.characterId) : null;
+        if (char) {
+            readDetailsContainer.innerHTML += `
+                <div style="display:flex; align-items:center; gap: 10px; margin-bottom: 20px;">
+                    ${char.artwork ? `<img src="${char.artwork}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` : ''}
+                    <div>
+                        <strong>${char.name}</strong><br>
+                        <span style="font-size: 0.9em; color: var(--gray-400)">${(char as any).voiceArchetype || (char as any).voiceStyle || 'No archetype'}</span>
+                    </div>
+                    <button id="read-view-profile-btn" class="icon-button" title="View Character Profile">👤</button>
+                </div>
+            `;
+            setTimeout(() => {
+                document.getElementById('read-view-profile-btn')?.addEventListener('click', () => openCharacterModal(char));
+            }, 0);
+        }
 
         document.getElementById('line-name-input')?.addEventListener('input', (e) => { details.lineName = (e.target as HTMLInputElement).value; });
         document.getElementById('record-take-button')?.addEventListener('click', toggleRecording);
@@ -763,7 +803,7 @@ export function initializeLineReader(characters: Character[], projects: Project[
             let targetFolder = audioFolder;
 
             if (settings.scriptExportGrouping === 'character') {
-                const char = characters.find(c => c.id === detail.characterId);
+                const char = currentLineReaderCharacters.find(c => c.id === detail.characterId);
                 const folderName = char ? char.name.replace(/[^a-zA-Z0-9]/g, '_') : 'Unassigned';
                 targetFolder = audioFolder.folder(folderName) || audioFolder;
             } else {

@@ -4,6 +4,7 @@ import { highlightDictionaryWords } from '../../components/dictionary-highlighte
 import { getDictionaryEntries } from '../../services/indexeddb.js';
 import { loadScriptIntoSides } from './vp-sides.js';
 import { loadScriptIntoLineReader } from '../line-reader.js';
+import { openScriptImportModal } from '../../components/script-import-modal.js';
 
 interface ScriptLine {
     id: string;
@@ -543,21 +544,35 @@ async function handleImport(e: Event) {
     try {
         if (file.name.endsWith('.txt')) {
             const textContent = await file.text();
-            const linesArray = textContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             
             nameInput.value = file.name.replace('.txt', '');
             versionInput.value = '1.0';
-            projectSelect.value = 'none';
-            handleProjectChange();
 
-            scriptLines = linesArray.map((text, idx) => ({
-                id: Date.now().toString() + '-' + idx,
-                type: 'line',
-                characterId: 'none',
-                descriptor: '',
-                text: text
-            }));
-            renderLines();
+            openScriptImportModal(projects, characters, textContent, (assignedLines) => {
+                scriptLines = assignedLines.map(al => ({
+                    id: al.id,
+                    type: al.type,
+                    characterId: al.characterId,
+                    descriptor: '',
+                    text: al.text
+                }));
+                
+                // If the first line is mapped to a character, let's try to set project automatically
+                const firstCharLine = assignedLines.find(l => l.characterId !== 'scene' && l.characterId !== 'none');
+                if (firstCharLine) {
+                    const char = characters.find(c => c.id.toString() === firstCharLine.characterId);
+                    if (char && char.projectId != null) {
+                        projectSelect.value = char.projectId.toString();
+                        handleProjectChange();
+                    }
+                } else {
+                    projectSelect.value = 'none';
+                    handleProjectChange();
+                }
+
+                renderLines();
+            });
+
             return;
         }
 

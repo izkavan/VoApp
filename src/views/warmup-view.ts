@@ -11,6 +11,50 @@ let editingWarmupId: number | null = null;
 let mediaRecorder: MediaRecorder | null = null;
 let audioChunks: Blob[] = [];
 
+export function refreshWarmupView(projects: Project[], characters: Character[]) {
+    currentProjects = projects;
+    currentCharacters = characters;
+
+    const projectSelect = document.getElementById('warmup-project-select') as HTMLSelectElement;
+    if (projectSelect) {
+        const currentVal = projectSelect.value;
+        projectSelect.innerHTML = `<option value="none">-- Filter by Project --</option>`;
+        currentProjects.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id.toString();
+            opt.textContent = p.name;
+            projectSelect.appendChild(opt);
+        });
+        projectSelect.value = currentVal;
+    }
+
+    const characterSelect = document.getElementById('warmup-character-select') as HTMLSelectElement;
+    if (characterSelect) {
+        const currentVal = characterSelect.value;
+        characterSelect.innerHTML = `<option value="none">-- Filter by Character --</option>`;
+        currentCharacters.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id.toString();
+            opt.textContent = c.name;
+            characterSelect.appendChild(opt);
+        });
+        characterSelect.value = currentVal;
+    }
+
+    const modalCharSelect = document.getElementById('warmup-modal-character-select') as HTMLSelectElement;
+    if (modalCharSelect) {
+        const currentVal = modalCharSelect.value;
+        modalCharSelect.innerHTML = '<option value="none">-- Select Character --</option>';
+        currentCharacters.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id.toString();
+            opt.textContent = c.name;
+            modalCharSelect.appendChild(opt);
+        });
+        modalCharSelect.value = currentVal;
+    }
+}
+
 export function initializeWarmupView(
     warmups: Warmup[],
     characters: Character[],

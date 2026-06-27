@@ -1816,3 +1816,75 @@ body.dark-mode .table-read-take-card.golden {
     0%, 100% { color: #f00; }
     50% { color: transparent; }
 }
+
+/* Script Import Modal Styles */
+
+#script-import-textarea span.import-highlight {
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.1s;
+}
+
+#script-import-textarea span.import-highlight:hover {
+    background-color: var(--primary-light);
+    color: white;
+}
+
+#script-import-textarea span.import-highlight.locked {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+#script-import-textarea span.import-assigned {
+    color: var(--gray-400);
+    text-decoration: line-through;
+    cursor: not-allowed;
+    background-color: transparent !important;
+}
+
+.import-list-item {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 4px solid transparent;
+    background: var(--bg-color);
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.import-list-item:hover {
+    background: var(--gray-200);
+}
+body.dark-mode .import-list-item:hover {
+    background: var(--gray-700);
+}
+
+.import-list-item.char-line {
+    border-left-color: #8b5cf6; /* Purple */
+}
+
+.import-list-item.title-line {
+    border-left-color: #000000; /* Black */
+}
+body.dark-mode .import-list-item.title-line {
+    border-left-color: #ffffff; /* White in dark mode */
+}
+
+.import-list-item.scene-line {
+    border-left-color: #10b981; /* Green */
+}
+
+#vp-script-toc-list li {
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+body.dark-mode #vp-script-toc-list li {
+    background: var(--gray-900);
+}

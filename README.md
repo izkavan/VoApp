@@ -177,6 +177,13 @@ Here are some of the features that I thought up for the app that could be coming
 5. **Live Dialect and Accent Coaches**: as an extension of the Utility Section of accents, To help people connect and work on the way that they portray accents and dialects, to ensure accuracy and reduce "stereotype". Could have a coach upload their sample sets, give a background on why they are trustworthy, let users rate their coach, etc. 
 
 
+# FAQ
+## I use a mac, but the DMG is unsigned-- what gives?
+I'm not a mac user, I don't have a mac, so I use Github's build system. I can't sign an application like that, so until I get a mac or figure out an alternative workflow, you'll have to trust the application, or download and use the webhosted version. 
+https://support.apple.com/en-us/102445#:~:text=If%20you%20want%20to%20open%20an%20app%20that%20hasn%E2%80%99t%20been%20notarized%20or%20is%20from%20an%20unidentified%20developer
+tl;dr: After trying to open the DMG, go to Settings > Privacy and Security > scroll down to where the app tried to open, and click "open anyway". Try to reopen the DMG and it should prompt you, and you should be able to open the app.
+
+
 
 # THANKS!
 Thanks for checking out Vo-App. I hope it helps you bring your characters to life!
