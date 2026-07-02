@@ -152,6 +152,9 @@ Here are some of the features that I thought up for the app that could be coming
 * A lore page - Could be good to have world lore at your fingertips as well, so you know what to reference as a character. Could even have "deep lore" for a specific character-- Especially for things like liveplay twitch streams or podcasts where the podcasters are video calling each other, it could be good to display this lore using OBS on the window or something.
 * Could expand characters to have a "lineage/faction" tag system... Could use the core tags for that now though.
 * Live session view can have so many additional features added to it-- Soundboards, idle soundscapes, etc. would be a big one, but I don't know if we want to compete with things like Syrinscape. 
+* I've never found a timeline feature I like, could be good to have one.
+* Linking to the timeline feature, it could also support individual character journals, and a DM journal, to keep track of events and what their fallout is. 
+* 
 
 ### Changes for Directors/Writers/producers
 
