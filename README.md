@@ -154,7 +154,7 @@ Here are some of the features that I thought up for the app that could be coming
 * Live session view can have so many additional features added to it-- Soundboards, idle soundscapes, etc. would be a big one, but I don't know if we want to compete with things like Syrinscape. 
 * I've never found a timeline feature I like, could be good to have one.
 * Linking to the timeline feature, it could also support individual character journals, and a DM journal, to keep track of events and what their fallout is. 
-* 
+* If we've got Timelines, Lore Pages, DM Notes, it would be nice to see if there's a way to get this page to load as a sub view in Foundry or other VTT systems to make life easier and not have to be alt-tabbing
 
 ### Changes for Directors/Writers/producers
 
