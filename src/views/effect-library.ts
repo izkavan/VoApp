@@ -84,6 +84,7 @@ export async function initializeEffectLibrary(
     setupFilters();
     renderEffectGrid();
     setupModalEvents();
+    setupImportModalEvents();
 }
 
 function setupFilters() {
@@ -118,6 +119,7 @@ function setupSelectionEvents() {
     const selectAllBtn = document.getElementById('effect-select-all-btn');
     const clearSelBtn = document.getElementById('effect-clear-selection-btn');
     const downloadBtn = document.getElementById('effect-download-btn');
+    const importBtn = document.getElementById('effect-import-btn');
 
     selectAllBtn?.addEventListener('click', () => {
         // Will be populated by visible effects in renderEffectGrid
@@ -141,6 +143,7 @@ function setupSelectionEvents() {
     });
 
     downloadBtn?.addEventListener('click', downloadSelectedEffects);
+    importBtn?.addEventListener('click', handleImportEffectsClick);
 }
 
 function updateSelectionCount() {
@@ -790,3 +793,155 @@ async function downloadSelectedEffects() {
         alert("Failed to generate zip file.");
     }
 }
+
+// --- Import Effects Logic ---
+
+let pendingImportData: { descriptor: any, fileData: Blob, extension: string }[] = [];
+
+function handleImportEffectsClick() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.zip';
+    input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        try {
+            const zip = await JSZip.loadAsync(file);
+            const soundsJsonFile = zip.file("sounds.json");
+            
+            if (!soundsJsonFile) {
+                alert("Invalid format: sounds.json not found in the ZIP.");
+                return;
+            }
+
+            const soundsJsonContent = await soundsJsonFile.async("string");
+            const descriptors = JSON.parse(soundsJsonContent);
+
+            if (!Array.isArray(descriptors) || descriptors.length === 0) {
+                alert("No effects found in the imported file.");
+                return;
+            }
+
+            pendingImportData = [];
+            
+            for (const desc of descriptors) {
+                if (desc.localPath) {
+                    const audioFile = zip.file(desc.localPath);
+                    if (audioFile) {
+                        const fileData = await audioFile.async("blob");
+                        const extension = desc.localPath.split('.').pop() || 'webm';
+                        pendingImportData.push({ descriptor: desc, fileData, extension });
+                    }
+                }
+            }
+
+            if (pendingImportData.length === 0) {
+                alert("No valid audio files found matching the descriptors.");
+                return;
+            }
+
+            // Populate Modal
+            const summary = document.getElementById('import-effects-summary');
+            if (summary) {
+                summary.textContent = `Found ${pendingImportData.length} effect(s) in the ZIP file.`;
+            }
+
+            const projSelect = document.getElementById('import-effects-project-select') as HTMLSelectElement;
+            const charSelect = document.getElementById('import-effects-character-select') as HTMLSelectElement;
+
+            if (projSelect && charSelect) {
+                projSelect.innerHTML = '<option value="none">-- Unassigned --</option>';
+                currentProjects.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id.toString();
+                    opt.textContent = p.name;
+                    projSelect.appendChild(opt);
+                });
+
+                charSelect.innerHTML = '<option value="none">-- Unassigned --</option>' + generateCharacterOptionsHTML(currentCharacters);
+
+                // Auto-select based on metadata if available (using first effect as a hint)
+                let autoProjectId: string | undefined;
+                let autoCharacterId: string | undefined;
+
+                for (const item of pendingImportData) {
+                    if (item.descriptor.projectIds && item.descriptor.projectIds.length > 0) {
+                        const originalProjId = item.descriptor.projectIds[0];
+                        // If we could find the project name from the old DB, that would be ideal,
+                        // but since we only have IDs in sounds.json, it might not match the current DB.
+                        // Let's see if the ID matches a project directly
+                        if (currentProjects.find(p => p.id === originalProjId)) {
+                            autoProjectId = originalProjId.toString();
+                        }
+                    }
+                    if (item.descriptor.characterIds && item.descriptor.characterIds.length > 0) {
+                        const originalCharId = item.descriptor.characterIds[0];
+                        if (currentCharacters.find(c => c.id === originalCharId)) {
+                            autoCharacterId = originalCharId.toString();
+                        }
+                    }
+                    if (autoProjectId || autoCharacterId) break;
+                }
+                
+                if (autoProjectId) projSelect.value = autoProjectId;
+                if (autoCharacterId) charSelect.value = autoCharacterId;
+            }
+
+            const modal = document.getElementById('import-effects-modal');
+            modal?.classList.remove('hidden');
+
+        } catch (err) {
+            console.error("Error reading ZIP file:", err);
+            alert("Error reading ZIP file. Ensure it is a valid Effect Library export.");
+        }
+    };
+    input.click();
+}
+
+function setupImportModalEvents() {
+    const modal = document.getElementById('import-effects-modal');
+    const closeBtn = document.getElementById('import-effects-modal-close');
+    const cancelBtn = document.getElementById('import-effects-cancel');
+    const confirmBtn = document.getElementById('import-effects-confirm');
+
+    const closeModal = () => modal?.classList.add('hidden');
+
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+
+    confirmBtn?.addEventListener('click', async () => {
+        const projSelect = document.getElementById('import-effects-project-select') as HTMLSelectElement;
+        const charSelect = document.getElementById('import-effects-character-select') as HTMLSelectElement;
+        
+        const projectId = projSelect.value !== 'none' ? parseInt(projSelect.value) : undefined;
+        const characterId = charSelect.value !== 'none' ? parseInt(charSelect.value) : undefined;
+
+        let importCount = 0;
+        for (const item of pendingImportData) {
+            const desc = item.descriptor;
+            // The fileData is already a blob, we can just use it or re-wrap it with correct type
+            const blob = new Blob([item.fileData], { type: `audio/${item.extension === 'wav' ? 'wav' : 'webm'}` });
+            
+            const newEffect: Omit<Effect, 'id'> = {
+                title: desc.title,
+                group: desc.group,
+                tags: desc.tags || [],
+                projectIds: projectId !== undefined ? [projectId] : [],
+                characterIds: characterId !== undefined ? [characterId] : [],
+                blob: blob,
+                date: Date.now()
+            };
+
+            await saveEffect(newEffect);
+            importCount++;
+        }
+
+        currentEffects = await getEffects();
+        renderEffectGrid();
+        
+        closeModal();
+        alert(`Successfully imported ${importCount} effect(s).`);
+    });
+}
+

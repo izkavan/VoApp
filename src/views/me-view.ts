@@ -19,7 +19,10 @@ export function initializeMeView() {
         <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2>My Profile</h2>
-                <button id="me-save-btn" style="background: var(--primary-color); color: white; padding: 10px 20px; font-size: 1.1em;">Save Profile</button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="me-export-btn" class="secondary-button" style="padding: 10px 20px; font-size: 1.1em;">Export Profile</button>
+                    <button id="me-save-btn" style="background: var(--primary-color); color: white; padding: 10px 20px; font-size: 1.1em;">Save Profile</button>
+                </div>
             </div>
             
             <div style="display: grid; grid-template-columns: 200px 1fr; gap: 30px;">
@@ -489,9 +492,35 @@ function bindMeViewEvents() {
 
     document.getElementById('me-save-btn')?.addEventListener('click', saveHandler);
     document.getElementById('me-save-btn-bottom')?.addEventListener('click', saveHandler);
+    document.getElementById('me-export-btn')?.addEventListener('click', exportProfileData);
 
     document.getElementById('me-add-custom-link-btn')?.addEventListener('click', () => {
         customLinksData.push({ name: '', url: '' });
         renderCustomLinks();
     });
+}
+
+function exportProfileData() {
+    const profile = DataStore.getUserProfile();
+    if (!profile) {
+        alert('No profile data saved yet. Please save your profile first.');
+        return;
+    }
+
+    const exportData = {
+        version: 1,
+        type: 'UserProfile',
+        profile: profile
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const filenameName = profile.firstName || profile.lastName ? `${profile.firstName}_${profile.lastName}`.trim() : 'Profile';
+    a.download = `${filenameName.replace(/\s+/g, '_')}_Export.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

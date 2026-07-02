@@ -217,7 +217,8 @@
                         <span style="font-weight: bold; margin-right: 10px;">Export:</span>
                         <button id="effect-select-all-btn" style="padding: 5px 10px;">Select All Visible</button>
                         <button id="effect-clear-selection-btn" style="padding: 5px 10px;">Clear Selection</button>
-                        <button id="effect-download-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Download</button>
+                        <button id="effect-download-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Export Selected</button>
+                        <button id="effect-import-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Import Effects</button>
                         <span id="effect-selection-count" style="margin-left: auto; font-style: italic;">0 selected</span>
                     </div>
 
@@ -453,6 +454,7 @@
                 <div class="tab-nav">
                     <button class="tab-link active" data-tab="dm-session">Session</button>
                     <button class="tab-link" data-tab="dm-generator">Generator</button>
+                    <button class="tab-link" data-tab="dm-character-notes">Character Notes</button>
                 </div>
                 <div id="dm-session" class="tab-content active">
 
@@ -482,6 +484,50 @@
                             </select>
                         </div>
                         <button id="dm-generator-button" style="padding: 10px 20px; font-size: 1.2rem; font-weight: bold; background: var(--primary-color, #744abd); color: white; border-radius: 5px; border: none; cursor: pointer;">Generate Random Character</button>
+                    </div>
+                </div>
+                
+                <div id="dm-character-notes" class="tab-content">
+                    <div class="character-notes-header" style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <label for="dm-notes-project-select" style="font-weight: bold;">Project:</label>
+                            <select id="dm-notes-project-select">
+                                <option value="none">All Projects</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="dm-notes-character-select" style="font-weight: bold;">Character:</label>
+                            <select id="dm-notes-character-select">
+                                <option value="" disabled selected>Select a Character...</option>
+                            </select>
+                        </div>
+                        <div style="flex-grow: 1;"></div>
+                        <button id="dm-notes-import-btn" class="secondary-button">Import Journal</button>
+                        <button id="dm-notes-export-btn" class="secondary-button" disabled>Export Journal</button>
+                    </div>
+
+                    <div id="dm-notes-container" class="journal-layout" style="display: none;">
+                        <div class="journal-sidebar">
+                            <div class="journal-search-container">
+                                <input type="text" id="dm-notes-search" placeholder="Search by title..." />
+                            </div>
+                            <div class="journal-add-buttons">
+                                <button id="dm-notes-add-text" class="add-journal-btn" title="Add Text Entry">📝</button>
+                                <button id="dm-notes-add-social" class="add-journal-btn" title="Add Social Entry">👥</button>
+                                <button id="dm-notes-add-event" class="add-journal-btn" title="Add Event Entry">📅</button>
+                            </div>
+                            <div id="dm-notes-list" class="journal-list">
+                                <!-- Journal entries will populate here -->
+                            </div>
+                        </div>
+                        <div class="journal-main">
+                            <div id="dm-notes-editor" class="journal-editor" style="display: none;">
+                                <!-- Dynamic form injected here -->
+                            </div>
+                            <div id="dm-notes-empty-state" class="journal-empty-state">
+                                <p>Select an entry from the list or create a new one.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1178,6 +1224,36 @@
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
                 <button id="script-import-cancel" class="secondary-btn">Cancel</button>
                 <button id="script-import-save" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+    <!-- Import Effects Modal -->
+    <div id="import-effects-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Import Effects</h3>
+                <span id="import-effects-modal-close" class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="import-effects-summary" style="margin-bottom: 15px; font-weight: bold;"></p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="import-effects-project-select" style="display: block; margin-bottom: 5px;">Assign to Project:</label>
+                    <select id="import-effects-project-select" style="width: 100%; padding: 8px;">
+                        <option value="none">-- Unassigned --</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="import-effects-character-select" style="display: block; margin-bottom: 5px;">Assign to Character:</label>
+                    <select id="import-effects-character-select" style="width: 100%; padding: 8px;">
+                        <option value="none">-- Unassigned --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="import-effects-cancel">Cancel</button>
+                <button id="import-effects-confirm" class="primary-button">Import</button>
             </div>
         </div>
     </div>

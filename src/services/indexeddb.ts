@@ -1,12 +1,13 @@
-import { VoiceMemo, DictionaryEntry, Effect } from '../types.js';
+import { VoiceMemo, DictionaryEntry, Effect, JournalEntry } from '../types.js';
 
 const DB_NAME = 'VoAppDatabase';
-const DB_VERSION = 5; // Incremented for images store
+const DB_VERSION = 6; // Incremented for journal_entries store
 const VOICE_MEMOS_STORE = 'voice_memos';
 const DICTIONARY_STORE = 'dictionary';
 const AUDIO_BLOBS_STORE = 'audio_blobs';
 const EFFECTS_STORE = 'effects';
 const IMAGE_BLOBS_STORE = 'image_blobs';
+const JOURNAL_ENTRIES_STORE = 'journal_entries';
 
 export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -38,6 +39,10 @@ export function initDB(): Promise<IDBDatabase> {
             }
             if (!db.objectStoreNames.contains(IMAGE_BLOBS_STORE)) {
                 db.createObjectStore(IMAGE_BLOBS_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(JOURNAL_ENTRIES_STORE)) {
+                const store = db.createObjectStore(JOURNAL_ENTRIES_STORE, { keyPath: 'id' });
+                store.createIndex('characterId', 'characterId', { unique: false });
             }
         };
     });
@@ -301,6 +306,45 @@ export async function deleteAudioBlob(id: string): Promise<void> {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([AUDIO_BLOBS_STORE], 'readwrite');
         const store = transaction.objectStore(AUDIO_BLOBS_STORE);
+        const request = store.delete(id);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+// --- Journal Entries Operations ---
+
+export async function saveJournalEntry(entry: JournalEntry): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([JOURNAL_ENTRIES_STORE], 'readwrite');
+        const store = transaction.objectStore(JOURNAL_ENTRIES_STORE);
+        const request = store.put(entry); // Handles both insert and update if id exists
+
+        request.onsuccess = () => resolve();
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function getJournalEntries(characterId: number): Promise<JournalEntry[]> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([JOURNAL_ENTRIES_STORE], 'readonly');
+        const store = transaction.objectStore(JOURNAL_ENTRIES_STORE);
+        const index = store.index('characterId');
+        const request = index.getAll(characterId);
+
+        request.onsuccess = (event) => resolve((event.target as IDBRequest<JournalEntry[]>).result);
+        request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+}
+
+export async function deleteJournalEntry(id: string): Promise<void> {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([JOURNAL_ENTRIES_STORE], 'readwrite');
+        const store = transaction.objectStore(JOURNAL_ENTRIES_STORE);
         const request = store.delete(id);
 
         request.onsuccess = () => resolve();

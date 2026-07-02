@@ -176,3 +176,46 @@ export interface SystemSettings {
     timerWarningTime?: number;
     timerStopTime?: number;
 }
+
+export type JournalEntryType = 'text' | 'social' | 'event';
+
+export interface JournalEntryBase {
+    id: string; // unique UUID for entry
+    characterId: number; // associated character
+    title: string;
+    type: JournalEntryType;
+    dateCreated: number;
+    dateUpdated: number;
+}
+
+export interface TextJournalEntry extends JournalEntryBase {
+    type: 'text';
+    content: string; // The massive text content
+}
+
+export interface RatingHistoryEvent {
+    oldRating: number;
+    newRating: number;
+    reasoning: string;
+    date: number;
+}
+
+export interface SocialJournalEntry extends JournalEntryBase {
+    type: 'social';
+    npcName: string;
+    occupation: string;
+    howTheyMet: string;
+    currentOpinion: string;
+    eventsInfluencing: string;
+    rating: number; // 1 to 8
+    ratingHistory: RatingHistoryEvent[];
+}
+
+export interface EventJournalEntry extends JournalEntryBase {
+    type: 'event';
+    description: string;
+    timeTookPlace: string;
+    openNotes: string;
+}
+
+export type JournalEntry = TextJournalEntry | SocialJournalEntry | EventJournalEntry;

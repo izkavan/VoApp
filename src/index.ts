@@ -18,6 +18,7 @@ import { initializeUtilityView } from './views/utility-view.js';
 import { initializeAuditionView, refreshAuditionView } from './views/audition-view.js';
 import { initializeTeleprompter, refreshTeleprompterProjects } from './components/teleprompt.js';
 import { initializeDungeonMasterView, refreshDungeonMasterView } from './views/dungeon-master-view.js';
+import { initializeCharacterNotesView, refreshCharacterNotesView } from './views/character-notes-view.js';
 import { initializeSettingsView } from './views/settings-view.js';
 import { initializeDictionaryModal, openDictionaryModal } from './components/dictionary-modal.js';
 import { initializeDictionaryHighlighter } from './components/dictionary-highlighter.js';
@@ -74,6 +75,7 @@ export function renderApp() {
     updateFilterData(characters, projects);
     filterCharacters();
     refreshDungeonMasterView(projects, characters);
+    refreshCharacterNotesView(projects, characters);
     refreshScriptView(projects, characters);
     refreshSidesView(characters);
     loadMeViewData();
@@ -201,6 +203,7 @@ async function initApp() {
     initializeVoiceProductionFeedback();
     initializeLineReader(characters, projects, currentSettings, openModal);
     initializeDungeonMasterView(characters, projects, openModal);
+    initializeCharacterNotesView(characters, projects, openModal);
     initializeUtilityView();
     initializeScriptView(projects, characters, openDictionaryModal);
     initializeSidesView(characters, openModal);
