@@ -62,9 +62,6 @@ export function initializeTeleprompter(projects: Project[]) {
 
     let fontSize = 24;
     let lineHeightRatio = 1.5;
-    displayDiv.style.lineHeight = `${lineHeightRatio}`;
-    displayDiv.style.color = colorPicker.value;
-    displayDiv.style.backgroundColor = bgColorPicker.value;
 
     let isReading = false;
     let animationFrameId: number;
@@ -79,6 +76,56 @@ export function initializeTeleprompter(projects: Project[]) {
     let activeFileId: string | null = null;
     let currentDictionary: DictionaryEntry[] = [];
     let audioUrls = new Map<string, string>();
+
+    const SESSION_KEY = 'teleprompter_session_v1';
+
+    const saveState = () => {
+        const state = {
+            fontSize,
+            lineHeightRatio,
+            color: colorPicker.value,
+            bgColor: bgColorPicker.value,
+            speed: speedInput.value,
+            projectId: projectSelect ? projectSelect.value : '',
+            sessionFiles,
+            activeFileId
+        };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+    };
+
+    const loadState = () => {
+        const dataStr = localStorage.getItem(SESSION_KEY);
+        if (!dataStr) return;
+        try {
+            const state = JSON.parse(dataStr);
+            if (state.fontSize) fontSize = state.fontSize;
+            if (state.lineHeightRatio) lineHeightRatio = state.lineHeightRatio;
+            if (state.color) colorPicker.value = state.color;
+            if (state.bgColor) bgColorPicker.value = state.bgColor;
+            if (state.speed) speedInput.value = state.speed;
+            if (state.sessionFiles) sessionFiles = state.sessionFiles;
+            if (state.activeFileId) activeFileId = state.activeFileId;
+            // Note: ProjectId will be handled when projectsData is bound in refreshTeleprompterProjects/init
+            if (state.projectId && projectSelect) {
+                // Wait for options to be populated or set it later
+                setTimeout(() => {
+                    projectSelect.value = state.projectId;
+                    projectSelect.dispatchEvent(new Event('change'));
+                }, 100);
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+    };
+
+    loadState();
+
+    displayDiv.style.fontSize = `${fontSize}px`;
+    fontLabel.textContent = `${fontSize}px`;
+    displayDiv.style.lineHeight = `${lineHeightRatio}`;
+    spacingLabel.textContent = lineHeightRatio.toFixed(1);
+    displayDiv.style.color = colorPicker.value;
+    displayDiv.style.backgroundColor = bgColorPicker.value;
 
     // --- TOC Logic ---
     tocToggle.addEventListener('click', () => {
@@ -100,9 +147,12 @@ export function initializeTeleprompter(projects: Project[]) {
                 const id = (e.currentTarget as HTMLElement).getAttribute('data-id');
                 if (id && id !== activeFileId) {
                     activeFileId = id;
+                    saveState();
                     renderTOC();
                     renderText();
                     renderTakes();
+                } else if (id === activeFileId) {
+                    scrollToHighlight();
                 }
             });
         });
@@ -127,6 +177,7 @@ export function initializeTeleprompter(projects: Project[]) {
                 activeFile.highlightedSentences.push(idx);
                 sentenceEl.classList.add('highlighted');
             }
+            saveState();
         }
     });
 
@@ -194,6 +245,7 @@ export function initializeTeleprompter(projects: Project[]) {
     const updateFontSize = () => {
         displayDiv.style.fontSize = `${fontSize}px`;
         fontLabel.textContent = `${fontSize}px`;
+        saveState();
     };
     fontMinus.addEventListener('click', () => { if (fontSize > 10) { fontSize -= 2; updateFontSize(); } });
     fontPlus.addEventListener('click', () => { if (fontSize < 100) { fontSize += 2; updateFontSize(); } });
@@ -201,12 +253,14 @@ export function initializeTeleprompter(projects: Project[]) {
     const updateLineSpacing = () => {
         displayDiv.style.lineHeight = `${lineHeightRatio}`;
         spacingLabel.textContent = lineHeightRatio.toFixed(1);
+        saveState();
     };
     spacingMinus.addEventListener('click', () => { if (lineHeightRatio > 1.0) { lineHeightRatio = Math.max(1.0, lineHeightRatio - 0.1); updateLineSpacing(); } });
     spacingPlus.addEventListener('click', () => { if (lineHeightRatio < 4.0) { lineHeightRatio = Math.min(4.0, lineHeightRatio + 0.1); updateLineSpacing(); } });
 
-    colorPicker.addEventListener('input', (e) => { displayDiv.style.color = (e.target as HTMLInputElement).value; });
-    bgColorPicker.addEventListener('input', (e) => { displayDiv.style.backgroundColor = (e.target as HTMLInputElement).value; });
+    colorPicker.addEventListener('input', (e) => { displayDiv.style.color = (e.target as HTMLInputElement).value; saveState(); });
+    bgColorPicker.addEventListener('input', (e) => { displayDiv.style.backgroundColor = (e.target as HTMLInputElement).value; saveState(); });
+    speedInput.addEventListener('change', () => { saveState(); });
 
     // --- Auto-Scroll ---
     const scrollLoop = (timestamp: number) => {
@@ -233,6 +287,10 @@ export function initializeTeleprompter(projects: Project[]) {
         isReading = state;
         readToggle.checked = state;
         if (isReading) {
+            const activeFile = getActiveFile();
+            if (activeFile && activeFile.highlightedSentences.length > 0) {
+                scrollToHighlight();
+            }
             lastTime = 0;
             exactScrollTop = displayDiv.scrollTop;
             animationFrameId = requestAnimationFrame(scrollLoop);
@@ -290,6 +348,7 @@ export function initializeTeleprompter(projects: Project[]) {
             const take = activeFile.takes[index];
             if (take.audioId) await deleteAudioBlob(take.audioId);
             activeFile.takes.splice(index, 1);
+            saveState();
             renderTakes();
         }));
 
@@ -315,21 +374,25 @@ export function initializeTeleprompter(projects: Project[]) {
                     audioUrls.set(newAudioId, newUrl);
                     audioPlayer.src = newUrl;
                 }
+                saveState();
             });
         }));
 
         takesList.querySelectorAll('.tp-title-input').forEach(input => input.addEventListener('input', (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             activeFile.takes[index].title = (e.target as HTMLInputElement).value;
+            saveState();
         }));
         takesList.querySelectorAll('.take-note-input').forEach(input => input.addEventListener('input', (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             activeFile.takes[index].notes = (e.target as HTMLInputElement).value;
+            saveState();
         }));
         document.querySelectorAll('#teleprompt-takes-list .star').forEach(star => star.addEventListener('click', (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.take-item')?.getAttribute('data-index'));
             const rating = Number((e.currentTarget as HTMLElement).getAttribute('data-value'));
             activeFile.takes[index].rating = rating;
+            saveState();
             renderTakes(); // Re-renders to update stars
         }));
     };
@@ -360,6 +423,7 @@ export function initializeTeleprompter(projects: Project[]) {
                 const audioId = await saveAudioBlob(audioBlob);
                 
                 activeFile.takes.push({ audioId, rating: 0, notes: '', title: `Take ${activeFile.takes.length + 1}` });
+                saveState();
                 renderTakes();
                 
                 stream.getTracks().forEach(track => track.stop());
@@ -445,6 +509,7 @@ export function initializeTeleprompter(projects: Project[]) {
             activeFileId = sessionFiles[0].id;
         }
         
+        saveState();
         renderTOC();
         renderText();
         renderTakes();
@@ -455,6 +520,7 @@ export function initializeTeleprompter(projects: Project[]) {
             if (confirm("Are you sure you want to clear the session? All unsaved takes will be lost.")) {
                 sessionFiles = [];
                 activeFileId = null;
+                saveState();
                 renderTOC();
                 renderText();
                 renderTakes();
@@ -531,4 +597,11 @@ export function initializeTeleprompter(projects: Project[]) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+
+    // Initial render if state was loaded
+    if (sessionFiles.length > 0) {
+        renderTOC();
+        renderText();
+        renderTakes();
+    }
 }

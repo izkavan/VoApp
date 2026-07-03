@@ -72,7 +72,6 @@ export function initializeDictionaryModal(modalEl: HTMLElement, contentEl: HTMLE
         ipaPopup.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
         ipaPopup.style.zIndex = '10000';
         ipaPopup.style.width = '340px';
-        ipaPopup.style.display = 'grid';
         ipaPopup.style.gridTemplateColumns = 'repeat(8, 1fr)';
         ipaPopup.style.gap = '5px';
         

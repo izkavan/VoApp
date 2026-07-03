@@ -153,12 +153,23 @@ export interface ActorProfile {
 
 export interface FeatureVisibility {
     viewVoiceActor: boolean;
-    viewDungeonMaster: boolean;
+    viewStoryteller: boolean;
+    viewVoiceProduction: boolean;
     viewUtility: boolean;
     tabLineReader: boolean;
     tabTeleprompter: boolean;
     tabAuditions: boolean;
     tabEffectLibrary: boolean;
+        tabVpFeedback: boolean;
+    tabVpScript: boolean;
+    tabVpSides: boolean;
+    tabVpAuditions: boolean;
+    tabVpContraster: boolean;
+    tabVpTableRead: boolean;
+    tabDmSession: boolean;
+    tabDmGenerator: boolean;
+    tabDmCharacterNotes: boolean;
+    tabAudioOverlay: boolean;
     tabWarmups: boolean;
     tabVoiceMemos: boolean;
     showRecordTimer: boolean;

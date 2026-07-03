@@ -711,22 +711,104 @@
                         <h3>Feature Visibility</h3>
                         <p style="margin-bottom: 15px; color: var(--gray-700);">Toggle entire views or specific tabs on/off to declutter your workspace.</p>
                         
-                        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 200px;">
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            
+                            <!-- Views Line -->
+                            <div>
                                 <h4 style="margin-bottom: 10px;">Views</h4>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-view-voice-actor"> Voice Actor View
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-view-dungeon-master"> Dungeon Master View
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-view-utility"> Utility View
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px; margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+                                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="visibility-view-voice-actor"> Voice Actor View
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="visibility-view-voice-production"> Voice Production View
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="visibility-view-storyteller"> Storyteller View
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="checkbox" id="visibility-view-utility"> Utility View
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Next line, Voice Actor & Voice Production -->
+                            <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <h4 style="margin-bottom: 10px;">Voice Actor Tabs</h4>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-line-reader"> Line Reader
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-teleprompter"> Teleprompter
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-auditions"> Auditions
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-effect-library"> Effect Library
+                                    </label>
+                                </div>
+
+                                <div style="flex: 1; min-width: 200px;">
+                                    <h4 style="margin-bottom: 10px;">Voice Production Tabs</h4>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-feedback"> Feedback
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-script"> Script
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-sides"> Sides
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-auditions"> Auditions
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-contraster"> Contraster
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-vp-table-read"> Table Read
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Next line, Storyteller & Utilities -->
+                            <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <h4 style="margin-bottom: 10px;">Storyteller Tabs</h4>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-dm-session"> Session
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-dm-generator"> Generator
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-dm-character-notes"> Character Notes
+                                    </label>
+                                </div>
+
+                                <div style="flex: 1; min-width: 200px;">
+                                    <h4 style="margin-bottom: 10px;">Utility Tabs</h4>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-warmups"> Vocal Warm Ups
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-voice-memos"> Voice Memos
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                        <input type="checkbox" id="visibility-tab-audio-overlay"> Audio Overlay
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Record Timer below -->
+                            <div style="border-top: 1px solid #ccc; padding-top: 20px;">
+                                <h4 style="margin-bottom: 10px;">Record Timer</h4>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                                     <input type="checkbox" id="visibility-show-record-timer"> Show Record Timer (Nav Bar)
                                 </label>
-                                <div id="timer-settings-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; padding-left: 20px;">
+                                <div id="timer-settings-container" style="display: flex; gap: 20px; align-items: center;">
                                     <label style="display: flex; align-items: center; gap: 10px; font-size: 0.9em;">
                                         Warning Time (sec): <input type="number" id="setting-timer-warning" style="width: 80px; background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 4px; border-radius: 4px;" min="0">
                                     </label>
@@ -736,31 +818,6 @@
                                 </div>
                             </div>
 
-                            <div style="flex: 1; min-width: 200px;">
-                                <h4 style="margin-bottom: 10px;">Voice Actor Tabs</h4>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-line-reader"> Line Reader
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-teleprompter"> Teleprompter
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-auditions"> Auditions
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-effect-library"> Effect Library
-                                </label>
-                            </div>
-
-                            <div style="flex: 1; min-width: 200px;">
-                                <h4 style="margin-bottom: 10px;">Utility Tabs</h4>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-warmups"> Vocal Warm Ups
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                    <input type="checkbox" id="visibility-tab-voice-memos"> Voice Memos
-                                </label>
-                            </div>
                         </div>
                     </div>
 

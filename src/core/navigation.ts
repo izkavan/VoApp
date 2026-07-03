@@ -8,7 +8,7 @@ export function initializeNavigation() {
     const navCharacterLibrary = document.getElementById('nav-character-library');
     const navVoiceActors = document.getElementById('nav-voice-actors');
     const navVoiceProduction = document.getElementById('nav-voice-production');
-    const navDungeonMaster = document.getElementById('nav-dungeon-master');
+    const navStoryteller = document.getElementById('nav-dungeon-master');
     const navUtilities = document.getElementById('nav-utilities');
     const navSettings = document.getElementById('nav-settings');
 
@@ -55,11 +55,13 @@ export function applyFeatureVisibility(settings: SystemSettings) {
 
     // View links
     const navVoiceActors = document.getElementById('nav-voice-actors');
-    const navDungeonMaster = document.getElementById('nav-dungeon-master');
+    const navStoryteller = document.getElementById('nav-dungeon-master');
+    const navVoiceProduction = document.getElementById('nav-voice-production');
     const navUtilities = document.getElementById('nav-utilities');
 
     if (navVoiceActors) navVoiceActors.style.display = fv.viewVoiceActor ? '' : 'none';
-    if (navDungeonMaster) navDungeonMaster.style.display = fv.viewDungeonMaster ? '' : 'none';
+    if (navStoryteller) navStoryteller.style.display = fv.viewStoryteller ? '' : 'none';
+    if (navVoiceProduction) navVoiceProduction.style.display = fv.viewVoiceProduction ? '' : 'none';
     if (navUtilities) navUtilities.style.display = fv.viewUtility ? '' : 'none';
 
     // Tab links (Voice Actor)
@@ -73,12 +75,38 @@ export function applyFeatureVisibility(settings: SystemSettings) {
     if (tabAuditions) tabAuditions.style.display = fv.tabAuditions ? '' : 'none';
     if (tabEffectLibrary) tabEffectLibrary.style.display = fv.tabEffectLibrary ? '' : 'none';
 
+    // Tab links (Voice Production)
+    const tabVpFeedback = document.querySelector('button[data-tab="vp-feedback"]') as HTMLElement;
+    const tabVpScript = document.querySelector('button[data-tab="vp-script"]') as HTMLElement;
+    const tabVpSides = document.querySelector('button[data-tab="vp-sides"]') as HTMLElement;
+    const tabVpAuditions = document.querySelector('button[data-tab="vp-auditions"]') as HTMLElement;
+    const tabVpContraster = document.querySelector('button[data-tab="vp-contraster"]') as HTMLElement;
+    const tabVpTableRead = document.querySelector('button[data-tab="vp-table-read"]') as HTMLElement;
+
+    if (tabVpFeedback) tabVpFeedback.style.display = fv.tabVpFeedback ? '' : 'none';
+    if (tabVpScript) tabVpScript.style.display = fv.tabVpScript ? '' : 'none';
+    if (tabVpSides) tabVpSides.style.display = fv.tabVpSides ? '' : 'none';
+    if (tabVpAuditions) tabVpAuditions.style.display = fv.tabVpAuditions ? '' : 'none';
+    if (tabVpContraster) tabVpContraster.style.display = fv.tabVpContraster ? '' : 'none';
+    if (tabVpTableRead) tabVpTableRead.style.display = fv.tabVpTableRead ? '' : 'none';
+
+    // Tab links (Storyteller)
+    const tabDmSession = document.querySelector('button[data-tab="dm-session"]') as HTMLElement;
+    const tabDmGenerator = document.querySelector('button[data-tab="dm-generator"]') as HTMLElement;
+    const tabDmCharacterNotes = document.querySelector('button[data-tab="dm-character-notes"]') as HTMLElement;
+
+    if (tabDmSession) tabDmSession.style.display = fv.tabDmSession ? '' : 'none';
+    if (tabDmGenerator) tabDmGenerator.style.display = fv.tabDmGenerator ? '' : 'none';
+    if (tabDmCharacterNotes) tabDmCharacterNotes.style.display = fv.tabDmCharacterNotes ? '' : 'none';
+
     // Tab links (Utility)
     const tabWarmups = document.querySelector('button[data-tab="warm-ups"]') as HTMLElement;
     const tabVoiceMemos = document.querySelector('button[data-tab="voice-memos"]') as HTMLElement;
+    const tabAudioOverlay = document.querySelector('button[data-tab="audio-overlay"]') as HTMLElement;
 
     if (tabWarmups) tabWarmups.style.display = fv.tabWarmups ? '' : 'none';
     if (tabVoiceMemos) tabVoiceMemos.style.display = fv.tabVoiceMemos ? '' : 'none';
+    if (tabAudioOverlay) tabAudioOverlay.style.display = fv.tabAudioOverlay ? '' : 'none';
 
     // Fallback logic for active elements that are now hidden
     

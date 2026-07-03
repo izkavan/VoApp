@@ -21,7 +21,8 @@ export function initializeSettingsView(
 
     // Feature Visibility Toggles
     const visViewVoiceActor = document.getElementById('visibility-view-voice-actor') as HTMLInputElement;
-    const visViewDungeonMaster = document.getElementById('visibility-view-dungeon-master') as HTMLInputElement;
+    const visViewStoryteller = document.getElementById('visibility-view-storyteller') as HTMLInputElement;
+    const visViewVoiceProduction = document.getElementById('visibility-view-voice-production') as HTMLInputElement;
     const visViewUtility = document.getElementById('visibility-view-utility') as HTMLInputElement;
     const visShowRecordTimer = document.getElementById('visibility-show-record-timer') as HTMLInputElement;
     const timerWarningInput = document.getElementById('setting-timer-warning') as HTMLInputElement;
@@ -30,6 +31,16 @@ export function initializeSettingsView(
     const visTabTeleprompter = document.getElementById('visibility-tab-teleprompter') as HTMLInputElement;
     const visTabAuditions = document.getElementById('visibility-tab-auditions') as HTMLInputElement;
     const visTabEffectLibrary = document.getElementById('visibility-tab-effect-library') as HTMLInputElement;
+    const visTabVpFeedback = document.getElementById('visibility-tab-vp-feedback') as HTMLInputElement;
+    const visTabVpScript = document.getElementById('visibility-tab-vp-script') as HTMLInputElement;
+    const visTabVpSides = document.getElementById('visibility-tab-vp-sides') as HTMLInputElement;
+    const visTabVpAuditions = document.getElementById('visibility-tab-vp-auditions') as HTMLInputElement;
+    const visTabVpContraster = document.getElementById('visibility-tab-vp-contraster') as HTMLInputElement;
+    const visTabVpTableRead = document.getElementById('visibility-tab-vp-table-read') as HTMLInputElement;
+    const visTabDmSession = document.getElementById('visibility-tab-dm-session') as HTMLInputElement;
+    const visTabDmGenerator = document.getElementById('visibility-tab-dm-generator') as HTMLInputElement;
+    const visTabDmCharacterNotes = document.getElementById('visibility-tab-dm-character-notes') as HTMLInputElement;
+    const visTabAudioOverlay = document.getElementById('visibility-tab-audio-overlay') as HTMLInputElement;
     const visTabWarmups = document.getElementById('visibility-tab-warmups') as HTMLInputElement;
     const visTabVoiceMemos = document.getElementById('visibility-tab-voice-memos') as HTMLInputElement;
 
@@ -62,16 +73,27 @@ export function initializeSettingsView(
     checkFontWarning();
 
     if (settings.featureVisibility) {
-        if (visViewVoiceActor) visViewVoiceActor.checked = settings.featureVisibility.viewVoiceActor;
-        if (visViewDungeonMaster) visViewDungeonMaster.checked = settings.featureVisibility.viewDungeonMaster;
-        if (visViewUtility) visViewUtility.checked = settings.featureVisibility.viewUtility;
+        if (visViewVoiceActor) visViewVoiceActor.checked = settings.featureVisibility.viewVoiceActor ?? true;
+        if (visViewStoryteller) visViewStoryteller.checked = settings.featureVisibility.viewStoryteller ?? true;
+        if (visViewVoiceProduction) visViewVoiceProduction.checked = settings.featureVisibility.viewVoiceProduction ?? true;
+        if (visViewUtility) visViewUtility.checked = settings.featureVisibility.viewUtility ?? true;
         if (visShowRecordTimer) visShowRecordTimer.checked = settings.featureVisibility.showRecordTimer || false;
-        if (visTabLineReader) visTabLineReader.checked = settings.featureVisibility.tabLineReader;
-        if (visTabTeleprompter) visTabTeleprompter.checked = settings.featureVisibility.tabTeleprompter;
-        if (visTabAuditions) visTabAuditions.checked = settings.featureVisibility.tabAuditions;
-        if (visTabEffectLibrary) visTabEffectLibrary.checked = settings.featureVisibility.tabEffectLibrary;
-        if (visTabWarmups) visTabWarmups.checked = settings.featureVisibility.tabWarmups;
-        if (visTabVoiceMemos) visTabVoiceMemos.checked = settings.featureVisibility.tabVoiceMemos;
+        if (visTabLineReader) visTabLineReader.checked = settings.featureVisibility.tabLineReader ?? true;
+        if (visTabTeleprompter) visTabTeleprompter.checked = settings.featureVisibility.tabTeleprompter ?? true;
+        if (visTabAuditions) visTabAuditions.checked = settings.featureVisibility.tabAuditions ?? true;
+        if (visTabEffectLibrary) visTabEffectLibrary.checked = settings.featureVisibility.tabEffectLibrary ?? true;
+        if (visTabVpFeedback) visTabVpFeedback.checked = settings.featureVisibility.tabVpFeedback ?? true;
+        if (visTabVpScript) visTabVpScript.checked = settings.featureVisibility.tabVpScript ?? true;
+        if (visTabVpSides) visTabVpSides.checked = settings.featureVisibility.tabVpSides ?? true;
+        if (visTabVpAuditions) visTabVpAuditions.checked = settings.featureVisibility.tabVpAuditions ?? true;
+        if (visTabVpContraster) visTabVpContraster.checked = settings.featureVisibility.tabVpContraster ?? true;
+        if (visTabVpTableRead) visTabVpTableRead.checked = settings.featureVisibility.tabVpTableRead ?? true;
+        if (visTabDmSession) visTabDmSession.checked = settings.featureVisibility.tabDmSession ?? true;
+        if (visTabDmGenerator) visTabDmGenerator.checked = settings.featureVisibility.tabDmGenerator ?? true;
+        if (visTabDmCharacterNotes) visTabDmCharacterNotes.checked = settings.featureVisibility.tabDmCharacterNotes ?? true;
+        if (visTabAudioOverlay) visTabAudioOverlay.checked = settings.featureVisibility.tabAudioOverlay ?? true;
+        if (visTabWarmups) visTabWarmups.checked = settings.featureVisibility.tabWarmups ?? true;
+        if (visTabVoiceMemos) visTabVoiceMemos.checked = settings.featureVisibility.tabVoiceMemos ?? true;
     }
 
     updateStorageUsageDisplay();
@@ -95,13 +117,24 @@ export function initializeSettingsView(
             recordingGear: gearInput?.value || '',
             featureVisibility: {
                 viewVoiceActor: visViewVoiceActor?.checked ?? true,
-                viewDungeonMaster: visViewDungeonMaster?.checked ?? true,
+                viewStoryteller: visViewStoryteller?.checked ?? true,
+                viewVoiceProduction: visViewVoiceProduction?.checked ?? true,
                 viewUtility: visViewUtility?.checked ?? true,
                 showRecordTimer: visShowRecordTimer?.checked ?? false,
                 tabLineReader: visTabLineReader?.checked ?? true,
                 tabTeleprompter: visTabTeleprompter?.checked ?? true,
                 tabAuditions: visTabAuditions?.checked ?? true,
                 tabEffectLibrary: visTabEffectLibrary?.checked ?? true,
+                tabVpFeedback: visTabVpFeedback?.checked ?? true,
+                tabVpScript: visTabVpScript?.checked ?? true,
+                tabVpSides: visTabVpSides?.checked ?? true,
+                tabVpAuditions: visTabVpAuditions?.checked ?? true,
+                tabVpContraster: visTabVpContraster?.checked ?? true,
+                tabVpTableRead: visTabVpTableRead?.checked ?? true,
+                tabDmSession: visTabDmSession?.checked ?? true,
+                tabDmGenerator: visTabDmGenerator?.checked ?? true,
+                tabDmCharacterNotes: visTabDmCharacterNotes?.checked ?? true,
+                tabAudioOverlay: visTabAudioOverlay?.checked ?? true,
                 tabWarmups: visTabWarmups?.checked ?? true,
                 tabVoiceMemos: visTabVoiceMemos?.checked ?? true
             },
@@ -128,7 +161,8 @@ export function initializeSettingsView(
     fontSelect?.addEventListener('change', triggerSave);
     
     visViewVoiceActor?.addEventListener('change', triggerSave);
-    visViewDungeonMaster?.addEventListener('change', triggerSave);
+    visViewStoryteller?.addEventListener('change', triggerSave);
+    visViewVoiceProduction?.addEventListener('change', triggerSave);
     visViewUtility?.addEventListener('change', triggerSave);
     visShowRecordTimer?.addEventListener('change', triggerSave);
     timerWarningInput?.addEventListener('input', triggerSave);
@@ -137,6 +171,16 @@ export function initializeSettingsView(
     visTabTeleprompter?.addEventListener('change', triggerSave);
     visTabAuditions?.addEventListener('change', triggerSave);
     visTabEffectLibrary?.addEventListener('change', triggerSave);
+    visTabVpFeedback?.addEventListener('change', triggerSave);
+    visTabVpScript?.addEventListener('change', triggerSave);
+    visTabVpSides?.addEventListener('change', triggerSave);
+    visTabVpAuditions?.addEventListener('change', triggerSave);
+    visTabVpContraster?.addEventListener('change', triggerSave);
+    visTabVpTableRead?.addEventListener('change', triggerSave);
+    visTabDmSession?.addEventListener('change', triggerSave);
+    visTabDmGenerator?.addEventListener('change', triggerSave);
+    visTabDmCharacterNotes?.addEventListener('change', triggerSave);
+    visTabAudioOverlay?.addEventListener('change', triggerSave);
     visTabWarmups?.addEventListener('change', triggerSave);
     visTabVoiceMemos?.addEventListener('change', triggerSave);
 
