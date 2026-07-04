@@ -263,6 +263,19 @@ function renderAuditions() {
         
         card.addEventListener('ratingChanged', () => saveCallback(receivedAuditions));
         card.addEventListener('commentChanged', () => saveCallback(receivedAuditions));
+        card.addEventListener('deleteAudition', (e: CustomEvent) => {
+            const auditionToDelete = e.detail;
+            receivedAuditions = receivedAuditions.filter(a => a.id !== auditionToDelete.id);
+            saveCallback(receivedAuditions);
+            
+            // Re-render
+            const wasLastForCharacter = receivedAuditions.filter(a => a.character === activeCharacter).length === 0;
+            if (wasLastForCharacter) {
+                activeCharacter = '';
+            }
+            renderCharacters();
+            renderAuditions();
+        });
 
         listContainer.appendChild(card);
     });

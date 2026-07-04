@@ -211,7 +211,7 @@ function openAuditionModal(audition?: Audition) {
     const renderFiles = () => {
         if (!fileListContainer) return;
         fileListContainer.innerHTML = aud.files.sort((a, b) => a.name.localeCompare(b.name)).map((file, index) => `
-            <div class="uploaded-file-item" style="display: flex; align-items: center; justify-content: space-between; padding: 5px; background: var(--gray-100); margin-bottom: 5px; border-radius: 4px;">
+            <div class="uploaded-file-item" style="display: flex; align-items: center; justify-content: space-between; padding: 5px; margin-bottom: 5px; border-radius: 4px;">
                 <span class="download-file-btn" data-index="${index}" style="cursor: pointer; font-weight: bold; flex: 1;">💾 ${file.name}</span>
                 <button class="remove-item-btn" data-index="${index}" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">🗑️</button>
             </div>

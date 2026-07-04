@@ -166,6 +166,9 @@ async function handleFileUpload(e: Event) {
 }
 
 function clearFeedback() {
+    if (!window.confirm("Are you sure you want to clear the feedback session? All unsaved changes will be lost.")) {
+        return;
+    }
     audioBlobs.clear();
     fileComments.clear();
     currentSelectedFile = '';

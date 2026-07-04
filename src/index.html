@@ -508,8 +508,14 @@
 
                     <div id="dm-notes-container" class="journal-layout" style="display: none;">
                         <div class="journal-sidebar">
-                            <div class="journal-search-container">
-                                <input type="text" id="dm-notes-search" placeholder="Search by title..." />
+                            <div class="journal-search-container" style="display: flex; gap: 5px;">
+                                <input type="text" id="dm-notes-search" placeholder="Search by title..." style="flex: 1;" />
+                                <select id="dm-notes-type-filter" style="width: auto;">
+                                    <option value="all">All Types</option>
+                                    <option value="text">📝 Text</option>
+                                    <option value="social">👥 Social</option>
+                                    <option value="event">📅 Event</option>
+                                </select>
                             </div>
                             <div class="journal-add-buttons">
                                 <button id="dm-notes-add-text" class="add-journal-btn" title="Add Text Entry">📝</button>

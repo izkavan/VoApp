@@ -116,6 +116,10 @@ input[type="checkbox"] {
     accent-color: var(--primary-color);
 }
 
+input[type="range"] {
+    accent-color: var(--primary-color);
+}
+
 #app, #settings-container {
     max-width: 800px;
     margin: 0 auto;
@@ -377,7 +381,6 @@ input[type="file"] {
 
 input[type="checkbox"] {
     width: auto;
-    accent-color: var(--primary-color);
 }
 
 #tag-container, .tag-view, #active-tags-container, #voice-memo-active-tags-container {
@@ -1691,6 +1694,13 @@ body.dark-mode .vp-auditions-card {
     color: #ffd700;
 }
 
+.uploaded-file-item {
+    background-color: var(--gray-100);
+}
+body.dark-mode .uploaded-file-item {
+    background-color: var(--gray-800);
+}
+
 .vp-auditions-comments {
     width: 100%;
     min-height: 60px;
@@ -1994,6 +2004,7 @@ body.dark-mode #vp-script-toc-list li {
     border-radius: 8px;
     border: 1px solid var(--border-color, #ccc);
     padding: 20px;
+    overflow-y: auto;
 }
 
 .journal-empty-state {

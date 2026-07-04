@@ -352,6 +352,34 @@ export function initializeTeleprompter(projects: Project[]) {
             renderTakes();
         }));
 
+        takesList.querySelectorAll('.tp-download-take').forEach(btn => btn.addEventListener('click', async (e) => {
+            const index = Number((e.currentTarget as HTMLElement).closest('.tp-take-item')?.getAttribute('data-index'));
+            const take = activeFile!.takes[index];
+            if (!take.audioId) return;
+
+            let blob = await getAudioBlob(take.audioId);
+            if (!blob) return;
+
+            const settings = loadFromLocalStorage().settings;
+            const format = settings.exportFormat === 'wav' ? 'wav' : 'webm';
+
+            if (format === 'wav') {
+                blob = await convertWebMToWav(blob);
+            }
+
+            let safeTitle = (take.title || '').trim().replace(/[^a-z0-9_-]/gi, '_');
+            if (!safeTitle) safeTitle = `take_${index + 1}`;
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeTitle}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }));
+
         takesList.querySelectorAll('.tp-edit-take').forEach(btn => btn.addEventListener('click', async (e) => {
             const index = Number((e.currentTarget as HTMLElement).closest('.tp-take-item')?.getAttribute('data-index'));
             const take = activeFile!.takes[index];
@@ -559,7 +587,13 @@ export function initializeTeleprompter(projects: Project[]) {
 
             for (let i = 0; i < f.takes.length; i++) {
                 const take = f.takes[i];
-                const fileName = `take_${i + 1}.${format}`;
+                
+                let safeTitle = (take.title || '').trim().replace(/[^a-z0-9_-]/gi, '_');
+                if (!safeTitle) {
+                    safeTitle = `take_${i + 1}`;
+                }
+                const fileName = `${safeTitle}.${format}`;
+                
                 fileMeta.takes.push({
                     title: take.title,
                     rating: take.rating,

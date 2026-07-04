@@ -42,7 +42,10 @@ export class AuditionCard extends HTMLElement {
             : '';
 
         this.innerHTML = `
-            <div class="vp-auditions-card-header">Audition ${HtmlSanitizer.escape(this.index.toString())}</div>
+            <div class="vp-auditions-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Audition ${HtmlSanitizer.escape(this.index.toString())}</span>
+                <span class="vp-auditions-delete" title="Delete Audition" style="cursor: pointer; color: var(--error-color, #dc3545);">🗑️</span>
+            </div>
             <div class="vp-auditions-stars">${starsHtml}</div>
             ${audioPlayer}
             <textarea class="vp-auditions-comments" placeholder="Leave notes here...">${HtmlSanitizer.escape(this.audition.comments || '')}</textarea>
@@ -66,6 +69,15 @@ export class AuditionCard extends HTMLElement {
                 if (this.audition) {
                     this.audition.comments = (e.target as HTMLTextAreaElement).value;
                     this.dispatchEvent(new CustomEvent('commentChanged', { detail: this.audition.comments }));
+                }
+            });
+        }
+
+        const deleteBtn = this.querySelector('.vp-auditions-delete');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                if (this.audition && confirm("Are you sure you want to delete this audition?")) {
+                    this.dispatchEvent(new CustomEvent('deleteAudition', { detail: this.audition }));
                 }
             });
         }

@@ -15,6 +15,7 @@ let importBtn: HTMLButtonElement;
 let exportBtn: HTMLButtonElement;
 let notesContainer: HTMLDivElement;
 let searchInput: HTMLInputElement;
+let typeFilter: HTMLSelectElement;
 let addTextBtn: HTMLButtonElement;
 let addSocialBtn: HTMLButtonElement;
 let addEventBtn: HTMLButtonElement;
@@ -74,6 +75,7 @@ export function initializeCharacterNotesView(
     exportBtn = document.getElementById('dm-notes-export-btn') as HTMLButtonElement;
     notesContainer = document.getElementById('dm-notes-container') as HTMLDivElement;
     searchInput = document.getElementById('dm-notes-search') as HTMLInputElement;
+    typeFilter = document.getElementById('dm-notes-type-filter') as HTMLSelectElement;
     addTextBtn = document.getElementById('dm-notes-add-text') as HTMLButtonElement;
     addSocialBtn = document.getElementById('dm-notes-add-social') as HTMLButtonElement;
     addEventBtn = document.getElementById('dm-notes-add-event') as HTMLButtonElement;
@@ -118,6 +120,7 @@ export function initializeCharacterNotesView(
     });
 
     searchInput.addEventListener('input', () => renderList());
+    if (typeFilter) typeFilter.addEventListener('change', () => renderList());
 
     addTextBtn.addEventListener('click', () => createNewEntry('text'));
     addSocialBtn.addEventListener('click', () => createNewEntry('social'));
@@ -138,8 +141,13 @@ async function loadEntries() {
 function renderList() {
     notesList.innerHTML = '';
     const query = searchInput.value.toLowerCase();
+    const typeValue = typeFilter ? typeFilter.value : 'all';
 
-    const filtered = currentEntries.filter(e => e.title.toLowerCase().includes(query));
+    const filtered = currentEntries.filter(e => {
+        const matchesQuery = e.title.toLowerCase().includes(query);
+        const matchesType = typeValue === 'all' || e.type === typeValue;
+        return matchesQuery && matchesType;
+    });
 
     if (filtered.length === 0) {
         notesList.innerHTML = '<div style="padding:10px; color:#666; text-align:center;">No entries found.</div>';
@@ -209,7 +217,7 @@ function renderEditor(entry: JournalEntry | null, isNew = false) {
 
     let html = `
         <div class="journal-editor-header">
-            <input type="text" id="j-edit-title" class="j-input-title" placeholder="Entry Title" value="${escapeHtml(entry.title)}">
+            <input type="text" id="j-edit-title" class="j-input-title" placeholder="Entry Title" value="${escapeHtml(entry.title)}" ${entry.type === 'social' ? 'style="display: none;"' : ''}>
             <button id="j-edit-delete" class="j-btn-delete" title="Delete Entry">🗑️</button>
         </div>
         <div class="journal-editor-body">
@@ -292,23 +300,35 @@ function renderEditor(entry: JournalEntry | null, isNew = false) {
 
     saveBtn.addEventListener('click', async () => {
         const titleInput = document.getElementById('j-edit-title') as HTMLInputElement;
-        entry.title = titleInput.value;
+        
         entry.dateUpdated = Date.now();
 
         if (entry.type === 'text') {
+            entry.title = titleInput.value;
             const contentInput = document.getElementById('j-edit-content') as HTMLTextAreaElement;
             (entry as TextJournalEntry).content = contentInput.value;
         } else if (entry.type === 'social') {
             const social = entry as SocialJournalEntry;
+            const oldEventsInfluencing = social.eventsInfluencing || '';
             social.npcName = (document.getElementById('j-edit-npcName') as HTMLInputElement).value;
+            entry.title = social.npcName || 'Unnamed NPC';
+            
             social.occupation = (document.getElementById('j-edit-occupation') as HTMLInputElement).value;
             social.howTheyMet = (document.getElementById('j-edit-howTheyMet') as HTMLTextAreaElement).value;
             social.currentOpinion = (document.getElementById('j-edit-currentOpinion') as HTMLTextAreaElement).value;
-            social.eventsInfluencing = (document.getElementById('j-edit-eventsInfluencing') as HTMLTextAreaElement).value;
             
+            const newEventsInfluencing = (document.getElementById('j-edit-eventsInfluencing') as HTMLTextAreaElement).value;
             const newRating = parseInt((document.getElementById('j-edit-rating') as HTMLInputElement).value, 10);
-            if (!isNew && newRating !== social.rating) {
-                // Prompt for reason
+            
+            if (isNew) {
+                social.ratingHistory.push({
+                    oldRating: newRating,
+                    newRating,
+                    reasoning: social.currentOpinion || 'No initial opinion given',
+                    date: Date.now()
+                });
+                social.eventsInfluencing = newEventsInfluencing;
+            } else if (newRating !== social.rating) {
                 const reason = prompt(`You changed the rating from ${social.rating} to ${newRating}. What is your reasoning?`);
                 if (reason) {
                     social.ratingHistory.push({
@@ -318,9 +338,13 @@ function renderEditor(entry: JournalEntry | null, isNew = false) {
                         date: Date.now()
                     });
                 }
+                social.eventsInfluencing = newEventsInfluencing;
+            } else {
+                social.eventsInfluencing = newEventsInfluencing;
             }
             social.rating = newRating;
         } else if (entry.type === 'event') {
+            entry.title = titleInput.value;
             const ev = entry as EventJournalEntry;
             ev.timeTookPlace = (document.getElementById('j-edit-timeTookPlace') as HTMLInputElement).value;
             ev.description = (document.getElementById('j-edit-description') as HTMLTextAreaElement).value;
