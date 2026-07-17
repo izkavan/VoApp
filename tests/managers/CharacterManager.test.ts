@@ -9,13 +9,18 @@ vi.mock('../../src/services/DataStore.js', () => ({
         getCharacters: vi.fn(),
         addCharacter: vi.fn(),
         updateCharacter: vi.fn(),
-        deleteCharacter: vi.fn()
+        deleteCharacter: vi.fn(),
+        getWarmups: vi.fn().mockReturnValue([])
     }
 }));
 
 vi.mock('../../src/services/indexeddb.js', () => ({
     saveImageBlob: vi.fn(),
-    deleteImageBlob: vi.fn(() => Promise.resolve())
+    deleteImageBlob: vi.fn(() => Promise.resolve()),
+    getJournalEntries: vi.fn().mockResolvedValue([]),
+    deleteJournalEntry: vi.fn().mockResolvedValue(undefined),
+    getEffects: vi.fn().mockResolvedValue([]),
+    updateEffect: vi.fn().mockResolvedValue(undefined)
 }));
 
 vi.mock('../../src/components/character-modal.js', () => ({

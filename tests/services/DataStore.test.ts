@@ -3,10 +3,18 @@ import { DataStore } from '../../src/services/DataStore.js';
 import { loadFromLocalStorage, saveToLocalStorage } from '../../src/services/storage.js';
 import { EventBus } from '../../src/services/EventBus.js';
 
+import { migrateLegacyStorage } from '../../src/services/storage.js';
+import { getAppState, saveAppState } from '../../src/services/indexeddb.js';
+
 vi.mock('../../src/services/storage.js', () => ({
-    loadFromLocalStorage: vi.fn(),
-    saveToLocalStorage: vi.fn(),
-    defaultSettings: { exportFormat: 'webm' }
+    migrateLegacyStorage: vi.fn().mockResolvedValue(true),
+    defaultSettings: { exportFormat: 'webm' },
+    DEFAULT_WARMUPS: []
+}));
+
+vi.mock('../../src/services/indexeddb.js', () => ({
+    getAppState: vi.fn(),
+    saveAppState: vi.fn().mockResolvedValue(undefined)
 }));
 
 vi.mock('../../src/services/EventBus.js', () => ({
@@ -20,7 +28,7 @@ describe('DataStore', () => {
         vi.clearAllMocks();
     });
 
-    it('initializes from local storage and emits event', () => {
+    it('initializes from indexedDB and emits event', async () => {
         const mockData = {
             characters: [{ id: 1, name: 'Char' }],
             projects: [{ id: 1, name: 'Proj' }],
@@ -29,15 +37,18 @@ describe('DataStore', () => {
             settings: { exportFormat: 'wav' },
             warmups: []
         };
-        (loadFromLocalStorage as any).mockReturnValue(mockData);
+        (getAppState as any).mockImplementation((key: string) => Promise.resolve((mockData as any)[key]));
 
-        DataStore.initialize();
+        await DataStore.initialize();
 
-        expect(loadFromLocalStorage).toHaveBeenCalled();
+        expect(migrateLegacyStorage).toHaveBeenCalled();
+        expect(getAppState).toHaveBeenCalledWith('characters');
         expect(DataStore.getCharacters()).toEqual(mockData.characters);
         expect(DataStore.getProjects()).toEqual(mockData.projects);
         expect(DataStore.getSettings()).toEqual(mockData.settings);
-        expect(EventBus.emit).toHaveBeenCalledWith('storeInitialized', expect.any(Object));
+        expect(EventBus.emit).toHaveBeenCalledWith('charactersUpdated', mockData.characters);
+        expect(EventBus.emit).toHaveBeenCalledWith('projectsUpdated', mockData.projects);
+        expect(EventBus.emit).toHaveBeenCalledWith('storeInitialized');
     });
 
     it('adds a character and triggers save', () => {
@@ -45,8 +56,8 @@ describe('DataStore', () => {
         DataStore.addCharacter(char);
 
         expect(DataStore.getCharacters()).toContain(char);
-        expect(saveToLocalStorage).toHaveBeenCalled();
-        expect(EventBus.emit).toHaveBeenCalledWith('storeUpdated', expect.any(Object));
+        expect(saveAppState).toHaveBeenCalledWith('characters', expect.any(Array));
+        expect(EventBus.emit).toHaveBeenCalledWith('charactersUpdated', expect.any(Array));
     });
 
     it('updates an existing character', () => {
@@ -56,14 +67,14 @@ describe('DataStore', () => {
 
         const chars = DataStore.getCharacters();
         expect(chars.find(c => c.id === 2)?.name).toBe('Updated Char');
-        expect(saveToLocalStorage).toHaveBeenCalled();
+        expect(saveAppState).toHaveBeenCalledWith('characters', expect.any(Array));
     });
 
     it('deletes a character', () => {
         DataStore.deleteCharacter(2);
         
         expect(DataStore.getCharacters().find(c => c.id === 2)).toBeUndefined();
-        expect(saveToLocalStorage).toHaveBeenCalled();
+        expect(saveAppState).toHaveBeenCalledWith('characters', expect.any(Array));
     });
 
     it('adds, updates, and deletes a project', () => {
@@ -85,7 +96,7 @@ describe('DataStore', () => {
         DataStore.updateSettings(settings);
 
         expect(DataStore.getSettings()).toEqual(settings);
-        expect(saveToLocalStorage).toHaveBeenCalled();
+        expect(saveAppState).toHaveBeenCalledWith('settings', settings);
     });
 
     it('restores all data', () => {
@@ -98,6 +109,21 @@ describe('DataStore', () => {
 
         expect(DataStore.getCharacters()).toEqual(chars);
         expect(DataStore.getProjects()).toEqual(projs);
-        expect(saveToLocalStorage).toHaveBeenCalled();
+        expect(saveAppState).toHaveBeenCalledWith('characters', chars);
+    });
+
+    it('emits a notify error when saveAppState fails', async () => {
+        (saveAppState as any).mockRejectedValueOnce(new Error('Quota exceeded'));
+        
+        const char = { id: 99, name: 'Fail Char' } as any;
+        DataStore.addCharacter(char);
+
+        // Allow promises to resolve
+        await new Promise(process.nextTick);
+
+        expect(EventBus.emit).toHaveBeenCalledWith('notify', expect.objectContaining({
+            type: 'error',
+            message: expect.stringContaining('Failed to save Characters')
+        }));
     });
 });

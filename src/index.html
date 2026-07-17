@@ -192,8 +192,10 @@
                 </div>
                 <div id="effect-library" class="tab-content">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-
-                        <button id="new-effect-button">New Effect</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="new-effect-button">New Effect</button>
+                            <button id="effect-import-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Import Effects</button>
+                        </div>
                     </div>
 
                     <div class="effect-filters" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
@@ -218,7 +220,6 @@
                         <button id="effect-select-all-btn" style="padding: 5px 10px;">Select All Visible</button>
                         <button id="effect-clear-selection-btn" style="padding: 5px 10px;">Clear Selection</button>
                         <button id="effect-download-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Export Selected</button>
-                        <button id="effect-import-btn" style="padding: 5px 10px; background: var(--primary-color); color: white;">Import Effects</button>
                         <span id="effect-selection-count" style="margin-left: auto; font-style: italic;">0 selected</span>
                     </div>
 

@@ -1,14 +1,14 @@
-import { ZipService } from '../../services/ZipService.js';
-import { AudioService } from '../../services/AudioService.js';
-import { EventBus } from '../../services/EventBus.js';
-import { FeedbackAudioPlayer } from './FeedbackAudioPlayer.js';
-import { FeedbackWaveform } from './FeedbackWaveform.js';
-import { html } from '../../services/HtmlSanitizer.js';
+import { ZipService } from "../../services/ZipService.js";
+import { AudioService } from "../../services/AudioService.js";
+import { EventBus } from "../../services/EventBus.js";
+import { FeedbackAudioPlayer } from "./FeedbackAudioPlayer.js";
+import { FeedbackWaveform } from "./FeedbackWaveform.js";
+import { html } from "../../services/HtmlSanitizer.js";
 
 export interface VPComment {
-    timestampStr: string;
-    timeSeconds: number;
-    text: string;
+  timestampStr: string;
+  timeSeconds: number;
+  text: string;
 }
 
 let player: FeedbackAudioPlayer;
@@ -16,7 +16,7 @@ let waveform: FeedbackWaveform;
 
 let audioBlobs: Map<string, Blob> = new Map();
 let fileComments: Map<string, VPComment[]> = new Map();
-let currentSelectedFile: string = '';
+let currentSelectedFile: string = "";
 let comments: VPComment[] = [];
 let isHoveringLine: boolean = false;
 
@@ -43,462 +43,510 @@ let cancelBtn: HTMLButtonElement;
 let saveBtn: HTMLButtonElement;
 
 export function initializeVoiceProductionFeedback() {
-    player = new FeedbackAudioPlayer();
-    waveform = new FeedbackWaveform('vp-waveform-canvas', '.vp-waveform-container');
+  player = new FeedbackAudioPlayer();
+  waveform = new FeedbackWaveform(
+    "vp-waveform-canvas",
+    ".vp-waveform-container",
+  );
 
-    fileInput = document.getElementById('vp-audio-upload') as HTMLInputElement;
-    progressBar = document.getElementById('vp-progress-bar') as HTMLElement;
-    btnStart = document.getElementById('vp-btn-start') as HTMLButtonElement;
-    btnPrevComment = document.getElementById('vp-btn-prev-comment') as HTMLButtonElement;
-    btnPlayPause = document.getElementById('vp-btn-play-pause') as HTMLButtonElement;
-    btnInsertComment = document.getElementById('vp-btn-insert-comment') as HTMLButtonElement;
-    timeDisplay = document.getElementById('vp-time-display') as HTMLElement;
-    commentList = document.getElementById('vp-comment-list') as HTMLElement;
-    titleInput = document.getElementById('vp-feedback-title') as HTMLInputElement;
-    btnExport = document.getElementById('vp-btn-export') as HTMLButtonElement;
+  fileInput = document.getElementById("vp-audio-upload") as HTMLInputElement;
+  progressBar = document.getElementById("vp-progress-bar") as HTMLElement;
+  btnStart = document.getElementById("vp-btn-start") as HTMLButtonElement;
+  btnPrevComment = document.getElementById(
+    "vp-btn-prev-comment",
+  ) as HTMLButtonElement;
+  btnPlayPause = document.getElementById(
+    "vp-btn-play-pause",
+  ) as HTMLButtonElement;
+  btnInsertComment = document.getElementById(
+    "vp-btn-insert-comment",
+  ) as HTMLButtonElement;
+  timeDisplay = document.getElementById("vp-time-display") as HTMLElement;
+  commentList = document.getElementById("vp-comment-list") as HTMLElement;
+  titleInput = document.getElementById("vp-feedback-title") as HTMLInputElement;
+  btnExport = document.getElementById("vp-btn-export") as HTMLButtonElement;
 
-    commentModal = document.getElementById('comment-modal') as HTMLElement;
-    timestampInput = document.getElementById('comment-timestamp-input') as HTMLInputElement;
-    commentInput = document.getElementById('comment-text-input') as HTMLTextAreaElement;
-    cancelBtn = document.getElementById('comment-cancel-btn') as HTMLButtonElement;
-    saveBtn = document.getElementById('comment-save-btn') as HTMLButtonElement;
+  commentModal = document.getElementById("comment-modal") as HTMLElement;
+  timestampInput = document.getElementById(
+    "comment-timestamp-input",
+  ) as HTMLInputElement;
+  commentInput = document.getElementById(
+    "comment-text-input",
+  ) as HTMLTextAreaElement;
+  cancelBtn = document.getElementById(
+    "comment-cancel-btn",
+  ) as HTMLButtonElement;
+  saveBtn = document.getElementById("comment-save-btn") as HTMLButtonElement;
 
-    fileListEl = document.getElementById('vp-feedback-file-list') as HTMLElement;
-    contentEl = document.getElementById('vp-feedback-content') as HTMLElement;
-    currentAudioTitleEl = document.getElementById('vp-current-audio-title') as HTMLElement;
-    btnClear = document.getElementById('vp-btn-clear') as HTMLButtonElement;
+  fileListEl = document.getElementById("vp-feedback-file-list") as HTMLElement;
+  contentEl = document.getElementById("vp-feedback-content") as HTMLElement;
+  currentAudioTitleEl = document.getElementById(
+    "vp-current-audio-title",
+  ) as HTMLElement;
+  btnClear = document.getElementById("vp-btn-clear") as HTMLButtonElement;
 
-    fileInput.addEventListener('change', handleFileUpload);
-    btnClear.addEventListener('click', clearFeedback);
-    
-    const container = waveform.getContainer();
-    container.addEventListener('click', handleWaveformClick);
-    container.addEventListener('mousemove', handleWaveformHover);
-    container.addEventListener('mouseleave', handleWaveformMouseLeave);
-    
-    btnPlayPause.addEventListener('click', () => player.toggle());
-    btnStart.addEventListener('click', seekToBeginning);
-    btnPrevComment.addEventListener('click', seekToLastComment);
-    btnInsertComment.addEventListener('click', openCommentModal);
-    btnExport.addEventListener('click', exportFeedback);
+  fileInput.addEventListener("change", handleFileUpload);
+  btnClear.addEventListener("click", clearFeedback);
 
-    cancelBtn.addEventListener('click', closeCommentModal);
-    saveBtn.addEventListener('click', saveComment);
+  const container = waveform.getContainer();
+  container.addEventListener("click", handleWaveformClick);
+  container.addEventListener("mousemove", handleWaveformHover);
+  container.addEventListener("mouseleave", handleWaveformMouseLeave);
 
-    // Event Bus Bindings
-    EventBus.on('feedbackPlaybackStarted', () => {
-        btnPlayPause.textContent = '⏸';
-    });
-    
-    EventBus.on('feedbackPlaybackStopped', (e) => {
-        btnPlayPause.textContent = '▶';
-        if (e.detail.pauseTime === 0) {
-            progressBar.style.display = 'none';
-            updateTimeDisplay(0);
-        }
-    });
+  btnPlayPause.addEventListener("click", () => player.toggle());
+  btnStart.addEventListener("click", seekToBeginning);
+  btnPrevComment.addEventListener("click", seekToLastComment);
+  btnInsertComment.addEventListener("click", openCommentModal);
+  btnExport.addEventListener("click", exportFeedback);
 
-    EventBus.on('feedbackPlaybackProgress', (e) => {
-        const { currentTime, duration } = e.detail;
-        updateTimeDisplay(currentTime);
-        progressBar.style.display = 'block';
-        progressBar.style.left = `${(currentTime / duration) * 100}%`;
+  cancelBtn.addEventListener("click", closeCommentModal);
+  saveBtn.addEventListener("click", saveComment);
 
-        let activeComment = null;
-        for (const c of comments) {
-            if (c.timeSeconds <= currentTime) {
-                activeComment = c;
-            }
-        }
-        highlightComment(activeComment ? activeComment.timeSeconds : -1, 'active');
-    });
+  // Event Bus Bindings
+  EventBus.on("feedbackPlaybackStarted", () => {
+    btnPlayPause.textContent = "⏸";
+  });
+
+  EventBus.on("feedbackPlaybackStopped", (e) => {
+    btnPlayPause.textContent = "▶";
+    if (e.detail.pauseTime === 0) {
+      progressBar.style.display = "none";
+      updateTimeDisplay(0);
+    }
+  });
+
+  EventBus.on("feedbackPlaybackProgress", (e) => {
+    const { currentTime, duration } = e.detail;
+    updateTimeDisplay(currentTime);
+    progressBar.style.display = "block";
+    progressBar.style.left = `${(currentTime / duration) * 100}%`;
+
+    let activeComment = null;
+    for (const c of comments) {
+      if (c.timeSeconds <= currentTime) {
+        activeComment = c;
+      }
+    }
+    highlightComment(activeComment ? activeComment.timeSeconds : -1, "active");
+  });
 }
 
 async function handleFileUpload(e: Event) {
-    const files = (e.target as HTMLInputElement).files;
-    if (!files || files.length === 0) return;
+  const files = (e.target as HTMLInputElement).files;
+  if (!files || files.length === 0) return;
 
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.name.endsWith('.zip')) {
-            const zip = await ZipService.loadZip(file);
-            
-            const data = await ZipService.readJsonFile<any>(zip, 'feedback.json', {});
-            if (!titleInput.value) {
-                titleInput.value = data.title || file.name.replace(/\.zip$/i, '');
-            }
-            
-            if (data.files) {
-                Object.keys(data.files).forEach(k => {
-                    fileComments.set(k, data.files[k]);
-                });
-            }
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    if (file.name.endsWith(".zip")) {
+      const zip = await ZipService.loadZip(file);
 
-            const audioExts = ['.webm', '.wav', '.mp3', '.ogg', '.flac', '.m4a'];
-            for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
-                if (zipEntry.dir) continue;
-                const isAudio = audioExts.some(ext => relativePath.toLowerCase().endsWith(ext));
-                if (isAudio) {
-                    const arrayBuffer = await zipEntry.async('arraybuffer');
-                    const type = relativePath.toLowerCase().endsWith('.webm') ? 'audio/webm' : 'audio/wav';
-                    audioBlobs.set(relativePath, new Blob([arrayBuffer], { type }));
-                    
-                    if (!fileComments.has(relativePath)) {
-                        fileComments.set(relativePath, []);
-                    }
-                }
-            }
-        } else {
-            const arrayBuffer = await file.arrayBuffer();
-            const filename = file.name;
-            audioBlobs.set(filename, new Blob([arrayBuffer], { type: file.type }));
-            if (!fileComments.has(filename)) {
-                fileComments.set(filename, []);
-            }
-            if (!titleInput.value) {
-                titleInput.value = filename.replace(/\.[^/.]+$/, '');
-            }
+      const data = await ZipService.readJsonFile<any>(zip, "feedback.json", {});
+      if (!titleInput.value) {
+        titleInput.value = data.title || file.name.replace(/\.zip$/i, "");
+      }
+
+      if (data.files) {
+        Object.keys(data.files).forEach((k) => {
+          fileComments.set(k, data.files[k]);
+        });
+      }
+
+      const audioExts = [".webm", ".wav", ".mp3", ".ogg", ".flac", ".m4a"];
+      for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+        if (zipEntry.dir) continue;
+        const isAudio = audioExts.some((ext) =>
+          relativePath.toLowerCase().endsWith(ext),
+        );
+        if (isAudio) {
+          const arrayBuffer = await zipEntry.async("arraybuffer");
+          const type = relativePath.toLowerCase().endsWith(".webm")
+            ? "audio/webm"
+            : "audio/wav";
+          audioBlobs.set(relativePath, new Blob([arrayBuffer], { type }));
+
+          if (!fileComments.has(relativePath)) {
+            fileComments.set(relativePath, []);
+          }
         }
+      }
+    } else {
+      const arrayBuffer = await file.arrayBuffer();
+      const filename = file.name;
+      audioBlobs.set(filename, new Blob([arrayBuffer], { type: file.type }));
+      if (!fileComments.has(filename)) {
+        fileComments.set(filename, []);
+      }
+      if (!titleInput.value) {
+        titleInput.value = filename.replace(/\.[^/.]+$/, "");
+      }
     }
-    
-    (e.target as HTMLInputElement).value = '';
-    renderTOC();
+  }
+
+  (e.target as HTMLInputElement).value = "";
+  renderTOC();
 }
 
 function clearFeedback() {
-    if (!window.confirm("Are you sure you want to clear the feedback session? All unsaved changes will be lost.")) {
-        return;
-    }
-    audioBlobs.clear();
-    fileComments.clear();
-    currentSelectedFile = '';
-    comments = [];
-    titleInput.value = '';
-    contentEl.style.display = 'none';
-    if (player) {
-        player.setPauseTime(0);
-        player.setBuffer(null);
-    }
-    updateTimeDisplay(0);
-    renderTOC();
+  if (
+    !window.confirm(
+      "Are you sure you want to clear the feedback session? All unsaved changes will be lost.",
+    )
+  ) {
+    return;
+  }
+  audioBlobs.clear();
+  fileComments.clear();
+  currentSelectedFile = "";
+  comments = [];
+  titleInput.value = "";
+  contentEl.style.display = "none";
+  if (player) {
+    player.setPauseTime(0);
+    player.setBuffer(null);
+  }
+  updateTimeDisplay(0);
+  renderTOC();
 }
 
 function renderTOC() {
-    fileListEl.innerHTML = '';
-    let firstFile = '';
-    for (const filename of audioBlobs.keys()) {
-        if (!firstFile) firstFile = filename;
-        const li = document.createElement('li');
-        li.textContent = filename;
-        li.style.padding = '8px';
-        li.style.cursor = 'pointer';
-        li.style.borderRadius = '4px';
-        li.style.wordBreak = 'break-all';
-        li.dataset.filename = filename;
-        
-        if (filename === currentSelectedFile) {
-            li.style.background = 'var(--primary-color)';
-            li.style.color = 'white';
-        } else {
-            li.style.background = 'var(--bg-color)';
-            li.addEventListener('mouseenter', () => { if(currentSelectedFile !== filename) li.style.background = 'var(--hover-color)'});
-            li.addEventListener('mouseleave', () => { if(currentSelectedFile !== filename) li.style.background = 'var(--bg-color)'});
-        }
-        
-        li.addEventListener('click', () => selectAudioFile(filename));
-        fileListEl.appendChild(li);
+  fileListEl.innerHTML = "";
+  let firstFile = "";
+  for (const filename of audioBlobs.keys()) {
+    if (!firstFile) firstFile = filename;
+    const li = document.createElement("li");
+    li.textContent = filename;
+    li.style.padding = "8px";
+    li.style.cursor = "pointer";
+    li.style.borderRadius = "4px";
+    li.style.wordBreak = "break-all";
+    li.dataset.filename = filename;
+
+    if (filename === currentSelectedFile) {
+      li.style.background = "var(--primary-color)";
+      li.style.color = "white";
+    } else {
+      li.style.background = "var(--bg-color)";
+      li.addEventListener("mouseenter", () => {
+        if (currentSelectedFile !== filename)
+          li.style.background = "var(--hover-color)";
+      });
+      li.addEventListener("mouseleave", () => {
+        if (currentSelectedFile !== filename)
+          li.style.background = "var(--bg-color)";
+      });
     }
 
-    if (!currentSelectedFile && firstFile) {
-        selectAudioFile(firstFile);
-    }
+    li.addEventListener("click", () => selectAudioFile(filename));
+    fileListEl.appendChild(li);
+  }
+
+  if (!currentSelectedFile && firstFile) {
+    selectAudioFile(firstFile);
+  }
 }
 
 async function selectAudioFile(filename: string) {
-    if (!audioBlobs.has(filename)) return;
-    
-    currentSelectedFile = filename;
-    currentAudioTitleEl.textContent = filename;
-    contentEl.style.display = 'flex';
-    
-    // Switch active comment array
-    comments = fileComments.get(filename) || [];
+  if (!audioBlobs.has(filename)) return;
 
-    // Lazy load the buffer
-    const blob = audioBlobs.get(filename)!;
-    const arrayBuffer = await blob.arrayBuffer();
-    const ctx = AudioService.getAudioContext();
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-    
-    player.setBuffer(audioBuffer);
-    
-    renderComments();
-    const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim() || '#007bff';
-    waveform.draw(audioBuffer, primaryColor);
-    waveform.renderMarkers(comments, audioBuffer.duration);
-    updateTimeDisplay(0);
-    renderTOC(); // Re-render to update highlighting
+  currentSelectedFile = filename;
+  currentAudioTitleEl.textContent = filename;
+  contentEl.style.display = "flex";
+
+  // Switch active comment array
+  comments = fileComments.get(filename) || [];
+
+  // Lazy load the buffer
+  const blob = audioBlobs.get(filename)!;
+  const arrayBuffer = await blob.arrayBuffer();
+  const ctx = AudioService.getAudioContext();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+  player.setBuffer(audioBuffer);
+
+  renderComments();
+  const primaryColor =
+    getComputedStyle(document.body)
+      .getPropertyValue("--primary-color")
+      .trim() || "#007bff";
+  waveform.draw(audioBuffer, primaryColor);
+  waveform.renderMarkers(comments, audioBuffer.duration);
+  updateTimeDisplay(0);
+  renderTOC(); // Re-render to update highlighting
 }
 
 function formatTime(seconds: number): string {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 1000);
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 1000);
+  return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}.${ms.toString().padStart(3, "0")}`;
 }
 
 function parseTime(timeStr: string): number {
-    const parts = timeStr.split(':');
-    if (parts.length !== 3) return 0;
-    const secParts = parts[2].split('.');
-    
-    const hrs = parseInt(parts[0], 10);
-    const mins = parseInt(parts[1], 10);
-    const secs = parseInt(secParts[0], 10);
-    const ms = secParts.length > 1 ? parseInt(secParts[1], 10) : 0;
+  const parts = timeStr.split(":");
+  if (parts.length !== 3) return 0;
+  const secParts = parts[2].split(".");
 
-    return hrs * 3600 + mins * 60 + secs + (ms / 1000);
+  const hrs = parseInt(parts[0], 10);
+  const mins = parseInt(parts[1], 10);
+  const secs = parseInt(secParts[0], 10);
+  const ms = secParts.length > 1 ? parseInt(secParts[1], 10) : 0;
+
+  return hrs * 3600 + mins * 60 + secs + ms / 1000;
 }
 
 function updateTimeDisplay(seconds: number) {
-    timeDisplay.textContent = formatTime(seconds);
+  timeDisplay.textContent = formatTime(seconds);
 }
 
 function handleWaveformClick(e: MouseEvent) {
-    const buffer = player.getBuffer();
-    if (!buffer) return;
-    
-    // Rounded down to nearest second
-    const seekTime = Math.floor(waveform.getClickTime(e, buffer.duration));
-    player.play(seekTime);
+  const buffer = player.getBuffer();
+  if (!buffer) return;
+
+  // Rounded down to nearest second
+  const seekTime = Math.floor(waveform.getClickTime(e, buffer.duration));
+  player.play(seekTime);
 }
 
 function seekToBeginning() {
-    if (player.getIsPlaying()) {
-        player.play(0);
-    } else {
-        player.setPauseTime(0);
-        updateTimeDisplay(0);
-        progressBar.style.left = '0%';
-    }
+  if (player.getIsPlaying()) {
+    player.play(0);
+  } else {
+    player.setPauseTime(0);
+    updateTimeDisplay(0);
+    progressBar.style.left = "0%";
+  }
 }
 
 function seekToLastComment() {
-    const current = player.getCurrentTime();
-    let prevCommentTime = 0;
+  const current = player.getCurrentTime();
+  let prevCommentTime = 0;
 
-    for (const c of comments) {
-        if (c.timeSeconds < current - 0.5) {
-            if (c.timeSeconds > prevCommentTime) {
-                prevCommentTime = c.timeSeconds;
-            }
-        }
+  for (const c of comments) {
+    if (c.timeSeconds < current - 0.5) {
+      if (c.timeSeconds > prevCommentTime) {
+        prevCommentTime = c.timeSeconds;
+      }
     }
+  }
 
-    if (player.getIsPlaying()) {
-        player.play(prevCommentTime);
-    } else {
-        player.setPauseTime(prevCommentTime);
-        updateTimeDisplay(prevCommentTime);
-        const buffer = player.getBuffer();
-        if (buffer) {
-            progressBar.style.left = `${(prevCommentTime / buffer.duration) * 100}%`;
-            progressBar.style.display = 'block';
-        }
+  if (player.getIsPlaying()) {
+    player.play(prevCommentTime);
+  } else {
+    player.setPauseTime(prevCommentTime);
+    updateTimeDisplay(prevCommentTime);
+    const buffer = player.getBuffer();
+    if (buffer) {
+      progressBar.style.left = `${(prevCommentTime / buffer.duration) * 100}%`;
+      progressBar.style.display = "block";
     }
+  }
 }
 
 function openCommentModal() {
-    if (player.getIsPlaying()) {
-        player.stop(true);
-    }
-    
-    timestampInput.value = formatTime(player.getPauseTime());
-    commentInput.value = '';
-    commentModal.classList.remove('hidden');
-    commentInput.focus();
+  if (player.getIsPlaying()) {
+    player.stop(true);
+  }
+
+  timestampInput.value = formatTime(player.getPauseTime());
+  commentInput.value = "";
+  commentModal.classList.remove("hidden");
+  commentInput.focus();
 }
 
 function closeCommentModal() {
-    commentModal.classList.add('hidden');
+  commentModal.classList.add("hidden");
 }
 
 function saveComment() {
-    const timeStr = timestampInput.value;
-    const tSecs = parseTime(timeStr);
-    const text = commentInput.value.trim();
+  const timeStr = timestampInput.value;
+  const tSecs = parseTime(timeStr);
+  const text = commentInput.value.trim();
 
-    if (text && !isNaN(tSecs)) {
-        comments.push({
-            timestampStr: timeStr,
-            timeSeconds: tSecs,
-            text: text
-        });
-        
-        comments.sort((a, b) => a.timeSeconds - b.timeSeconds);
-        renderComments();
-        waveform.renderMarkers(comments, player.getBuffer()?.duration || 0);
-    }
-    closeCommentModal();
+  if (text && !isNaN(tSecs)) {
+    comments.push({
+      timestampStr: timeStr,
+      timeSeconds: tSecs,
+      text: text,
+    });
+
+    comments.sort((a, b) => a.timeSeconds - b.timeSeconds);
+    renderComments();
+    waveform.renderMarkers(comments, player.getBuffer()?.duration || 0);
+  }
+  closeCommentModal();
 }
 
 function renderComments() {
-    commentList.innerHTML = '';
-    
-    if (comments.length === 0) {
-        commentList.innerHTML = '<p style="color: var(--gray-600); font-style: italic;">No comments yet.</p>';
-        return;
-    }
+  commentList.innerHTML = "";
 
-    comments.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'vp-comment-item';
-        item.dataset.time = c.timeSeconds.toString();
-        
-        item.addEventListener('mouseenter', () => {
-            isHoveringLine = true;
-            highlightComment(c.timeSeconds, 'hover');
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            isHoveringLine = false;
-            highlightComment(-1, 'hover');
-        });
-        
-        const header = document.createElement('div');
-        header.className = 'vp-comment-header';
-        
-        const timeEl = document.createElement('span');
-        timeEl.className = 'vp-comment-timestamp';
-        timeEl.textContent = c.timestampStr;
-        timeEl.addEventListener('click', () => {
-            if (player.getIsPlaying()) {
-                player.play(c.timeSeconds);
-            } else {
-                player.setPauseTime(c.timeSeconds);
-                updateTimeDisplay(c.timeSeconds);
-                const buffer = player.getBuffer();
-                if (buffer) {
-                    progressBar.style.left = `${(c.timeSeconds / buffer.duration) * 100}%`;
-                    progressBar.style.display = 'block';
-                }
-            }
-        });
+  if (comments.length === 0) {
+    commentList.innerHTML =
+      '<p style="color: var(--gray-600); font-style: italic;">No comments yet.</p>';
+    return;
+  }
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.innerHTML = '🗑️';
-        deleteBtn.style.background = 'transparent';
-        deleteBtn.style.border = 'none';
-        deleteBtn.style.cursor = 'pointer';
-        deleteBtn.style.fontSize = '1.2em';
-        deleteBtn.title = 'Delete Comment';
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            comments = comments.filter(comment => comment !== c);
-            renderComments();
-            waveform.renderMarkers(comments, player.getBuffer()?.duration || 0);
-        });
+  comments.forEach((c) => {
+    const item = document.createElement("div");
+    item.className = "vp-comment-item";
+    item.dataset.time = c.timeSeconds.toString();
 
-        header.appendChild(timeEl);
-        header.appendChild(deleteBtn);
-
-        const textEl = document.createElement('div');
-        textEl.className = 'vp-comment-text';
-        // HTML Sanitizer to prevent XSS in comment text!
-        textEl.innerHTML = html`${c.text}`;
-
-        item.appendChild(header);
-        item.appendChild(textEl);
-        commentList.appendChild(item);
+    item.addEventListener("mouseenter", () => {
+      isHoveringLine = true;
+      highlightComment(c.timeSeconds, "hover");
     });
+
+    item.addEventListener("mouseleave", () => {
+      isHoveringLine = false;
+      highlightComment(-1, "hover");
+    });
+
+    const header = document.createElement("div");
+    header.className = "vp-comment-header";
+
+    const timeEl = document.createElement("span");
+    timeEl.className = "vp-comment-timestamp";
+    timeEl.textContent = c.timestampStr;
+    timeEl.addEventListener("click", () => {
+      if (player.getIsPlaying()) {
+        player.play(c.timeSeconds);
+      } else {
+        player.setPauseTime(c.timeSeconds);
+        updateTimeDisplay(c.timeSeconds);
+        const buffer = player.getBuffer();
+        if (buffer) {
+          progressBar.style.left = `${(c.timeSeconds / buffer.duration) * 100}%`;
+          progressBar.style.display = "block";
+        }
+      }
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerHTML = "🗑️";
+    deleteBtn.style.background = "transparent";
+    deleteBtn.style.border = "none";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.style.fontSize = "1.2em";
+    deleteBtn.title = "Delete Comment";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      comments = comments.filter((comment) => comment !== c);
+      renderComments();
+      waveform.renderMarkers(comments, player.getBuffer()?.duration || 0);
+    });
+
+    header.appendChild(timeEl);
+    header.appendChild(deleteBtn);
+
+    const textEl = document.createElement("div");
+    textEl.className = "vp-comment-text";
+    // HTML Sanitizer to prevent XSS in comment text!
+    textEl.innerHTML = html`${c.text}`;
+
+    item.appendChild(header);
+    item.appendChild(textEl);
+    commentList.appendChild(item);
+  });
 }
 
 function handleWaveformHover(e: MouseEvent) {
-    const buffer = player.getBuffer();
-    if (!buffer || comments.length === 0) return;
-    
-    const hoverTime = waveform.getClickTime(e, buffer.duration);
-    let foundComment = null;
-    const threshold = (3 / waveform.getContainer().getBoundingClientRect().width) * buffer.duration;
+  const buffer = player.getBuffer();
+  if (!buffer || comments.length === 0) return;
 
-    for (const c of comments) {
-        if (Math.abs(c.timeSeconds - hoverTime) <= threshold) {
-            foundComment = c;
-            break;
-        }
-    }
+  const hoverTime = waveform.getClickTime(e, buffer.duration);
+  let foundComment = null;
+  const threshold =
+    (3 / waveform.getContainer().getBoundingClientRect().width) *
+    buffer.duration;
 
-    if (foundComment) {
-        isHoveringLine = true;
-        highlightComment(foundComment.timeSeconds, 'hover');
-    } else {
-        isHoveringLine = false;
-        highlightComment(-1, 'hover');
+  for (const c of comments) {
+    if (Math.abs(c.timeSeconds - hoverTime) <= threshold) {
+      foundComment = c;
+      break;
     }
+  }
+
+  if (foundComment) {
+    isHoveringLine = true;
+    highlightComment(foundComment.timeSeconds, "hover");
+  } else {
+    isHoveringLine = false;
+    highlightComment(-1, "hover");
+  }
 }
 
 function handleWaveformMouseLeave() {
-    isHoveringLine = false;
-    highlightComment(-1, 'hover');
+  isHoveringLine = false;
+  highlightComment(-1, "hover");
 }
 
-function highlightComment(timeSeconds: number, type: 'active' | 'hover') {
-    const items = commentList.querySelectorAll('.vp-comment-item');
-    items.forEach((item: Element) => {
-        if (type === 'hover') item.classList.remove('vp-comment-hover-purple');
-        if (type === 'active') item.classList.remove('vp-comment-active-orange');
-        
-        const itemTime = parseFloat((item as HTMLElement).dataset.time || '-1');
-        if (itemTime === timeSeconds) {
-            if (type === 'hover') {
-                item.classList.add('vp-comment-hover-purple');
-                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else if (type === 'active') {
-                item.classList.add('vp-comment-active-orange');
-                if (!isHoveringLine) {
-                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        }
-    });
+function highlightComment(timeSeconds: number, type: "active" | "hover") {
+  const items = commentList.querySelectorAll(".vp-comment-item");
+  items.forEach((item: Element) => {
+    if (type === "hover") item.classList.remove("vp-comment-hover-purple");
+    if (type === "active") item.classList.remove("vp-comment-active-orange");
 
-    if (type === 'hover') {
-        const markers = waveform.getContainer().querySelectorAll('.vp-orange-marker');
-        markers.forEach(marker => {
-            const markerTime = parseFloat((marker as HTMLElement).dataset.time || '-1');
-            if (markerTime === timeSeconds) {
-                marker.classList.add('vp-marker-hover');
-            } else {
-                marker.classList.remove('vp-marker-hover');
-            }
-        });
+    const itemTime = parseFloat((item as HTMLElement).dataset.time || "-1");
+    if (itemTime === timeSeconds) {
+      if (type === "hover") {
+        item.classList.add("vp-comment-hover-purple");
+        item.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (type === "active") {
+        item.classList.add("vp-comment-active-orange");
+        if (!isHoveringLine) {
+          item.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
     }
+  });
+
+  if (type === "hover") {
+    const markers = waveform
+      .getContainer()
+      .querySelectorAll(".vp-orange-marker");
+    markers.forEach((marker) => {
+      const markerTime = parseFloat(
+        (marker as HTMLElement).dataset.time || "-1",
+      );
+      if (markerTime === timeSeconds) {
+        marker.classList.add("vp-marker-hover");
+      } else {
+        marker.classList.remove("vp-marker-hover");
+      }
+    });
+  }
 }
 
 async function exportFeedback() {
-    if (audioBlobs.size === 0) {
-        alert("No audio files loaded.");
-        return;
-    }
+  if (audioBlobs.size === 0) {
+    alert("No audio files loaded.");
+    return;
+  }
 
-    const zip = await ZipService.createZip();
-    const title = titleInput.value || "Feedback";
-    
-    // Convert maps to plain objects for JSON serialization
-    const filesObj: Record<string, VPComment[]> = {};
-    for (const [filename, fileCommentsList] of fileComments.entries()) {
-        filesObj[filename] = fileCommentsList;
-    }
+  const zip = await ZipService.createZip();
+  const title = titleInput.value || "Feedback";
 
-    zip.file("feedback.json", JSON.stringify({
+  // Convert maps to plain objects for JSON serialization
+  const filesObj: Record<string, VPComment[]> = {};
+  for (const [filename, fileCommentsList] of fileComments.entries()) {
+    filesObj[filename] = fileCommentsList;
+  }
+
+  zip.file(
+    "feedback.json",
+    JSON.stringify(
+      {
         title: titleInput.value,
-        files: filesObj
-    }, null, 2));
+        files: filesObj,
+      },
+      null,
+      2,
+    ),
+  );
 
-    for (const [filename, blob] of audioBlobs.entries()) {
-        zip.file(filename, blob);
-    }
+  for (const [filename, blob] of audioBlobs.entries()) {
+    zip.file(filename, blob);
+  }
 
-    await ZipService.downloadZip(zip, `${title}.zip`);
+  await ZipService.downloadZip(zip, `${title}.zip`);
 }

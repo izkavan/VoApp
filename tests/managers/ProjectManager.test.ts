@@ -4,6 +4,13 @@ import { DataStore } from '../../src/services/DataStore.js';
 import { closeProjectModal } from '../../src/components/project-modal.js';
 import JSZip from 'jszip';
 
+vi.mock('../../src/services/indexeddb.js', () => ({
+    getDictionaryEntries: vi.fn().mockResolvedValue([]),
+    deleteDictionaryEntry: vi.fn().mockResolvedValue(undefined),
+    getVoiceMemos: vi.fn().mockResolvedValue([]),
+    deleteVoiceMemos: vi.fn().mockResolvedValue(undefined)
+}));
+
 vi.mock('../../src/services/DataStore.js', () => ({
     DataStore: {
         getCharacters: vi.fn(),
@@ -35,7 +42,7 @@ describe('ProjectManager', () => {
         
         (DataStore.getCharacters as any).mockReturnValue(chars);
 
-        ProjectManager.deleteProject(projectToDelete);
+        await ProjectManager.deleteProject(projectToDelete);
 
         expect(DataStore.deleteProject).toHaveBeenCalledWith(1);
         expect(chars[0].projectId).toBeUndefined(); // Character 10 unassigned
