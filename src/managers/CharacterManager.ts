@@ -138,6 +138,7 @@ export class AppCharacterManager {
           }
         }
 
+
         // Cleanup references in Effects
         const effects = await getEffects();
         for (const effect of effects) {

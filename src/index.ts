@@ -93,6 +93,13 @@ import { initializeEditAudioModal } from "./views/edit-audio-modal.js";
 import { initializeScriptImportModal } from "./components/script-import-modal.js";
 import { initializeToastSystem } from "./components/toast.js";
 
+// --- Testing Hooks ---
+// WARNING: We are exposing the internal EventBus to the global window object.
+// This is strictly to allow Playwright E2E tests to observe internal state
+// transitions and trigger notifications. Since this is a client-side only 
+// application without backend secrets, this exposure is safe.
+(window as any).EventBus = EventBus;
+
 // --- Main Page Elements ---
 const characterListElement = document.getElementById("character-list");
 const newCharacterButton = document.getElementById("new-character-button");

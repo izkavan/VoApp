@@ -1060,8 +1060,12 @@
             </div>
             
             <div style="margin-bottom: 15px;">
-                <div id="warmup-modal-tags" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
-                <input type="text" id="warmup-modal-tags-input" class="hidden" placeholder="Comma-separated tags (e.g. breath, pitch)" style="width: 100%;">
+                <div id="warmup-modal-tags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px;"></div>
+                <div id="warmup-modal-tags-container" class="hidden tag-input-container">
+                    <div id="warmup-active-tags-container" class="tag-view"></div>
+                    <input type="text" id="warmup-modal-tags-input" placeholder="Add tags (space-separated)" style="width: 100%;">
+                    <div id="warmup-tag-suggestions" class="tag-suggestions"></div>
+                </div>
             </div>
             
             <div class="voice-memo-record-section" style="margin-bottom: 20px; background: var(--bg-color-light); padding: 15px; border-radius: 8px;">

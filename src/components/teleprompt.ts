@@ -8,7 +8,7 @@ import {
   deleteAudioBlob,
 } from "../services/indexeddb.js";
 import { highlightDictionaryWords } from "./dictionary-highlighter.js";
-import { loadFromLocalStorage } from "../services/storage.js";
+import { DataStore } from "../services/DataStore.js";
 import { openEditAudioModal } from "../views/edit-audio-modal.js";
 
 interface TakeDetail {
@@ -481,7 +481,7 @@ export function initializeTeleprompter(projects: Project[]) {
         let blob = await getAudioBlob(take.audioId);
         if (!blob) return;
 
-        const settings = loadFromLocalStorage().settings;
+        const settings = DataStore.getSettings();
         const format = settings.exportFormat === "wav" ? "wav" : "webm";
 
         if (format === "wav") {
@@ -726,7 +726,7 @@ export function initializeTeleprompter(projects: Project[]) {
       return;
     }
 
-    const settings = loadFromLocalStorage().settings;
+    const settings = DataStore.getSettings();
     const format = settings.exportFormat === "wav" ? "wav" : "webm";
     const zip = new JSZip();
 

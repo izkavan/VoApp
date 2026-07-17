@@ -9,10 +9,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage && make-coverage-badge",
+    "test:e2e": "playwright test",
     "tauri:build:mac-universal": "tauri build --target universal-apple-darwin",
     "tauri:build:mac-intel": "tauri build --target x86_64-apple-darwin"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/cli": "^2.11.3",
     "@types/jszip": "^3.4.0",
@@ -21,6 +23,7 @@
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.1.1",
     "make-coverage-badge": "^1.2.0",
+    "serve": "^14.2.6",
     "typescript": "^5.5.3",
     "vitest": "^4.1.9"
   },

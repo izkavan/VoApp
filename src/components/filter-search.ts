@@ -155,4 +155,5 @@ export function updateFilterData(
 ) {
   characters = newCharacters;
   projects = newProjects;
+  filterCharacters();
 }

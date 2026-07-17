@@ -1,4 +1,5 @@
 import { DataStore } from "../services/DataStore.js";
+import { EventBus } from "../services/EventBus.js";
 import { UserProfile, Character } from "../types.js";
 import {
   saveImageBlob,
@@ -504,93 +505,103 @@ function bindMeViewEvents() {
   });
 
   const saveHandler = async () => {
-    const firstName = (
-      document.getElementById("me-first-name") as HTMLInputElement
-    ).value;
-    const lastName = (
-      document.getElementById("me-last-name") as HTMLInputElement
-    ).value;
-    const email = (document.getElementById("me-email") as HTMLInputElement)
-      .value;
-    const phone = (document.getElementById("me-phone") as HTMLInputElement)
-      .value;
-    const address = (document.getElementById("me-address") as HTMLInputElement)
-      .value;
-    const yearsOfExperience = (
-      document.getElementById("me-experience") as HTMLInputElement
-    ).value;
+    try {
+      const firstName = (
+        document.getElementById("me-first-name") as HTMLInputElement
+      ).value;
+      const lastName = (
+        document.getElementById("me-last-name") as HTMLInputElement
+      ).value;
+      const email = (document.getElementById("me-email") as HTMLInputElement)
+        .value;
+      const phone = (document.getElementById("me-phone") as HTMLInputElement)
+        .value;
+      const address = (document.getElementById("me-address") as HTMLInputElement)
+        .value;
+      const yearsOfExperience = (
+        document.getElementById("me-experience") as HTMLInputElement
+      ).value;
 
-    const preferredJobTypes: string[] = [];
-    document.querySelectorAll(".me-job-type-cb:checked").forEach((cb) => {
-      const val = (cb as HTMLInputElement).value;
-      if (val === "Other") {
-        const otherInput = (
-          document.getElementById("me-job-type-other-input") as HTMLInputElement
-        ).value;
-        if (otherInput.trim()) {
-          preferredJobTypes.push(
-            ...otherInput
-              .split(",")
-              .map((s) => s.trim())
-              .filter((s) => s),
-          );
+      const preferredJobTypes: string[] = [];
+      document.querySelectorAll(".me-job-type-cb:checked").forEach((cb) => {
+        const val = (cb as HTMLInputElement).value;
+        if (val === "Other") {
+          const otherInput = (
+            document.getElementById("me-job-type-other-input") as HTMLInputElement
+          ).value;
+          if (otherInput.trim()) {
+            preferredJobTypes.push(
+              ...otherInput
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            );
+          } else {
+            preferredJobTypes.push("Other");
+          }
         } else {
-          preferredJobTypes.push("Other");
+          preferredJobTypes.push(val);
         }
-      } else {
-        preferredJobTypes.push(val);
+      });
+
+      // Filter out empty custom links before saving
+      customLinksData = customLinksData.filter(
+        (l) => l.name.trim() !== "" || l.url.trim() !== "",
+      );
+
+      const socialLinks = {
+        twitter: (document.getElementById("me-twitter") as HTMLInputElement)
+          .value,
+        mastodon: (document.getElementById("me-mastodon") as HTMLInputElement)
+          .value,
+        bluesky: (document.getElementById("me-bluesky") as HTMLInputElement)
+          .value,
+        linkedin: (document.getElementById("me-linkedin") as HTMLInputElement)
+          .value,
+        personalSite: (document.getElementById("me-site") as HTMLInputElement)
+          .value,
+        custom: customLinksData,
+      };
+
+      if (pendingHeadshotFile) {
+        currentHeadshotId = await saveImageBlob(pendingHeadshotFile);
+        pendingHeadshotFile = null;
       }
-    });
 
-    // Filter out empty custom links before saving
-    customLinksData = customLinksData.filter(
-      (l) => l.name.trim() !== "" || l.url.trim() !== "",
-    );
+      if (pendingDemoReelFile) {
+        currentDemoReelId = await saveAudioBlob(pendingDemoReelFile);
+        currentDemoReelFilename = pendingDemoReelFile.name;
+        pendingDemoReelFile = null;
+      }
 
-    const socialLinks = {
-      twitter: (document.getElementById("me-twitter") as HTMLInputElement)
-        .value,
-      mastodon: (document.getElementById("me-mastodon") as HTMLInputElement)
-        .value,
-      bluesky: (document.getElementById("me-bluesky") as HTMLInputElement)
-        .value,
-      linkedin: (document.getElementById("me-linkedin") as HTMLInputElement)
-        .value,
-      personalSite: (document.getElementById("me-site") as HTMLInputElement)
-        .value,
-      custom: customLinksData,
-    };
+      const profile: UserProfile = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        address,
+        yearsOfExperience,
+        preferredJobTypes,
+        socialLinks,
+        roleHistory: currentRoleHistory,
+        headshotId: currentHeadshotId,
+        demoReelId: currentDemoReelId,
+        demoReelFilename: currentDemoReelFilename,
+      };
 
-    if (pendingHeadshotFile) {
-      currentHeadshotId = await saveImageBlob(pendingHeadshotFile);
-      pendingHeadshotFile = null;
+      DataStore.setUserProfile(profile);
+      EventBus.emit("notify", { message: "Profile saved successfully!", type: "success" });
+
+      renderCustomLinks(); // Re-render to clear out removed blanks from UI
+    } catch (error: any) {
+      console.error("Profile save error:", error);
+      console.error("Error name:", error?.name);
+      if (error?.name === 'QuotaExceededError') {
+        EventBus.emit("notify", { message: "Failed to upload image. Storage limit may be reached.", type: "error" });
+      } else {
+        EventBus.emit("notify", { message: "Failed to save profile.", type: "error" });
+      }
     }
-
-    if (pendingDemoReelFile) {
-      currentDemoReelId = await saveAudioBlob(pendingDemoReelFile);
-      currentDemoReelFilename = pendingDemoReelFile.name;
-      pendingDemoReelFile = null;
-    }
-
-    const profile: UserProfile = {
-      firstName,
-      lastName,
-      email,
-      phone,
-      address,
-      yearsOfExperience,
-      preferredJobTypes,
-      socialLinks,
-      roleHistory: currentRoleHistory,
-      headshotId: currentHeadshotId,
-      demoReelId: currentDemoReelId,
-      demoReelFilename: currentDemoReelFilename,
-    };
-
-    DataStore.setUserProfile(profile);
-    alert("Profile saved successfully!");
-
-    renderCustomLinks(); // Re-render to clear out removed blanks from UI
   };
 
   document

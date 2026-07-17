@@ -1,0 +1,18 @@
+const fs = require('fs');
+const buffer = Buffer.alloc(44 + 8000);
+buffer.write('RIFF', 0);
+buffer.writeUInt32LE(36 + 8000, 4);
+buffer.write('WAVE', 8);
+buffer.write('fmt ', 12);
+buffer.writeUInt32LE(16, 16);
+buffer.writeUInt16LE(1, 20);
+buffer.writeUInt16LE(1, 22);
+buffer.writeUInt32LE(8000, 24);
+buffer.writeUInt32LE(8000, 28);
+buffer.writeUInt16LE(1, 32);
+buffer.writeUInt16LE(8, 34);
+buffer.write('data', 36);
+buffer.writeUInt32LE(8000, 40);
+const b64 = buffer.toString('base64');
+console.log("BASE64:", b64.substring(0, 50) + "...");
+fs.writeFileSync('test-real.wav', buffer);

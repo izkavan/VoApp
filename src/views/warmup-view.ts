@@ -1,6 +1,6 @@
 import { Character, Project, Warmup, SystemSettings } from "../types.js";
 import { generateCharacterOptionsHTML } from "../utils/dom-utils.js";
-import { loadFromLocalStorage } from "../services/storage.js";
+import { DataStore } from "../services/DataStore.js";
 import { convertWebMToWav } from "../utils/audio-utils.js";
 
 let currentWarmups: Warmup[] = [];
@@ -11,6 +11,7 @@ let onSaveCallback: (warmups: Warmup[]) => void;
 let editingWarmupId: number | null = null;
 let mediaRecorder: MediaRecorder | null = null;
 let audioChunks: Blob[] = [];
+let currentWarmupTags: string[] = [];
 
 export function refreshWarmupView(
   projects: Project[],
@@ -75,6 +76,7 @@ export function initializeWarmupView(
   setupFilters();
   renderWarmupGrid();
   setupModalEvents();
+  setupTagging();
 }
 
 function setupFilters() {
@@ -302,10 +304,9 @@ function openWarmupModal(warmup: Warmup | null) {
       document.getElementById("warmup-modal-text-input") as HTMLTextAreaElement
     ).value = warmup.text;
 
-    renderTags(warmup.tags);
-    (
-      document.getElementById("warmup-modal-tags-input") as HTMLInputElement
-    ).value = warmup.tags.join(", ");
+    currentWarmupTags = [...warmup.tags];
+    renderTagsView(currentWarmupTags);
+    renderActiveTags();
 
     renderStars(warmup.rating);
     renderAttachedCharacters(warmup.characterIds);
@@ -323,10 +324,10 @@ function openWarmupModal(warmup: Warmup | null) {
       document.getElementById("warmup-modal-text-input") as HTMLTextAreaElement
     ).value = "";
 
-    renderTags([]);
-    (
-      document.getElementById("warmup-modal-tags-input") as HTMLInputElement
-    ).value = "";
+    currentWarmupTags = [];
+    renderTagsView([]);
+    renderActiveTags();
+    (document.getElementById("warmup-modal-tags-input") as HTMLInputElement).value = "";
 
     renderStars(0);
     document
@@ -361,7 +362,7 @@ function setModalEditMode(isEditing: boolean) {
   const textEl = document.getElementById("warmup-modal-text")!;
   const textInp = document.getElementById("warmup-modal-text-input")!;
   const tagsEl = document.getElementById("warmup-modal-tags")!;
-  const tagsInp = document.getElementById("warmup-modal-tags-input")!;
+  const tagsContainer = document.getElementById("warmup-modal-tags-container")!;
   const editBtn = document.getElementById("warmup-modal-edit-btn")!;
   const saveBtn = document.getElementById("warmup-modal-save-btn")!;
 
@@ -371,7 +372,7 @@ function setModalEditMode(isEditing: boolean) {
     textEl.classList.add("hidden");
     textInp.classList.remove("hidden");
     tagsEl.classList.add("hidden");
-    tagsInp.classList.remove("hidden");
+    tagsContainer.classList.remove("hidden");
     editBtn.classList.add("hidden");
     saveBtn.classList.remove("hidden");
   } else {
@@ -380,7 +381,7 @@ function setModalEditMode(isEditing: boolean) {
     textEl.classList.remove("hidden");
     textInp.classList.add("hidden");
     tagsEl.classList.remove("hidden");
-    tagsInp.classList.add("hidden");
+    tagsContainer.classList.add("hidden");
     editBtn.classList.remove("hidden");
     saveBtn.classList.add("hidden");
   }
@@ -393,13 +394,7 @@ function saveModalChanges() {
   const text = (
     document.getElementById("warmup-modal-text-input") as HTMLTextAreaElement
   ).value.trim();
-  const tagsStr = (
-    document.getElementById("warmup-modal-tags-input") as HTMLInputElement
-  ).value;
-  const tags = tagsStr
-    .split(",")
-    .map((t) => t.trim())
-    .filter((t) => t.length > 0);
+  const tags = [...currentWarmupTags];
 
   if (!title) {
     alert("Title is required.");
@@ -438,7 +433,7 @@ function saveModalChanges() {
   if (w) {
     document.getElementById("warmup-modal-title")!.textContent = w.title;
     document.getElementById("warmup-modal-text")!.textContent = w.text;
-    renderTags(w.tags);
+    renderTagsView(w.tags);
   }
 
   setModalEditMode(false);
@@ -470,12 +465,80 @@ function renderStars(rating: number) {
   div.innerHTML = html;
 }
 
-function renderTags(tags: string[]) {
+function renderTagsView(tags: string[]) {
   const div = document.getElementById("warmup-modal-tags");
   if (!div) return;
   div.innerHTML = tags
     .map((t) => `<span class="warmup-card-tag">${t}</span>`)
     .join("");
+}
+
+function renderActiveTags() {
+  const container = document.getElementById("warmup-active-tags-container");
+  if (!container) return;
+  container.innerHTML = "";
+  currentWarmupTags.forEach((tag) => {
+    const span = document.createElement("span");
+    span.className = "tag";
+    span.textContent = tag;
+    const removeBtn = document.createElement("span");
+    removeBtn.className = "tag-remove";
+    removeBtn.textContent = " x";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.addEventListener("click", () => {
+      currentWarmupTags = currentWarmupTags.filter((t) => t !== tag);
+      renderActiveTags();
+    });
+    span.appendChild(removeBtn);
+    container.appendChild(span);
+  });
+}
+
+function setupTagging() {
+  const tagsInput = document.getElementById("warmup-modal-tags-input") as HTMLInputElement;
+  const tagSuggestions = document.getElementById("warmup-tag-suggestions");
+
+  tagsInput?.addEventListener("input", () => {
+    const val = tagsInput.value.toLowerCase();
+    if (tagSuggestions) tagSuggestions.innerHTML = "";
+    if (!val) return;
+
+    const allExistingTags = Array.from(
+      new Set([...currentWarmups.flatMap((w) => w.tags), ...currentCharacters.flatMap(c => c.tags)])
+    );
+
+    const matches = allExistingTags.filter(
+      (t) => t.toLowerCase().includes(val) && !currentWarmupTags.includes(t),
+    );
+    matches.forEach((m) => {
+      const div = document.createElement("div");
+      div.className = "tag-suggestion";
+      div.textContent = m;
+      div.addEventListener("click", () => {
+        addTag(m);
+        tagsInput.value = "";
+        if (tagSuggestions) tagSuggestions.innerHTML = "";
+      });
+      tagSuggestions?.appendChild(div);
+    });
+  });
+
+  tagsInput?.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === "," || e.key === " ") && tagsInput.value.trim()) {
+      e.preventDefault();
+      const val = tagsInput.value.replace(/,/g, "").trim();
+      if (val) addTag(val);
+      tagsInput.value = "";
+      if (tagSuggestions) tagSuggestions.innerHTML = "";
+    }
+  });
+}
+
+function addTag(tag: string) {
+  if (!currentWarmupTags.includes(tag)) {
+    currentWarmupTags.push(tag);
+    renderActiveTags();
+  }
 }
 
 function populateModalCharacterSelect() {
@@ -600,7 +663,7 @@ function setupAudioRecorder() {
 
           downloadBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
-            const settings = loadFromLocalStorage().settings;
+            const settings = DataStore.getSettings();
             const ext = settings.exportFormat || "webm";
             let exportBlob = audioBlob;
             if (ext === "wav") {

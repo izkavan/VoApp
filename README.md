@@ -126,6 +126,7 @@ Here are some of the features that I thought up for the app that could be coming
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 * Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
 * Video Guide to the feature list. Either a single large youtube video with all the annotated sections, or a smaller set of youtube videos for each "view".
+* **Allure/V8/Istanbul Code Coverage** : allure-playwright and some vite instrumentation could give a much clearer picture about what portions of the application are and are not covered by the test suites.
 
 ### Changes to the Character and Project Management
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
@@ -157,7 +158,6 @@ Here are some of the features that I thought up for the app that could be coming
 * If we've got Timelines, Lore Pages, DM Notes, it would be nice to see if there's a way to get this page to load as a sub view in Foundry or other VTT systems to make life easier and not have to be alt-tabbing
 
 ### Changes for Directors/Writers/producers
-
 * **More Robust Audio Exports**: Editors live and die by file organization. Add a highly customizable export menu using tokens (e.g., [ProjectCode]_[CharacterInitials]_[LineNumber]_[TakeNumber]_[Rating]). When the editor/actor/director hits export, Vo-App perfectly names hundreds of audio files instantly, saving them hours of manual data entry.
 * It might be a good idea to also allow a script to bundle with it a project/character library, so that if you are sending it to someone you don't need to remember to do that as well. This gets into more and more complex data formats, so it's in the backlog for now. I'm thinking it would be something like "Prepare Production Package", and the resulting zip file would be able to see who has been selected for a project, and make a sub-folder-zip for each person that they can import and have all of their character descriptions, project, project library, scripts, etc. in one spot.
 * **Franken-bite**: Often, a director loves the first half of Take 1, and the second half of Take 3. Instead of just starring both and confusing the editor, the director could highlight specific words in the script text attached to each take. This generates an "Edit Decision List" (EDL) so the editor knows exactly which pieces to stitch together.... Could also use the Demo Reel Builder from the "Me" section
@@ -171,7 +171,6 @@ Here are some of the features that I thought up for the app that could be coming
 * **Vocal Range Mapper**: could be fun to have the user track what their highest and lowest comfortable notes are, map those on a keyboard, and then when they are making a character it can flag, "This pitch is outside your comfort zone"
 
 ### Community Platform
-
 * **Community & Platform Features:** I don't know how this would work without being hosted centrally, so this is a very very low priority. 
 1. **Community Sharing:** An opt-in platform to share and download "Vocal Recipes" or character templates to get a head start on new projects. 
 2. **Community Assistance**: Be able to post a voice to get feedback and review on the work-- Tag it with assistance tags or requests on specific features (Breath control, recovery, etc)
@@ -205,6 +204,7 @@ Dependencies:
 * npm install -D make-coverage-badge
 * npm install -D fake-indexeddb
 * npm install -D @tauri-apps/cli
+* npm install -D @playwright/test serve (Serve will )
 
 Also features:
 * npx make-coverage-badge
@@ -212,10 +212,18 @@ Also features:
 
 install/run via npm
 
+## Useful commands
 * `npm run build && npx serve dist` to make and serve the project locally
 * `npm run build && npm run test:coverage` to make and run the test, while updating coverage
 * `npx make-coverage-badge` for coverage badge updates by itself
+* `npm run test:e2e` for headless e2e tests
+* `npm run test:e2e -- --[ui|headed]` for headed tests. UI uses the Playwright built in ui.
+* `npx playwright show-report` to show the full breakdown of tests
 * `npx tauri build` for the tauri system to build the application into a standalone.
+* `fuser -k [port]/tcp` - Kills any leftover process on the specified [port]
+* `fuser -k [port]/tcp || true && npm run build && npx serve dist &` Kills whatever is on the [port], builds, and serves.
+
+
 
 ## Test Coverage Metrics:
 ### General Health
@@ -228,3 +236,23 @@ install/run via npm
 #### Views: 50.10%
 
 *For a detailed breakdown of covered lines and branches, see [TEST_COVERAGE.md](./TEST_COVERAGE.md).*
+### e2e Routes
+
+| Route / View | Status | Test File(s) | Purpose & Notes |
+| :--- | :--- | :--- | :--- |
+| **Me Profile** | 🟢 Full | `me-profile.spec.ts` | Covers profile setup and data handling. |
+| **Project Management** | 🟢 Full | `project-lifecycle.spec.ts` | Validates project creation, editing, and deletion. |
+| **Character Management** | 🟢 Full | `character-lifecycle.spec.ts` | Validates character creation, editing, and deletion. |
+| **Settings** | 🟢 Full | `settings.spec.ts` | Covers application settings configuration. |
+| **Utilities: Warmups** | 🟢 Full | `utilities.spec.ts` | Exercises vocal warmup tools. |
+| **Utilities: Voice Memos** | 🟢 Full | `utilities.spec.ts` | Covers memo recording and playback UI. |
+| **Utilities: Audio Overlay**| 🟢 Full | `utilities.spec.ts` | Checks audio overlay component functionality. |
+| **Voice Actor View** | 🟢 Full | `voice-actor-view.spec.ts` | Validates Teleprompter and Effect Library tools. |
+| **Voice Production (VP)** | 🟢 Full | `voice-production-view.spec.ts` | Validates uploading scripts, generating sides, zip-based audition reviews, table reads, and feedback. |
+| **Line Reader** | 🟢 Full | `voice-actor-view.spec.ts` | Validates uploading scripts, tracking lines, and recording takes. |
+| **Audition View** | 🟢 Full | `voice-actor-view.spec.ts` | Validates audition metadata, audio recording, and ZIP exports. |
+| **Dungeon Master View** | 🟢 Full | `storytellers.spec.ts` | Validates DM Session builder and Character Generator. |
+| **Character Notes View** | 🟢 Full | `storytellers.spec.ts` | Covers Character Journal creation, editing, and filtering. |
+| **Effect Library** | 🟢 Full | `voice-actor-view.spec.ts` | Validates creating, tagging, and exporting mock sound effects. |
+| **Craft Demo Reel** | 🟢 Full | `me-profile.spec.ts` | Covers launching the workspace, reordering audio clips, and exporting a merged reel. |
+| **System/Data Integrity** | 🟢 Full | `database-io.spec.ts`, `cascading-deletes.spec.ts`, etc. | (Non-visual) Validates state, DB isolation, quotas, and legacy migrations. |

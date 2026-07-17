@@ -9,8 +9,8 @@ export function initializeToastSystem() {
     document.body.appendChild(container);
   }
 
-  EventBus.on("notify", (payload: any) => {
-    const { message, type = "info" } = payload;
+  EventBus.on("notify", (event: any) => {
+    const { message, type = "info" } = event.detail || event;
     showToast(message, type, container!);
   });
 }
