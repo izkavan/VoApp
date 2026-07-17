@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/coverage';
 import { BasePage } from '../pages/BasePage';
 import { ProjectModalPage } from '../pages/ProjectModalPage';
 import { CharacterModalPage } from '../pages/CharacterModalPage';

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/coverage';
 import { MePage } from '../pages/MePage';
 import { BasePage } from '../pages/BasePage';
 import * as path from 'path';

@@ -194,35 +194,32 @@ If you feel like this project is fun enough to kick a few bucks to, check me out
 
 
 # Technical callouts
-Dependencies:
-* Typescript
-* Rust (for Tauri)
-* npm install --save-dev @types/jszip
-* npm install --save-dev @types/node
-* npm install -D vitest jsdom
-* npm install -D @vitest/coverage-v8
-* npm install -D make-coverage-badge
-* npm install -D fake-indexeddb
-* npm install -D @tauri-apps/cli
-* npm install -D @playwright/test serve (Serve will )
 
-Also features:
-* npx make-coverage-badge
-* npx vitest run --coverage
+**Core Technologies:**
+* TypeScript
+* Rust (for Tauri desktop builds)
+* NPM
 
-install/run via npm
+**Setup:**
+Because all dependencies are tracked in the `package.json`, you do not need to install them individually. Simply run the following command from the root of the project to install all required libraries (Vite, Playwright, Vitest, Tauri, etc.):
+
+```bash
+npm install
+```
 
 ## Useful commands
-* `npm run build && npx serve dist` to make and serve the project locally
-* `npm run build && npm run test:coverage` to make and run the test, while updating coverage
-* `npx make-coverage-badge` for coverage badge updates by itself
-* `npm run test:e2e` for headless e2e tests
+* `npm run dev` to start the Vite development server with Hot Module Replacement (HMR).
+* `npm run build && npm run preview` to build the production bundle and serve it locally.
+* `npm run build && npm run test:coverage` to make and run the unit tests, while updating coverage.
+* `npx make-coverage-badge` for coverage badge updates by itself.
+* `npm run test:e2e` for headless Playwright e2e tests (automatically collects V8 coverage).
 * `npm run test:e2e -- --[ui|headed]` for headed tests. UI uses the Playwright built in ui.
-* `npx playwright show-report` to show the full breakdown of tests
-* `npx tauri build` for the tauri system to build the application into a standalone.
-* `fuser -k [port]/tcp` - Kills any leftover process on the specified [port]
-* `fuser -k [port]/tcp || true && npm run build && npx serve dist &` Kills whatever is on the [port], builds, and serves.
-
+* `npx playwright show-report` to show the standard Playwright breakdown of tests.
+* `npx monocart show-report test-results/coverage/index.html` to view the unified E2E V8 Code Coverage report.
+* `npm run tauri build` for the Tauri system to build the application into a standalone desktop runtime.
+* `fuser -k [port]/tcp` - Kills any leftover process on the specified [port].
+* `npx monocart show-report test-results/coverage/index.html` Show the coverage report for e2e tests after they've been run
+* `npx vitest run --coverage` unit test coverage through vitest
 
 
 ## Test Coverage Metrics:

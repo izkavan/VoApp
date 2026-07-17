@@ -10,7 +10,22 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [
+    ['list'],
+    ['monocart-reporter', {
+      name: "E2E V8 Coverage Report",
+      outputFile: './test-results/coverage/index.html',
+      coverage: {
+        entryFilter: (entry: any) => true,
+        sourceFilter: (sourcePath: string) => sourcePath.search(/src\//) !== -1,
+        sourcePath: (fileSource: string) => {
+          const match = fileSource.match(/src\/.*/);
+          return match ? match[0] : fileSource;
+        },
+        all: './src'
+      }
+    }]
+  ],
   use: {
     actionTimeout: 0,
     baseURL: 'http://localhost:8080',
@@ -32,7 +47,7 @@ export default defineConfig({
   ],
   outputDir: 'test-results/',
   webServer: {
-    command: 'npm run build && npx serve dist -p 8080',
+    command: 'npm run build && npm run preview',
     port: 8080,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
