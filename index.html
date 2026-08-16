@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/src/images/favicon.svg">
     <link rel="stylesheet" href="/src/styles.css">
-    <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+    <script async defer src="https://assets.pinterest.com/js/pinit.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -1258,10 +1258,10 @@
                     </div>
                     
                     <div style="display: flex; gap: 15px; align-items: center;">
-                        <button id="script-import-add-char" class="primary-btn" disabled>Add Character</button>
-                        <button id="script-import-add-scene" class="primary-btn" disabled>Scene Text</button>
-                        <button id="script-import-add-title" class="primary-btn" disabled>Title Text</button>
-                        <button id="script-import-reset-btn" class="secondary-btn">Reset</button>
+                        <button id="script-import-add-char" class="primary-btn" disabled title="Hotkey: c">Add Character</button>
+                        <button id="script-import-add-scene" class="primary-btn" disabled title="Hotkey: s">Scene Text</button>
+                        <button id="script-import-add-title" class="primary-btn" disabled title="Hotkey: t">Title Text</button>
+                        <button id="script-import-reset-btn" class="secondary-btn" title="Reset selected, select none to reset all">Reset</button>
                     </div>
                 </div>
                 
@@ -1279,12 +1279,12 @@
 
             <div style="display: flex; flex: 1; min-height: 0; gap: 20px; padding-top: 15px;">
                 <!-- Left List View -->
-                <div id="script-import-list" style="flex: 1; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-y: auto; padding: 10px; background: var(--bg-color-light); display: flex; flex-direction: column; gap: 8px;">
+                <div id="script-import-list" style="flex: 1; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-y: auto; padding: 10px; background: rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; gap: 8px;">
                     <!-- List items generated here -->
                 </div>
                 
                 <!-- Right Text Area -->
-                <div id="script-import-textarea" style="flex: 2; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-y: auto; padding: 15px; background: var(--bg-color); font-family: monospace; white-space: pre-wrap; line-height: 1.6; user-select: none; position: relative;">
+                <div id="script-import-textarea" style="flex: 2; border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow-y: auto; padding: 15px; background: rgba(0, 0, 0, 0.3); font-family: monospace; white-space: pre-wrap; line-height: 1.6; user-select: none; position: relative;">
                     <!-- Text content loaded here -->
                 </div>
             </div>

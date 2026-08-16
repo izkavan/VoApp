@@ -193,11 +193,11 @@ function handleProjectChange() {
   updateButtonStates();
 }
 
-function isSegmentAssigned(
+function getSegmentAssignmentId(
   lineIdx: number,
   charIdxStart: number,
   charIdxEnd: number,
-) {
+): string | null {
   const startOffset = lineIdx * 100000 + charIdxStart;
   const endOffset = lineIdx * 100000 + charIdxEnd;
 
@@ -206,10 +206,10 @@ function isSegmentAssigned(
       startOffset < assigned.originalEnd &&
       endOffset > assigned.originalStart
     ) {
-      return true;
+      return assigned.id;
     }
   }
-  return false;
+  return null;
 }
 
 function renderTextContent() {
@@ -228,7 +228,7 @@ function renderTextContent() {
     if (isLineMode) {
       const segStart = lineIdx * 100000;
       const segEnd = segStart + lineText.length;
-      const assigned = isSegmentAssigned(lineIdx, 0, lineText.length);
+      const assignedId = getSegmentAssignmentId(lineIdx, 0, lineText.length);
 
       const span = document.createElement("span");
       span.textContent = lineText;
@@ -237,8 +237,12 @@ function renderTextContent() {
       span.dataset.end = segEnd.toString();
       span.dataset.text = lineText;
 
-      if (assigned) {
+      if (assignedId) {
         span.className = "import-assigned";
+        span.dataset.assignedId = assignedId;
+        if (lockedElementId === assignedId) {
+          span.classList.add("assigned-locked");
+        }
       } else {
         span.className = "import-highlight";
         if (lockedElementId === span.dataset.id) {
@@ -254,7 +258,7 @@ function renderTextContent() {
         if (!sentence) return;
         const segStart = lineIdx * 100000 + cursor;
         const segEnd = segStart + sentence.length;
-        const assigned = isSegmentAssigned(
+        const assignedId = getSegmentAssignmentId(
           lineIdx,
           cursor,
           cursor + sentence.length,
@@ -267,8 +271,12 @@ function renderTextContent() {
         span.dataset.end = segEnd.toString();
         span.dataset.text = sentence;
 
-        if (assigned) {
+        if (assignedId) {
           span.className = "import-assigned";
+          span.dataset.assignedId = assignedId;
+          if (lockedElementId === assignedId) {
+            span.classList.add("assigned-locked");
+          }
         } else {
           span.className = "import-highlight";
           if (lockedElementId === span.dataset.id) {
@@ -392,9 +400,22 @@ function renderListView() {
 
     item.dataset.lineId = line.id;
 
+    item.addEventListener("mouseenter", () => {
+      const spans = textareaContainer.querySelectorAll(`span[data-assigned-id="${line.id}"]`);
+      spans.forEach(span => span.classList.add("assigned-hovered"));
+    });
+    
+    item.addEventListener("mouseleave", () => {
+      const spans = textareaContainer.querySelectorAll(`span[data-assigned-id="${line.id}"]`);
+      spans.forEach(span => span.classList.remove("assigned-hovered"));
+    });
+
     item.addEventListener("click", () => {
       const allItems = listContainer.querySelectorAll(".import-list-item");
       allItems.forEach((el: any) => (el.style.backgroundColor = ""));
+      
+      const allLocked = textareaContainer.querySelectorAll(".assigned-locked");
+      allLocked.forEach((el: any) => el.classList.remove("assigned-locked"));
 
       if (lockedElementId === line.id) {
         lockedElementId = null;
@@ -403,6 +424,9 @@ function renderListView() {
         item.style.backgroundColor = "var(--gray-300)";
         if (document.body.classList.contains("dark-mode"))
           item.style.backgroundColor = "var(--gray-600)";
+          
+        const spans = textareaContainer.querySelectorAll(`span[data-assigned-id="${line.id}"]`);
+        spans.forEach(span => span.classList.add("assigned-locked"));
 
         if (
           line.type === "line" &&

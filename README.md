@@ -5,6 +5,9 @@ Welcome to Vo-App! This is a "simple", "lightweight" tool designed to help you k
 
 As the project progresses, I am likely going to drop that Simple tag, as well as lightweight; The intent of this is to be a one-stop shop for a number of features that Voice Actors, Podcasters, DMs, and others to find common ground on. I sort of want this to be the "connective tissue" of the industry, for teams that feel that it's a good fit!
 
+If text is a lot for you to take in, check out the youtube overview!
+https://youtu.be/Z8qLPntvOhE
+
 ### Please Note: 
 * I have no interest in selling this application to a corporation.
 * I have no interest in making a "Premium" tier and gating features behind it
@@ -126,8 +129,6 @@ Here are some of the features that I thought up for the app that could be coming
 * Extend the current recording plugin to have a Waveform viewer with all audio (optional button/setting to expand and see?)
 * Version histories on characters, projects, scripts? That way if you make a change you don't like, you can roll back. This might be needlessly complicated, though.
 * Video Guide to the feature list. Either a single large youtube video with all the annotated sections, or a smaller set of youtube videos for each "view".
-* **Allure/V8/Istanbul Code Coverage** : allure-playwright and some vite instrumentation could give a much clearer picture about what portions of the application are and are not covered by the test suites.
-
 ### Changes to the Character and Project Management
 * **Character Arc Tracker:** A timeline view for a character to log key development moments and attach new voice samples that reflect their evolution over a story. I thought of this while watching clips of Avatar the Last Airbender, and tracking the changes in Zuko's voice by Dante Basco-- The brash and arrogance from his earlier arc fading into a more even tempered and even resigned tone in the mid-late arc, and picking back up into a self-confident and more level headed tone of the ending.
 * An update to the dictionary: "Accent rulebooks". Like, "this society has what we would consider rhoticism." or "All words with a hard G are glottal stopped".
@@ -147,6 +148,7 @@ Here are some of the features that I thought up for the app that could be coming
 * Could look into lightweight VSTs, like radio/telephone, some compression, for exports.
 * An overlay widget that shows pitch? Could be good for characters who sing, or who thematically need to sit in a specific range of tone. Could also be useful for replication purposes if you say "sits at a C5".
 * IPA Keyboard overlay/underlay with the dictionary-- I know this is over in VA section rather than the Character/project system, but I've met very few people who know of, understand, or care about the IPA symbols that aren't knee deep in linguistics of D'ni, or voice actors. Tishmah shorah!
+* Video sync system, upload a video and a script, and you can record your lines. Can also look at "sync markers" in the video that can get tied to a specific line, so you can select "I want to run this line until it's right" and it just loops that section of video and displays that text.
 
 ### Changes for Story Tellers
 * **Quick-Key Support:** In the Live Session view, assign hotkeys (e.g., `Ctrl+1`, `Ctrl+2`) to characters to instantly pull up their info or play their anchor phrase. Perfect for rapid switching between NPCs. 
@@ -154,7 +156,7 @@ Here are some of the features that I thought up for the app that could be coming
 * Could expand characters to have a "lineage/faction" tag system... Could use the core tags for that now though.
 * Live session view can have so many additional features added to it-- Soundboards, idle soundscapes, etc. would be a big one, but I don't know if we want to compete with things like Syrinscape. 
 * I've never found a timeline feature I like, could be good to have one.
-* Linking to the timeline feature, it could also support individual character journals, and a DM journal, to keep track of events and what their fallout is. 
+* Linking to the timeline feature, it could also support a DM journal, to keep track of events and what their fallout is. 
 * If we've got Timelines, Lore Pages, DM Notes, it would be nice to see if there's a way to get this page to load as a sub view in Foundry or other VTT systems to make life easier and not have to be alt-tabbing
 
 ### Changes for Directors/Writers/producers

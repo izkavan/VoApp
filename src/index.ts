@@ -252,7 +252,10 @@ window.addEventListener("click", (e) => {
   if (target.classList.contains("modal")) {
     if (target.id === "modal") closeModal();
     else if (target.id === "project-modal") closeProjectModal();
-    else target.style.display = "none";
+    else {
+      target.classList.add("hidden");
+      target.style.display = "";
+    }
   }
 });
 
@@ -294,10 +297,18 @@ async function initApp() {
     modalContentElement as HTMLElement,
     characters,
     projects,
-    (char, art, samp, rec) =>
-      CharacterManager.saveCharacter(char, art, samp, rec),
-    (char) => CharacterManager.duplicateCharacter(char),
-    (id) => CharacterManager.deleteCharacter(id),
+    async (char, art, samp, rec) => {
+      await CharacterManager.saveCharacter(char, art, samp, rec);
+      initialRenderApp();
+    },
+    (char) => {
+      CharacterManager.duplicateCharacter(char);
+      initialRenderApp();
+    },
+    (id) => {
+      CharacterManager.deleteCharacter(id);
+      initialRenderApp();
+    },
   );
 
   initializeDictionaryModal(

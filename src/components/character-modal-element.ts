@@ -96,13 +96,7 @@ export class CharacterModalElement extends HTMLElement {
       this.bindEditEvents();
     } else {
       this.bindViewEvents();
-      if (this.currentMoodboardType === "pinterest") {
-        setTimeout(() => {
-          if ((window as any).PinUtils) {
-            (window as any).PinUtils.build();
-          }
-        }, 100);
-      }
+      // Pinterest widget will be built when the collapsible is opened
     }
     this.bindCollapsibles();
   }
@@ -232,11 +226,17 @@ export class CharacterModalElement extends HTMLElement {
 
     let moodboardDisplay = "";
     if (char.moodboardType === "pinterest" && char.pinterestBoardUrl) {
+      let pinDo = "embedBoard";
+      let pinAttrs = 'data-pin-board-width="400" data-pin-scale-height="240" data-pin-scale-width="80"';
+      if (char.pinterestBoardUrl.includes("/pin/")) {
+        pinDo = "embedPin";
+        pinAttrs = 'data-pin-width="large"';
+      }
       moodboardDisplay = `
                 <div class="collapsible-section" style="margin-top: 20px;">
                     <h3 class="collapsible-header">Mood Board (Pinterest)</h3>
-                    <div class="collapsible-content" style="display: none; overflow-y: auto; max-height: 600px;">
-                        <a data-pin-do="embedBoard" data-pin-board-width="400" data-pin-scale-height="240" data-pin-scale-width="80" href="${HtmlSanitizer.escape(char.pinterestBoardUrl)}"></a>
+                    <div class="collapsible-content" style="display: none; overflow-y: auto; max-height: 600px; text-align: center;">
+                        <a data-pin-do="${pinDo}" ${pinAttrs} href="${HtmlSanitizer.escape(char.pinterestBoardUrl)}"></a>
                     </div>
                 </div>
             `;
@@ -496,8 +496,14 @@ export class CharacterModalElement extends HTMLElement {
         header.classList.toggle("active");
         const content = header.nextElementSibling as HTMLElement;
         if (content) {
-          content.style.display =
-            content.style.display === "block" ? "none" : "block";
+          const isOpening = content.style.display === "none";
+          content.style.display = isOpening ? "block" : "none";
+          
+          if (isOpening && content.querySelector('a[data-pin-do]')) {
+            if ((window as any).PinUtils) {
+              (window as any).PinUtils.build();
+            }
+          }
         }
       });
     });

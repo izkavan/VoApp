@@ -2481,3 +2481,14 @@ body.dark-mode .ipa-btn:hover {
 .toast-icon {
   font-size: 16px;
 }
+
+#script-import-textarea span.assigned-hovered {
+  background-color: yellow !important;
+  color: black !important;
+}
+
+#script-import-textarea span.assigned-locked {
+  background-color: orange !important;
+  color: black !important;
+  font-weight: bold;
+}
